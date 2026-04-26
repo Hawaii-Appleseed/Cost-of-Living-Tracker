@@ -9,90 +9,4018 @@
   ],
   "ci90_coverage_by_indicator_method": {
     "B19013_001E": {
-      "multi_anchor": 0.9583333333333334,
-      "trend_ensemble": 0.9583333333333334
+      "multi_anchor": 0.9333333333333333,
+      "trend_ensemble": 0.95
     },
     "B25058_001E": {
-      "multi_anchor": 0.875,
-      "trend_ensemble": 0.875
+      "multi_anchor": 0.9333333333333333,
+      "trend_ensemble": 0.9
     },
     "B25064_001E": {
-      "multi_anchor": 0.9583333333333334,
-      "trend_ensemble": 0.8333333333333334
+      "multi_anchor": 0.95,
+      "trend_ensemble": 0.8166666666666667
     },
     "B25077_001E": {
-      "multi_anchor": 0.9583333333333334,
-      "trend_ensemble": 0.875
+      "multi_anchor": 0.9333333333333333,
+      "trend_ensemble": 0.9333333333333333
     }
   },
   "ci90_coverage_post_override": {
     "B19013_001E": {
-      "multi_anchor": 0.9166666666666666,
-      "trend_ensemble": 0.9166666666666666
+      "multi_anchor": 0.9333333333333333,
+      "trend_ensemble": 0.95
     },
     "B25058_001E": {
-      "multi_anchor": 0.875,
-      "trend_ensemble": 0.875
+      "multi_anchor": 0.9333333333333333,
+      "trend_ensemble": 0.9
     },
     "B25064_001E": {
-      "multi_anchor": 0.875,
-      "trend_ensemble": 0.9166666666666666
+      "multi_anchor": 0.95,
+      "trend_ensemble": 0.95
     },
     "B25077_001E": {
-      "multi_anchor": 0.9166666666666666,
-      "trend_ensemble": 0.875
+      "multi_anchor": 0.9333333333333333,
+      "trend_ensemble": 0.9333333333333333
     }
   },
-  "horizon": 2,
+  "horizons": [
+    1,
+    2,
+    3
+  ],
   "rmse_by_indicator_method": {
     "B19013_001E": {
-      "multi_anchor": 0.06765679268716396,
-      "trend_ensemble": 0.07028450459087084
+      "multi_anchor": 0.07267700083601063,
+      "trend_ensemble": 0.07296134565950439
     },
     "B25058_001E": {
-      "multi_anchor": 0.09451976332047768,
-      "trend_ensemble": 0.1036646068289773
+      "multi_anchor": 0.08474444406810272,
+      "trend_ensemble": 0.09783367987255746
     },
     "B25064_001E": {
-      "multi_anchor": 0.0865781484739998,
-      "trend_ensemble": 0.09720513418265446
+      "multi_anchor": 0.08204967266926261,
+      "trend_ensemble": 0.0957201118348056
     },
     "B25077_001E": {
-      "multi_anchor": 0.06160300687402799,
-      "trend_ensemble": 0.0732133799825521
+      "multi_anchor": 0.06992209346577563,
+      "trend_ensemble": 0.07653073904048525
     }
   },
   "rmse_by_indicator_source": {
     "B19013_001E": {
-      "cpi_honolulu_allitems": 0.07081652426154833,
-      "pce_deflator": 0.0697560644933417,
-      "qcew_hawaii_wages": 0.06528840734729513
+      "cpi_honolulu_allitems": 0.08024428972133447,
+      "pce_deflator": 0.07955946885240248,
+      "qcew_hawaii_wages": 0.07216228312808973
     },
     "B25058_001E": {
-      "cpi_honolulu_rent": 0.09892298595709118,
-      "hud_fmr_honolulu": 0.0951516056521171
+      "cpi_honolulu_rent": 0.09241492822133711,
+      "hud_fmr_honolulu": 0.09275176149325892
     },
     "B25064_001E": {
-      "cpi_honolulu_rent": 0.0900394884376818,
-      "hud_fmr_honolulu": 0.08871064068417485
+      "cpi_honolulu_rent": 0.08777953950535569,
+      "hud_fmr_honolulu": 0.08953392851373791
     },
     "B25077_001E": {
-      "fred_hi_hpi": 0.06160300687402799
+      "fred_hi_hpi": 0.07106843421624265
     }
   },
-  "run_date": "2026-04-25",
-  "schema_version": 2,
+  "run_date": "2026-04-26",
+  "schema_version": 3,
   "se_inflator_override_by_indicator_method": {
-    "B19013_001E": {
-      "multi_anchor": 1.0499,
-      "trend_ensemble": 1.1749
-    },
     "B25064_001E": {
-      "multi_anchor": 1.0499,
-      "trend_ensemble": 1.8392
-    },
-    "B25077_001E": {
-      "multi_anchor": 1.0499
+      "trend_ensemble": 2.6
     }
+  },
+  "strata_records": {
+    "bias": [
+      {
+        "extra": {
+          "b_raw": 0.019941989867125823,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": 0.007747442338178134,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": 0.022201133375765923,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.015857335858825112,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.013793068788027945,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.021451324180882445,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.01646679791255702,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.044421254196009986,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.023085183777343664,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": -0.023085183777343664
+      },
+      {
+        "extra": {
+          "b_raw": -0.0297894303856123,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": -0.0297894303856123
+      },
+      {
+        "extra": {
+          "b_raw": -0.0459741628637353,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.08564463305211209,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.017256660133752613,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.035559165058883395,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.002036311483269026,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.04923557738170467,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.008203662219003623,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.00955543433735802,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.0017899370166469838,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.01688870568647948,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.06593773114199297,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": -0.06593773114199297
+      },
+      {
+        "extra": {
+          "b_raw": -0.04633575896512964,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": -0.04633575896512964
+      },
+      {
+        "extra": {
+          "b_raw": -0.11689415210490076,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.0957914990743667,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.007977005506319369,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.02574199315003175,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": 0.0028443612944568644,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.032877618698178755,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.015157971762312468,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.009065237957132155,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.017992630187360654,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.019992786510721294,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.06048479740295288,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": -0.06048479740295288
+      },
+      {
+        "extra": {
+          "b_raw": -0.037426363588022746,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": -0.037426363588022746
+      },
+      {
+        "extra": {
+          "b_raw": -0.10899691277810296,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.09203720366104721,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.03833635813776693,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": 0.004858029233980447,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.13004315526544086,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.05416505435387565,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.014132746324394629,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": 0.026063435719797867,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.0402833099812982,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": 0.017343735583706655,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.05515704115306506,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": -0.05515704115306506
+      },
+      {
+        "extra": {
+          "b_raw": -0.012705501374341394,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": -0.012705501374341394
+      },
+      {
+        "extra": {
+          "b_raw": -0.1475674334015693,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.07511319703189313,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": 0.020544428136096516,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": 0.0014528348189772685,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.0145060632212357,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.027576638851583124,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.029188911533714765,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": -0.029188911533714765
+      },
+      {
+        "extra": {
+          "b_raw": -0.044684151096678906,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": -0.044684151096678906
+      },
+      {
+        "extra": {
+          "b_raw": -0.013197900493623656,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.03920620834496907,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.006493335498375187,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.011510973363790412,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.07952611006543504,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": -0.07952611006543504
+      },
+      {
+        "extra": {
+          "b_raw": -0.05952395632759286,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": -0.05952395632759286
+      },
+      {
+        "extra": {
+          "b_raw": -0.00509130769277904,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.027644826629537614,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.015913880675658652,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.011979250904755925,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.0734213615029929,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": -0.0734213615029929
+      },
+      {
+        "extra": {
+          "b_raw": -0.0519892542741626,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": -0.0519892542741626
+      },
+      {
+        "extra": {
+          "b_raw": -0.06279150403847998,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.010881459722781178,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.02110622996623558,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": 0.023738182350173543,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.07979981241933286,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": -0.07979981241933286
+      },
+      {
+        "extra": {
+          "b_raw": -0.029347553549688526,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": -0.029347553549688526
+      },
+      {
+        "extra": {
+          "b_raw": -0.013084864538142178,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": -0.013084864538142178
+      },
+      {
+        "extra": {
+          "b_raw": -0.02887302655649092,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": -0.02887302655649092
+      },
+      {
+        "extra": {
+          "b_raw": -0.04468586403071724,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": -0.04468586403071724
+      },
+      {
+        "extra": {
+          "b_raw": -0.042441273590986296,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": -0.042441273590986296
+      },
+      {
+        "extra": {
+          "b_raw": -0.04196197784360588,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": -0.04196197784360588
+      },
+      {
+        "extra": {
+          "b_raw": -0.03590064652065469,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": -0.03590064652065469
+      },
+      {
+        "extra": {
+          "b_raw": -0.06087433971084532,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": -0.06087433971084532
+      },
+      {
+        "extra": {
+          "b_raw": -0.011459596117996173,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": -0.011459596117996173
+      }
+    ],
+    "coverage_post": [
+      {
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.9090909090909091
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.9090909090909091
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.9090909090909091
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.9090909090909091
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.7272727272727273
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.75
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.9090909090909091
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.9090909090909091
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.6363636363636364
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.5
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.8181818181818182
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.75
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.9090909090909091
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.8636363636363636
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.9090909090909091
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.75
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.7272727272727273
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.8636363636363636
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.8636363636363636
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.8666666666666667
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.7333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.8666666666666667
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.6
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.8
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.9
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.8
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.9
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.9
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.95
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.9
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.95
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.95
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.9333333333333333
+      }
+    ],
+    "coverage_pre": [
+      {
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.9090909090909091
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.9090909090909091
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.8181818181818182
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.9090909090909091
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.7272727272727273
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.75
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.9545454545454546
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.8181818181818182
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.6363636363636364
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.5
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.8181818181818182
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.75
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.9090909090909091
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.8636363636363636
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.9090909090909091
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.75
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.7272727272727273
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.8636363636363636
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.8666666666666667
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.7333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.9666666666666667
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.8666666666666667
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.6
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.8
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.9
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.8
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.9
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.95
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.9
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.8166666666666667
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.95
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.9333333333333333
+      }
+    ],
+    "rmse": [
+      {
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.06504750506378569
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.06520355030168833
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.0905009433361043
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.08143539418413136
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.028742043100873978
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.022610822427214274
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.02822458875056403
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.019357100040416044
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.08900902652395834
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.09500100271923952
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 0.08179686945717657
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 0.0688718354629926
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.08973160047605791
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.07215122201734474
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.10328018694887806
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.06678186912972728
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.04849099756056252
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.0458269636362557
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.060322949554392595
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.039646300525052025
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.10776876518474836
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.09918475288808647
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 0.13560893170596702
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 0.11724873184994132
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.09681260045255757
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.07540384419756083
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.11387313757178935
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.06351724814774429
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.0427098612415294
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.036090982553538174
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.049793846101417204
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.024581602280388123
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.10540956309440261
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.09630702872537314
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 0.12264965964649475
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 0.11426498469472747
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.06629536006093317
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.07242260725502575
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.08851299297422978
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.10586998366200924
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.058555249108949034
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.061094587121730576
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.0339533027947208
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.0730890889016146
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.07772789450246459
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.059769574062635666
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 0.10982387027415247
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 0.0788969449828545
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.07271159469399385
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.06990156240270658
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.028604970545100878
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.021790718952624265
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.08714416646842459
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.08878829298747164
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.09353664145803128
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.07075924410864302
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.05191055015464612
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.044263252733764524
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.11584883934899368
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.10430814213724524
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.10164245881586649
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.07242508781102434
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.04470880834784434
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.03341174436348443
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.11027078547977105
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.10140724119777428
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.07288530813212436
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.08267574743947957
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.05312074062172064
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.06451154625191498
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.08744636884003985
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.06541933125635371
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.07296134565950439
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.07267700083601063
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.09783367987255746
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.08474444406810272
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.0957201118348056
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.08204967266926261
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.07653073904048525
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.06992209346577563
+      }
+    ],
+    "se_inflator": [
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9090909090909091,
+          "coverage_pre": 0.9090909090909091,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9090909090909091,
+          "coverage_pre": 0.9090909090909091,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9090909090909091,
+          "coverage_pre": 0.8181818181818182,
+          "factor": 1.5
+        },
+        "h_bucket": "short",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 1.9500000000000002
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9090909090909091,
+          "coverage_pre": 0.9090909090909091,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.7272727272727273,
+          "coverage_pre": 0.7272727272727273,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.75,
+          "coverage_pre": 0.75,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9090909090909091,
+          "coverage_pre": 0.9545454545454546,
+          "factor": 0.775
+        },
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 1.0075
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9090909090909091,
+          "coverage_pre": 0.8181818181818182,
+          "factor": 1.25
+        },
+        "h_bucket": "short",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 1.625
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.6363636363636364,
+          "coverage_pre": 0.6363636363636364,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.5,
+          "coverage_pre": 0.5,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.8181818181818182,
+          "coverage_pre": 0.8181818181818182,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.75,
+          "coverage_pre": 0.75,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9090909090909091,
+          "coverage_pre": 0.9090909090909091,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.8636363636363636,
+          "coverage_pre": 0.8636363636363636,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9090909090909091,
+          "coverage_pre": 0.9090909090909091,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.75,
+          "coverage_pre": 0.75,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.7272727272727273,
+          "coverage_pre": 0.7272727272727273,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.8636363636363636,
+          "coverage_pre": 1.0,
+          "factor": 0.775
+        },
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 1.0075
+      },
+      {
+        "extra": {
+          "coverage_post": 0.8636363636363636,
+          "coverage_pre": 0.8636363636363636,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9333333333333333,
+          "coverage_pre": 0.9333333333333333,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9333333333333333,
+          "coverage_pre": 0.9333333333333333,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.8666666666666667,
+          "coverage_pre": 0.8666666666666667,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9333333333333333,
+          "coverage_pre": 0.9333333333333333,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.7333333333333333,
+          "coverage_pre": 0.7333333333333333,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9333333333333333,
+          "coverage_pre": 0.9666666666666667,
+          "factor": 0.775
+        },
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 1.0075
+      },
+      {
+        "extra": {
+          "coverage_post": 0.8666666666666667,
+          "coverage_pre": 0.8666666666666667,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.6,
+          "coverage_pre": 0.6,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.8,
+          "coverage_pre": 0.8,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9333333333333333,
+          "coverage_pre": 0.9333333333333333,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9,
+          "coverage_pre": 0.9,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9333333333333333,
+          "coverage_pre": 0.9333333333333333,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9333333333333333,
+          "coverage_pre": 0.9333333333333333,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.8,
+          "coverage_pre": 0.8,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9,
+          "coverage_pre": 1.0,
+          "factor": 0.775
+        },
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 1.0075
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9,
+          "coverage_pre": 0.9,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.95,
+          "coverage_pre": 0.95,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9333333333333333,
+          "coverage_pre": 0.9333333333333333,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B19013_001E",
+        "method": "multi_anchor",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9,
+          "coverage_pre": 0.9,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9333333333333333,
+          "coverage_pre": 0.9333333333333333,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25058_001E",
+        "method": "multi_anchor",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.95,
+          "coverage_pre": 0.8166666666666667,
+          "factor": 2.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 2.6
+      },
+      {
+        "extra": {
+          "coverage_post": 0.95,
+          "coverage_pre": 0.95,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25064_001E",
+        "method": "multi_anchor",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9333333333333333,
+          "coverage_pre": 0.9333333333333333,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9333333333333333,
+          "coverage_pre": 0.9333333333333333,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25077_001E",
+        "method": "multi_anchor",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 1.3
+      }
+    ]
   }
 }
