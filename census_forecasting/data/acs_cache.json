@@ -89,6 +89,36 @@
    "state": "15"
   }
  ],
+ "1y|2010|for=county:*&in=state:15|B25071_001E,B25071_001M": [
+  {
+   "B25071_001E": "34.4",
+   "B25071_001M": "6.0",
+   "NAME": "Hawaii County, Hawaii",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "33.5",
+   "B25071_001M": "1.2",
+   "NAME": "Honolulu County, Hawaii",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "31.4",
+   "B25071_001M": "5.3",
+   "NAME": "Kauai County, Hawaii",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "33.4",
+   "B25071_001M": "3.6",
+   "NAME": "Maui County, Hawaii",
+   "county": "009",
+   "state": "15"
+  }
+ ],
  "1y|2010|for=county:*&in=state:15|B25077_001E,B25077_001M": [
   {
    "B25077_001E": "322700",
@@ -115,6 +145,96 @@
    "B25077_001E": "597100",
    "B25077_001M": "28718",
    "NAME": "Maui County, Hawaii",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2010|for=county:*&in=state:15|S1501_C02_014E,S1501_C02_014M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_014E": "90.1",
+   "S1501_C02_014M": "2.3",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_014E": "91.7",
+   "S1501_C02_014M": "0.7",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_014E": "91.0",
+   "S1501_C02_014M": "2.1",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_014E": "88.7",
+   "S1501_C02_014M": "2.6",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2010|for=county:*&in=state:15|S1501_C02_015E,S1501_C02_015M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_015E": "22.7",
+   "S1501_C02_015M": "2.6",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_015E": "32.0",
+   "S1501_C02_015M": "1.4",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_015E": "20.9",
+   "S1501_C02_015M": "4.0",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_015E": "25.0",
+   "S1501_C02_015M": "3.3",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2010|for=county:*&in=state:15|S1701_C03_001E,S1701_C03_001M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1701_C03_001E": "18.4",
+   "S1701_C03_001M": "2.9",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1701_C03_001E": "9.1",
+   "S1701_C03_001M": "0.9",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1701_C03_001E": "11.6",
+   "S1701_C03_001M": "2.8",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1701_C03_001E": "11.2",
+   "S1701_C03_001M": "2.5",
    "county": "009",
    "state": "15"
   }
@@ -209,6 +329,36 @@
    "state": "15"
   }
  ],
+ "1y|2011|for=county:*&in=state:15|B25071_001E,B25071_001M": [
+  {
+   "B25071_001E": "35.5",
+   "B25071_001M": "2.7",
+   "NAME": "Hawaii County, Hawaii",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "34.3",
+   "B25071_001M": "1.1",
+   "NAME": "Honolulu County, Hawaii",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "31.2",
+   "B25071_001M": "4.0",
+   "NAME": "Kauai County, Hawaii",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "35.2",
+   "B25071_001M": "3.8",
+   "NAME": "Maui County, Hawaii",
+   "county": "009",
+   "state": "15"
+  }
+ ],
  "1y|2011|for=county:*&in=state:15|B25077_001E,B25077_001M": [
   {
    "B25077_001E": "290400",
@@ -235,6 +385,96 @@
    "B25077_001E": "527900",
    "B25077_001M": "28653",
    "NAME": "Maui County, Hawaii",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2011|for=county:*&in=state:15|S1501_C02_014E,S1501_C02_014M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_014E": "88.0",
+   "S1501_C02_014M": "2.5",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_014E": "91.6",
+   "S1501_C02_014M": "0.8",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_014E": "91.7",
+   "S1501_C02_014M": "2.6",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_014E": "91.4",
+   "S1501_C02_014M": "2.0",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2011|for=county:*&in=state:15|S1501_C02_015E,S1501_C02_015M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_015E": "21.5",
+   "S1501_C02_015M": "2.7",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_015E": "30.1",
+   "S1501_C02_015M": "1.3",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_015E": "25.6",
+   "S1501_C02_015M": "4.2",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_015E": "25.1",
+   "S1501_C02_015M": "2.9",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2011|for=county:*&in=state:15|S1701_C03_001E,S1701_C03_001M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1701_C03_001E": "21.5",
+   "S1701_C03_001M": "4.0",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1701_C03_001E": "10.1",
+   "S1701_C03_001M": "0.9",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1701_C03_001E": "12.3",
+   "S1701_C03_001M": "4.0",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1701_C03_001E": "12.3",
+   "S1701_C03_001M": "2.6",
    "county": "009",
    "state": "15"
   }
@@ -329,6 +569,36 @@
    "state": "15"
   }
  ],
+ "1y|2012|for=county:*&in=state:15|B25071_001E,B25071_001M": [
+  {
+   "B25071_001E": "33.1",
+   "B25071_001M": "1.0",
+   "NAME": "Honolulu County, Hawaii",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "31.1",
+   "B25071_001M": "3.0",
+   "NAME": "Maui County, Hawaii",
+   "county": "009",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "31.9",
+   "B25071_001M": "4.0",
+   "NAME": "Hawaii County, Hawaii",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "30.8",
+   "B25071_001M": "3.5",
+   "NAME": "Kauai County, Hawaii",
+   "county": "007",
+   "state": "15"
+  }
+ ],
  "1y|2012|for=county:*&in=state:15|B25077_001E,B25077_001M": [
   {
    "B25077_001E": "563600",
@@ -355,6 +625,96 @@
    "B25077_001E": "447000",
    "B25077_001M": "24092",
    "NAME": "Kauai County, Hawaii",
+   "county": "007",
+   "state": "15"
+  }
+ ],
+ "1y|2012|for=county:*&in=state:15|S1501_C02_014E,S1501_C02_014M": [
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_014E": "91.4",
+   "S1501_C02_014M": "0.7",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_014E": "89.7",
+   "S1501_C02_014M": "1.8",
+   "county": "009",
+   "state": "15"
+  },
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_014E": "90.6",
+   "S1501_C02_014M": "1.7",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_014E": "91.9",
+   "S1501_C02_014M": "2.4",
+   "county": "007",
+   "state": "15"
+  }
+ ],
+ "1y|2012|for=county:*&in=state:15|S1501_C02_015E,S1501_C02_015M": [
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_015E": "30.7",
+   "S1501_C02_015M": "1.0",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_015E": "20.5",
+   "S1501_C02_015M": "2.6",
+   "county": "009",
+   "state": "15"
+  },
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_015E": "23.1",
+   "S1501_C02_015M": "2.9",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_015E": "25.3",
+   "S1501_C02_015M": "3.8",
+   "county": "007",
+   "state": "15"
+  }
+ ],
+ "1y|2012|for=county:*&in=state:15|S1701_C03_001E,S1701_C03_001M": [
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1701_C03_001E": "10.3",
+   "S1701_C03_001M": "0.9",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1701_C03_001E": "10.3",
+   "S1701_C03_001M": "1.7",
+   "county": "009",
+   "state": "15"
+  },
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1701_C03_001E": "19.2",
+   "S1701_C03_001M": "2.4",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1701_C03_001E": "11.0",
+   "S1701_C03_001M": "3.1",
    "county": "007",
    "state": "15"
   }
@@ -449,6 +809,36 @@
    "state": "15"
   }
  ],
+ "1y|2013|for=county:*&in=state:15|B25071_001E,B25071_001M": [
+  {
+   "B25071_001E": "33.3",
+   "B25071_001M": "0.9",
+   "NAME": "Honolulu County, Hawaii",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "28.5",
+   "B25071_001M": "3.0",
+   "NAME": "Maui County, Hawaii",
+   "county": "009",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "37.2",
+   "B25071_001M": "4.0",
+   "NAME": "Hawaii County, Hawaii",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "27.6",
+   "B25071_001M": "3.0",
+   "NAME": "Kauai County, Hawaii",
+   "county": "007",
+   "state": "15"
+  }
+ ],
  "1y|2013|for=county:*&in=state:15|B25077_001E,B25077_001M": [
   {
    "B25077_001E": "573800",
@@ -475,6 +865,96 @@
    "B25077_001E": "498300",
    "B25077_001M": "46048",
    "NAME": "Kauai County, Hawaii",
+   "county": "007",
+   "state": "15"
+  }
+ ],
+ "1y|2013|for=county:*&in=state:15|S1501_C02_014E,S1501_C02_014M": [
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_014E": "91.4",
+   "S1501_C02_014M": "0.7",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_014E": "93.1",
+   "S1501_C02_014M": "1.4",
+   "county": "009",
+   "state": "15"
+  },
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_014E": "91.0",
+   "S1501_C02_014M": "2.3",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_014E": "89.8",
+   "S1501_C02_014M": "3.1",
+   "county": "007",
+   "state": "15"
+  }
+ ],
+ "1y|2013|for=county:*&in=state:15|S1501_C02_015E,S1501_C02_015M": [
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_015E": "32.6",
+   "S1501_C02_015M": "1.2",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_015E": "25.6",
+   "S1501_C02_015M": "2.8",
+   "county": "009",
+   "state": "15"
+  },
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_015E": "25.2",
+   "S1501_C02_015M": "3.2",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_015E": "23.8",
+   "S1501_C02_015M": "4.1",
+   "county": "007",
+   "state": "15"
+  }
+ ],
+ "1y|2013|for=county:*&in=state:15|S1701_C03_001E,S1701_C03_001M": [
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1701_C03_001E": "9.4",
+   "S1701_C03_001M": "0.8",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1701_C03_001E": "9.5",
+   "S1701_C03_001M": "1.6",
+   "county": "009",
+   "state": "15"
+  },
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1701_C03_001E": "19.5",
+   "S1701_C03_001M": "3.4",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1701_C03_001E": "10.1",
+   "S1701_C03_001M": "2.6",
    "county": "007",
    "state": "15"
   }
@@ -569,6 +1049,36 @@
    "state": "15"
   }
  ],
+ "1y|2014|for=county:*&in=state:15|B25071_001E,B25071_001M": [
+  {
+   "B25071_001E": "32.4",
+   "B25071_001M": "2.3",
+   "NAME": "Hawaii County, Hawaii",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "29.8",
+   "B25071_001M": "2.7",
+   "NAME": "Kauai County, Hawaii",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "35.1",
+   "B25071_001M": "1.2",
+   "NAME": "Honolulu County, Hawaii",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "30.4",
+   "B25071_001M": "2.8",
+   "NAME": "Maui County, Hawaii",
+   "county": "009",
+   "state": "15"
+  }
+ ],
  "1y|2014|for=county:*&in=state:15|B25077_001E,B25077_001M": [
   {
    "B25077_001E": "304600",
@@ -595,6 +1105,96 @@
    "B25077_001E": "534100",
    "B25077_001M": "29814",
    "NAME": "Maui County, Hawaii",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2014|for=county:*&in=state:15|S1501_C02_014E,S1501_C02_014M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_014E": "93.2",
+   "S1501_C02_014M": "1.8",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_014E": "91.9",
+   "S1501_C02_014M": "2.0",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_014E": "92.5",
+   "S1501_C02_014M": "0.6",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_014E": "91.6",
+   "S1501_C02_014M": "2.2",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2014|for=county:*&in=state:15|S1501_C02_015E,S1501_C02_015M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_015E": "25.8",
+   "S1501_C02_015M": "3.0",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_015E": "28.4",
+   "S1501_C02_015M": "3.7",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_015E": "32.0",
+   "S1501_C02_015M": "1.2",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_015E": "24.1",
+   "S1501_C02_015M": "2.8",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2014|for=county:*&in=state:15|S1701_C03_001E,S1701_C03_001M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1701_C03_001E": "17.9",
+   "S1701_C03_001M": "2.6",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1701_C03_001E": "11.9",
+   "S1701_C03_001M": "2.6",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1701_C03_001E": "9.7",
+   "S1701_C03_001M": "0.7",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1701_C03_001E": "13.2",
+   "S1701_C03_001M": "2.4",
    "county": "009",
    "state": "15"
   }
@@ -689,6 +1289,36 @@
    "state": "15"
   }
  ],
+ "1y|2015|for=county:*&in=state:15|B25071_001E,B25071_001M": [
+  {
+   "B25071_001E": "30.6",
+   "B25071_001M": "3.5",
+   "NAME": "Hawaii County, Hawaii",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "25.9",
+   "B25071_001M": "3.0",
+   "NAME": "Kauai County, Hawaii",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "35.0",
+   "B25071_001M": "1.5",
+   "NAME": "Honolulu County, Hawaii",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "30.3",
+   "B25071_001M": "2.8",
+   "NAME": "Maui County, Hawaii",
+   "county": "009",
+   "state": "15"
+  }
+ ],
  "1y|2015|for=county:*&in=state:15|B25077_001E,B25077_001M": [
   {
    "B25077_001E": "321400",
@@ -715,6 +1345,96 @@
    "B25077_001E": "569300",
    "B25077_001M": "27663",
    "NAME": "Maui County, Hawaii",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2015|for=county:*&in=state:15|S1501_C02_014E,S1501_C02_014M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_014E": "91.4",
+   "S1501_C02_014M": "1.6",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_014E": "92.8",
+   "S1501_C02_014M": "1.7",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_014E": "90.6",
+   "S1501_C02_014M": "0.7",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_014E": "91.0",
+   "S1501_C02_014M": "1.5",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2015|for=county:*&in=state:15|S1501_C02_015E,S1501_C02_015M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_015E": "28.7",
+   "S1501_C02_015M": "2.2",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_015E": "27.5",
+   "S1501_C02_015M": "3.2",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_015E": "33.2",
+   "S1501_C02_015M": "0.9",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_015E": "25.3",
+   "S1501_C02_015M": "1.9",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2015|for=county:*&in=state:15|S1701_C03_001E,S1701_C03_001M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1701_C03_001E": "18.8",
+   "S1701_C03_001M": "3.0",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1701_C03_001E": "10.2",
+   "S1701_C03_001M": "2.6",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1701_C03_001E": "9.2",
+   "S1701_C03_001M": "0.7",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1701_C03_001E": "9.7",
+   "S1701_C03_001M": "1.9",
    "county": "009",
    "state": "15"
   }
@@ -809,6 +1529,36 @@
    "state": "15"
   }
  ],
+ "1y|2016|for=county:*&in=state:15|B25071_001E,B25071_001M": [
+  {
+   "B25071_001E": "34.7",
+   "B25071_001M": "1.3",
+   "NAME": "Honolulu County, Hawaii",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "28.8",
+   "B25071_001M": "2.2",
+   "NAME": "Maui County, Hawaii",
+   "county": "009",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "29.6",
+   "B25071_001M": "5.1",
+   "NAME": "Hawaii County, Hawaii",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "31.0",
+   "B25071_001M": "4.1",
+   "NAME": "Kauai County, Hawaii",
+   "county": "007",
+   "state": "15"
+  }
+ ],
  "1y|2016|for=county:*&in=state:15|B25077_001E,B25077_001M": [
   {
    "B25077_001E": "658900",
@@ -835,6 +1585,96 @@
    "B25077_001E": "558000",
    "B25077_001M": "42078",
    "NAME": "Kauai County, Hawaii",
+   "county": "007",
+   "state": "15"
+  }
+ ],
+ "1y|2016|for=county:*&in=state:15|S1501_C02_014E,S1501_C02_014M": [
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_014E": "91.6",
+   "S1501_C02_014M": "0.7",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_014E": "92.9",
+   "S1501_C02_014M": "1.4",
+   "county": "009",
+   "state": "15"
+  },
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_014E": "92.7",
+   "S1501_C02_014M": "1.2",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_014E": "93.1",
+   "S1501_C02_014M": "1.7",
+   "county": "007",
+   "state": "15"
+  }
+ ],
+ "1y|2016|for=county:*&in=state:15|S1501_C02_015E,S1501_C02_015M": [
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_015E": "34.4",
+   "S1501_C02_015M": "1.0",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_015E": "24.7",
+   "S1501_C02_015M": "2.0",
+   "county": "009",
+   "state": "15"
+  },
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_015E": "27.6",
+   "S1501_C02_015M": "2.5",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_015E": "27.9",
+   "S1501_C02_015M": "2.8",
+   "county": "007",
+   "state": "15"
+  }
+ ],
+ "1y|2016|for=county:*&in=state:15|S1701_C03_001E,S1701_C03_001M": [
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1701_C03_001E": "8.5",
+   "S1701_C03_001M": "0.9",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1701_C03_001E": "8.3",
+   "S1701_C03_001M": "1.9",
+   "county": "009",
+   "state": "15"
+  },
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1701_C03_001E": "15.4",
+   "S1701_C03_001M": "2.4",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1701_C03_001E": "6.1",
+   "S1701_C03_001M": "1.3",
    "county": "007",
    "state": "15"
   }
@@ -929,6 +1769,36 @@
    "state": "15"
   }
  ],
+ "1y|2017|for=county:*&in=state:15|B25071_001E,B25071_001M": [
+  {
+   "B25071_001E": "29.8",
+   "B25071_001M": "2.6",
+   "NAME": "Hawaii County, Hawaii",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "34.3",
+   "B25071_001M": "1.3",
+   "NAME": "Honolulu County, Hawaii",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "29.8",
+   "B25071_001M": "2.6",
+   "NAME": "Maui County, Hawaii",
+   "county": "009",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "30.9",
+   "B25071_001M": "4.2",
+   "NAME": "Kauai County, Hawaii",
+   "county": "007",
+   "state": "15"
+  }
+ ],
  "1y|2017|for=county:*&in=state:15|B25077_001E,B25077_001M": [
   {
    "B25077_001E": "344800",
@@ -955,6 +1825,96 @@
    "B25077_001E": "560600",
    "B25077_001M": "38571",
    "NAME": "Kauai County, Hawaii",
+   "county": "007",
+   "state": "15"
+  }
+ ],
+ "1y|2017|for=county:*&in=state:15|S1501_C02_014E,S1501_C02_014M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_014E": "93.2",
+   "S1501_C02_014M": "1.0",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_014E": "92.3",
+   "S1501_C02_014M": "0.7",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_014E": "91.8",
+   "S1501_C02_014M": "1.4",
+   "county": "009",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_014E": "90.3",
+   "S1501_C02_014M": "2.5",
+   "county": "007",
+   "state": "15"
+  }
+ ],
+ "1y|2017|for=county:*&in=state:15|S1501_C02_015E,S1501_C02_015M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_015E": "30.7",
+   "S1501_C02_015M": "2.7",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_015E": "34.7",
+   "S1501_C02_015M": "1.0",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_015E": "27.0",
+   "S1501_C02_015M": "2.1",
+   "county": "009",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_015E": "28.8",
+   "S1501_C02_015M": "3.0",
+   "county": "007",
+   "state": "15"
+  }
+ ],
+ "1y|2017|for=county:*&in=state:15|S1701_C03_001E,S1701_C03_001M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1701_C03_001E": "15.0",
+   "S1701_C03_001M": "2.3",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1701_C03_001E": "8.4",
+   "S1701_C03_001M": "0.6",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1701_C03_001E": "9.7",
+   "S1701_C03_001M": "1.7",
+   "county": "009",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1701_C03_001E": "9.5",
+   "S1701_C03_001M": "2.3",
    "county": "007",
    "state": "15"
   }
@@ -1049,6 +2009,36 @@
    "state": "15"
   }
  ],
+ "1y|2018|for=county:*&in=state:15|B25071_001E,B25071_001M": [
+  {
+   "B25071_001E": "29.1",
+   "B25071_001M": "4.4",
+   "NAME": "Hawaii County, Hawaii",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "32.4",
+   "B25071_001M": "0.9",
+   "NAME": "Honolulu County, Hawaii",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "27.3",
+   "B25071_001M": "3.0",
+   "NAME": "Kauai County, Hawaii",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "28.8",
+   "B25071_001M": "4.0",
+   "NAME": "Maui County, Hawaii",
+   "county": "009",
+   "state": "15"
+  }
+ ],
  "1y|2018|for=county:*&in=state:15|B25077_001E,B25077_001M": [
   {
    "B25077_001E": "368200",
@@ -1075,6 +2065,96 @@
    "B25077_001E": "629500",
    "B25077_001M": "19696",
    "NAME": "Maui County, Hawaii",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2018|for=county:*&in=state:15|S1501_C02_014E,S1501_C02_014M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_014E": "92.4",
+   "S1501_C02_014M": "1.5",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_014E": "91.8",
+   "S1501_C02_014M": "0.7",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_014E": "92.0",
+   "S1501_C02_014M": "2.1",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_014E": "92.4",
+   "S1501_C02_014M": "1.9",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2018|for=county:*&in=state:15|S1501_C02_015E,S1501_C02_015M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_015E": "29.6",
+   "S1501_C02_015M": "2.5",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_015E": "35.2",
+   "S1501_C02_015M": "1.0",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_015E": "31.4",
+   "S1501_C02_015M": "3.9",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_015E": "29.5",
+   "S1501_C02_015M": "2.9",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2018|for=county:*&in=state:15|S1701_C03_001E,S1701_C03_001M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1701_C03_001E": "16.2",
+   "S1701_C03_001M": "2.5",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1701_C03_001E": "7.8",
+   "S1701_C03_001M": "0.7",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1701_C03_001E": "6.4",
+   "S1701_C03_001M": "1.8",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1701_C03_001E": "7.1",
+   "S1701_C03_001M": "1.6",
    "county": "009",
    "state": "15"
   }
@@ -1169,6 +2249,36 @@
    "state": "15"
   }
  ],
+ "1y|2019|for=county:*&in=state:15|B25071_001E,B25071_001M": [
+  {
+   "B25071_001E": "31.2",
+   "B25071_001M": "4.7",
+   "NAME": "Hawaii County, Hawaii",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "32.6",
+   "B25071_001M": "1.3",
+   "NAME": "Honolulu County, Hawaii",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "27.0",
+   "B25071_001M": "2.5",
+   "NAME": "Kauai County, Hawaii",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "31.1",
+   "B25071_001M": "4.9",
+   "NAME": "Maui County, Hawaii",
+   "county": "009",
+   "state": "15"
+  }
+ ],
  "1y|2019|for=county:*&in=state:15|B25077_001E,B25077_001M": [
   {
    "B25077_001E": "381000",
@@ -1195,6 +2305,96 @@
    "B25077_001E": "697900",
    "B25077_001M": "27946",
    "NAME": "Maui County, Hawaii",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2019|for=county:*&in=state:15|S1501_C02_014E,S1501_C02_014M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_014E": "92.6",
+   "S1501_C02_014M": "1.6",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_014E": "92.6",
+   "S1501_C02_014M": "0.6",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_014E": "92.8",
+   "S1501_C02_014M": "1.8",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_014E": "90.6",
+   "S1501_C02_014M": "1.8",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2019|for=county:*&in=state:15|S1501_C02_015E,S1501_C02_015M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_015E": "30.0",
+   "S1501_C02_015M": "2.0",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_015E": "35.8",
+   "S1501_C02_015M": "1.0",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_015E": "28.6",
+   "S1501_C02_015M": "3.1",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_015E": "27.7",
+   "S1501_C02_015M": "2.3",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2019|for=county:*&in=state:15|S1701_C03_001E,S1701_C03_001M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1701_C03_001E": "13.2",
+   "S1701_C03_001M": "2.5",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1701_C03_001E": "8.1",
+   "S1701_C03_001M": "0.8",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1701_C03_001E": "8.6",
+   "S1701_C03_001M": "3.4",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1701_C03_001E": "11.9",
+   "S1701_C03_001M": "2.5",
    "county": "009",
    "state": "15"
   }
@@ -1289,6 +2489,36 @@
    "state": "15"
   }
  ],
+ "1y|2021|for=county:*&in=state:15|B25071_001E,B25071_001M": [
+  {
+   "B25071_001E": "29.7",
+   "B25071_001M": "2.6",
+   "NAME": "Hawaii County, Hawaii",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "36.7",
+   "B25071_001M": "9.0",
+   "NAME": "Kauai County, Hawaii",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "34.0",
+   "B25071_001M": "1.0",
+   "NAME": "Honolulu County, Hawaii",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "36.2",
+   "B25071_001M": "6.2",
+   "NAME": "Maui County, Hawaii",
+   "county": "009",
+   "state": "15"
+  }
+ ],
  "1y|2021|for=county:*&in=state:15|B25077_001E,B25077_001M": [
   {
    "B25077_001E": "472800",
@@ -1315,6 +2545,96 @@
    "B25077_001E": "744400",
    "B25077_001M": "40238",
    "NAME": "Maui County, Hawaii",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2021|for=county:*&in=state:15|S1501_C02_014E,S1501_C02_014M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_014E": "92.9",
+   "S1501_C02_014M": "1.3",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_014E": "92.5",
+   "S1501_C02_014M": "2.1",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_014E": "92.8",
+   "S1501_C02_014M": "0.7",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_014E": "94.0",
+   "S1501_C02_014M": "1.3",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2021|for=county:*&in=state:15|S1501_C02_015E,S1501_C02_015M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_015E": "30.7",
+   "S1501_C02_015M": "2.6",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_015E": "36.2",
+   "S1501_C02_015M": "3.7",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_015E": "37.1",
+   "S1501_C02_015M": "1.0",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_015E": "30.0",
+   "S1501_C02_015M": "2.4",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2021|for=county:*&in=state:15|S1701_C03_001E,S1701_C03_001M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1701_C03_001E": "14.8",
+   "S1701_C03_001M": "2.6",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1701_C03_001E": "11.7",
+   "S1701_C03_001M": "2.4",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1701_C03_001E": "10.2",
+   "S1701_C03_001M": "0.9",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1701_C03_001E": "12.1",
+   "S1701_C03_001M": "2.5",
    "county": "009",
    "state": "15"
   }
@@ -1409,6 +2729,36 @@
    "state": "15"
   }
  ],
+ "1y|2022|for=county:*&in=state:15|B25071_001E,B25071_001M": [
+  {
+   "B25071_001E": "28.3",
+   "B25071_001M": "3.7",
+   "NAME": "Hawaii County, Hawaii",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "34.7",
+   "B25071_001M": "0.9",
+   "NAME": "Honolulu County, Hawaii",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "28.8",
+   "B25071_001M": "6.4",
+   "NAME": "Kauai County, Hawaii",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "30.2",
+   "B25071_001M": "2.6",
+   "NAME": "Maui County, Hawaii",
+   "county": "009",
+   "state": "15"
+  }
+ ],
  "1y|2022|for=county:*&in=state:15|B25077_001E,B25077_001M": [
   {
    "B25077_001E": "535600",
@@ -1435,6 +2785,96 @@
    "B25077_001E": "922700",
    "B25077_001M": "35914",
    "NAME": "Maui County, Hawaii",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2022|for=county:*&in=state:15|S1501_C02_014E,S1501_C02_014M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_014E": "92.6",
+   "S1501_C02_014M": "1.5",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_014E": "93.0",
+   "S1501_C02_014M": "0.6",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_014E": "92.2",
+   "S1501_C02_014M": "1.9",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_014E": "92.9",
+   "S1501_C02_014M": "1.5",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2022|for=county:*&in=state:15|S1501_C02_015E,S1501_C02_015M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_015E": "32.1",
+   "S1501_C02_015M": "2.5",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_015E": "37.7",
+   "S1501_C02_015M": "0.9",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_015E": "29.2",
+   "S1501_C02_015M": "3.3",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_015E": "29.0",
+   "S1501_C02_015M": "2.0",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2022|for=county:*&in=state:15|S1701_C03_001E,S1701_C03_001M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1701_C03_001E": "15.1",
+   "S1701_C03_001M": "2.6",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1701_C03_001E": "9.7",
+   "S1701_C03_001M": "0.8",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1701_C03_001E": "6.6",
+   "S1701_C03_001M": "2.7",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1701_C03_001E": "8.2",
+   "S1701_C03_001M": "1.9",
    "county": "009",
    "state": "15"
   }
@@ -1529,6 +2969,36 @@
    "state": "15"
   }
  ],
+ "1y|2023|for=county:*&in=state:15|B25071_001E,B25071_001M": [
+  {
+   "B25071_001E": "32.6",
+   "B25071_001M": "3.3",
+   "NAME": "Hawaii County, Hawaii",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "33.2",
+   "B25071_001M": "1.1",
+   "NAME": "Honolulu County, Hawaii",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "34.2",
+   "B25071_001M": "4.7",
+   "NAME": "Kauai County, Hawaii",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "32.4",
+   "B25071_001M": "4.3",
+   "NAME": "Maui County, Hawaii",
+   "county": "009",
+   "state": "15"
+  }
+ ],
  "1y|2023|for=county:*&in=state:15|B25077_001E,B25077_001M": [
   {
    "B25077_001E": "528800",
@@ -1555,6 +3025,96 @@
    "B25077_001E": "934500",
    "B25077_001M": "37345",
    "NAME": "Maui County, Hawaii",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2023|for=county:*&in=state:15|S1501_C02_014E,S1501_C02_014M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_014E": "93.2",
+   "S1501_C02_014M": "1.6",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_014E": "93.1",
+   "S1501_C02_014M": "0.6",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_014E": "92.0",
+   "S1501_C02_014M": "2.2",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_014E": "92.7",
+   "S1501_C02_014M": "1.6",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2023|for=county:*&in=state:15|S1501_C02_015E,S1501_C02_015M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_015E": "31.7",
+   "S1501_C02_015M": "2.1",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_015E": "39.6",
+   "S1501_C02_015M": "0.9",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_015E": "30.7",
+   "S1501_C02_015M": "3.1",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_015E": "31.2",
+   "S1501_C02_015M": "2.6",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2023|for=county:*&in=state:15|S1701_C03_001E,S1701_C03_001M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1701_C03_001E": "17.5",
+   "S1701_C03_001M": "2.5",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1701_C03_001E": "9.0",
+   "S1701_C03_001M": "0.8",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1701_C03_001E": "7.6",
+   "S1701_C03_001M": "2.1",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1701_C03_001E": "8.8",
+   "S1701_C03_001M": "1.5",
    "county": "009",
    "state": "15"
   }
@@ -1649,6 +3209,36 @@
    "state": "15"
   }
  ],
+ "1y|2024|for=county:*&in=state:15|B25071_001E,B25071_001M": [
+  {
+   "B25071_001E": "34.5",
+   "B25071_001M": "3.8",
+   "NAME": "Hawaii County, Hawaii",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "32.5",
+   "B25071_001M": "1.4",
+   "NAME": "Honolulu County, Hawaii",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "29.3",
+   "B25071_001M": "3.8",
+   "NAME": "Kauai County, Hawaii",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "B25071_001E": "32.5",
+   "B25071_001M": "4.8",
+   "NAME": "Maui County, Hawaii",
+   "county": "009",
+   "state": "15"
+  }
+ ],
  "1y|2024|for=county:*&in=state:15|B25077_001E,B25077_001M": [
   {
    "B25077_001E": "580100",
@@ -1675,6 +3265,96 @@
    "B25077_001E": "1061300",
    "B25077_001M": "38282",
    "NAME": "Maui County, Hawaii",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2024|for=county:*&in=state:15|S1501_C02_014E,S1501_C02_014M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_014E": "93.9",
+   "S1501_C02_014M": "1.0",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_014E": "93.6",
+   "S1501_C02_014M": "0.5",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_014E": "94.7",
+   "S1501_C02_014M": "1.9",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_014E": "93.8",
+   "S1501_C02_014M": "1.4",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2024|for=county:*&in=state:15|S1501_C02_015E,S1501_C02_015M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1501_C02_015E": "32.0",
+   "S1501_C02_015M": "2.6",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1501_C02_015E": "40.1",
+   "S1501_C02_015M": "1.0",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1501_C02_015E": "27.8",
+   "S1501_C02_015M": "3.5",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1501_C02_015E": "35.5",
+   "S1501_C02_015M": "2.8",
+   "county": "009",
+   "state": "15"
+  }
+ ],
+ "1y|2024|for=county:*&in=state:15|S1701_C03_001E,S1701_C03_001M": [
+  {
+   "NAME": "Hawaii County, Hawaii",
+   "S1701_C03_001E": "16.7",
+   "S1701_C03_001M": "2.3",
+   "county": "001",
+   "state": "15"
+  },
+  {
+   "NAME": "Honolulu County, Hawaii",
+   "S1701_C03_001E": "8.8",
+   "S1701_C03_001M": "0.9",
+   "county": "003",
+   "state": "15"
+  },
+  {
+   "NAME": "Kauai County, Hawaii",
+   "S1701_C03_001E": "7.4",
+   "S1701_C03_001M": "2.8",
+   "county": "007",
+   "state": "15"
+  },
+  {
+   "NAME": "Maui County, Hawaii",
+   "S1701_C03_001E": "9.7",
+   "S1701_C03_001M": "2.1",
    "county": "009",
    "state": "15"
   }

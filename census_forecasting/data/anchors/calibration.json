@@ -20,9 +20,21 @@
       "multi_anchor": 0.95,
       "trend_ensemble": 0.8166666666666667
     },
+    "B25071_001E": {
+      "trend_ensemble": 0.9333333333333333
+    },
     "B25077_001E": {
       "multi_anchor": 0.9333333333333333,
       "trend_ensemble": 0.9333333333333333
+    },
+    "S1501_C02_014E": {
+      "trend_ensemble": 1.0
+    },
+    "S1501_C02_015E": {
+      "trend_ensemble": 1.0
+    },
+    "S1701_C03_001E": {
+      "trend_ensemble": 0.9
     }
   },
   "ci90_coverage_post_override": {
@@ -38,9 +50,21 @@
       "multi_anchor": 0.95,
       "trend_ensemble": 0.95
     },
+    "B25071_001E": {
+      "trend_ensemble": 0.9333333333333333
+    },
     "B25077_001E": {
       "multi_anchor": 0.9333333333333333,
       "trend_ensemble": 0.9333333333333333
+    },
+    "S1501_C02_014E": {
+      "trend_ensemble": 0.9
+    },
+    "S1501_C02_015E": {
+      "trend_ensemble": 0.8666666666666667
+    },
+    "S1701_C03_001E": {
+      "trend_ensemble": 0.9
     }
   },
   "horizons": [
@@ -61,9 +85,21 @@
       "multi_anchor": 0.08204967266926261,
       "trend_ensemble": 0.0957201118348056
     },
+    "B25071_001E": {
+      "trend_ensemble": 0.09591440268158744
+    },
     "B25077_001E": {
       "multi_anchor": 0.06992209346577563,
       "trend_ensemble": 0.07653073904048525
+    },
+    "S1501_C02_014E": {
+      "trend_ensemble": 0.013029086788827061
+    },
+    "S1501_C02_015E": {
+      "trend_ensemble": 0.08673456734042871
+    },
+    "S1701_C03_001E": {
+      "trend_ensemble": 0.23444404290797005
     }
   },
   "rmse_by_indicator_source": {
@@ -89,6 +125,12 @@
   "se_inflator_override_by_indicator_method": {
     "B25064_001E": {
       "trend_ensemble": 2.6
+    },
+    "S1501_C02_014E": {
+      "trend_ensemble": 0.7150000000000001
+    },
+    "S1501_C02_015E": {
+      "trend_ensemble": 0.7150000000000001
     }
   },
   "strata_records": {
@@ -671,6 +713,294 @@
       },
       {
         "extra": {
+          "b_raw": -0.050694161635324614,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.06884986382869862,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": 0.02567437363506394,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": 0.02853436081825042,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.027520440259863155,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": -0.027520440259863155
+      },
+      {
+        "extra": {
+          "b_raw": -0.021214806232262778,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": 0.006045405849602784,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": 0.013686220699078606,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.004188607325929476,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.00767470575852723,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": 0.002534752986239165,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.002534752986239165
+      },
+      {
+        "extra": {
+          "b_raw": 0.00235673479408754,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": 0.03591363858282743,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": 0.06455673161927747,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.009611977167325939,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.007570872521974928,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.01577200022482538,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": -0.01577200022482538
+      },
+      {
+        "extra": {
+          "b_raw": 0.002066578975135293,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.06183487080340826,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.06889988234753915,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": 0.014568228059366918,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.014924729017295864,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": 0.04294715030524103,
+          "clamped": 0.0
+        },
+        "h_bucket": "short",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.04294715030524103
+      },
+      {
+        "extra": {
+          "b_raw": 0.06902171395449976,
+          "clamped": 0.0
+        },
+        "h_bucket": "long",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 0.0
+      },
+      {
+        "extra": {
           "b_raw": 0.020544428136096516,
           "clamped": 0.0
         },
@@ -959,6 +1289,150 @@
       },
       {
         "extra": {
+          "b_raw": -0.05553568222022435,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": 0.02643703688391367,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.025838937852503054,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": -0.025838937852503054
+      },
+      {
+        "extra": {
+          "b_raw": 0.008082956476129671,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.00511823357462221,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": 0.0024872814683320654,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.0024872814683320654
+      },
+      {
+        "extra": {
+          "b_raw": 0.04355179672588077,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.009067682595232336,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": -0.011015045771502531,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": -0.011015045771502531
+      },
+      {
+        "extra": {
+          "b_raw": -0.06371887388184316,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": 0.006703439505590176,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.0
+      },
+      {
+        "extra": {
+          "b_raw": 0.04990036727837669,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.04990036727837669
+      },
+      {
+        "extra": {
           "b_raw": -0.013084864538142178,
           "clamped": 0.0
         },
@@ -1052,6 +1526,54 @@
         "n_folds": 60,
         "pop_bucket": "*",
         "value": -0.011459596117996173
+      },
+      {
+        "extra": {
+          "b_raw": -0.020194130260329197,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": -0.020194130260329197
+      },
+      {
+        "extra": {
+          "b_raw": 0.0019848214595428976,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.0019848214595428976
+      },
+      {
+        "extra": {
+          "b_raw": 0.003113505646910843,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.003113505646910843
+      },
+      {
+        "extra": {
+          "b_raw": 0.0106963250451251,
+          "clamped": 0.0
+        },
+        "h_bucket": "*",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.0106963250451251
       }
     ],
     "coverage_post": [
@@ -1440,6 +1962,198 @@
         "value": 1.0
       },
       {
+        "h_bucket": "short",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.8181818181818182
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.9090909090909091
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.8636363636363636
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.9090909090909091
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.9090909090909091
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.75
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.9090909090909091
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.75
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.9090909090909091
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
         "h_bucket": "*",
         "indicator": "B19013_001E",
         "method": "trend_ensemble",
@@ -1633,6 +2347,102 @@
       },
       {
         "h_bucket": "*",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.8666666666666667
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.9
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.8666666666666667
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.8666666666666667
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
         "indicator": "B19013_001E",
         "method": "trend_ensemble",
         "n_folds": 60,
@@ -1694,6 +2504,38 @@
         "n_folds": 60,
         "pop_bucket": "*",
         "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.9
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.8666666666666667
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.9
       }
     ],
     "coverage_pre": [
@@ -2082,6 +2924,198 @@
         "value": 1.0
       },
       {
+        "h_bucket": "short",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.8181818181818182
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.9090909090909091
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.9090909090909091
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.75
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.9090909090909091
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.75
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.9090909090909091
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
         "h_bucket": "*",
         "indicator": "B19013_001E",
         "method": "trend_ensemble",
@@ -2275,6 +3309,102 @@
       },
       {
         "h_bucket": "*",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.8666666666666667
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.8666666666666667
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.8666666666666667
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
         "indicator": "B19013_001E",
         "method": "trend_ensemble",
         "n_folds": 60,
@@ -2336,6 +3466,38 @@
         "n_folds": 60,
         "pop_bucket": "*",
         "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.9333333333333333
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 1.0
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.9
       }
     ],
     "rmse": [
@@ -2724,6 +3886,198 @@
         "value": 0.0788969449828545
       },
       {
+        "h_bucket": "short",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.07619812005584224
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.09055479505771143
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.0632796267869417
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.08911511940914066
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.11866492985668738
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 0.09334244934753533
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.008867038740317076
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.014989222126102365
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.008669484758043716
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.011812669819146637
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.015570408149815078
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 0.014591552262290357
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.04916296525783495
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.07709883082416899
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.02120192280897771
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.02004139151511875
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.0986662919330288
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 0.15011955186848847
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 0.14892999457387987
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 0.16911959123841572
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 0.09144570467693272
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 0.14338287407639785
+      },
+      {
+        "h_bucket": "short",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.28758185163645555
+      },
+      {
+        "h_bucket": "long",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 0.343831369236335
+      },
+      {
         "h_bucket": "*",
         "indicator": "B19013_001E",
         "method": "trend_ensemble",
@@ -2917,6 +4271,102 @@
       },
       {
         "h_bucket": "*",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.08027800534487076
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.07109310367795296
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.11247111414569423
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.010843047714327276
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.00960873317593319
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.015315498248860441
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.05794473662619656
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.020898750096956256
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.11466732409154566
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 0.15457195103125493
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 0.10777138774773862
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.30360243490250066
+      },
+      {
+        "h_bucket": "*",
         "indicator": "B19013_001E",
         "method": "trend_ensemble",
         "n_folds": 60,
@@ -2978,6 +4428,38 @@
         "n_folds": 60,
         "pop_bucket": "*",
         "value": 0.06992209346577563
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.09591440268158744
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.013029086788827061
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.08673456734042871
+      },
+      {
+        "h_bucket": "*",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.23444404290797005
       }
     ],
     "se_inflator": [
@@ -3611,6 +5093,318 @@
           "coverage_pre": 1.0,
           "factor": 1.0
         },
+        "h_bucket": "short",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.8181818181818182,
+          "coverage_pre": 0.8181818181818182,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9090909090909091,
+          "coverage_pre": 0.9090909090909091,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.8636363636363636,
+          "coverage_pre": 1.0,
+          "factor": 0.55
+        },
+        "h_bucket": "short",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.7150000000000001
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9090909090909091,
+          "coverage_pre": 1.0,
+          "factor": 0.7188
+        },
+        "h_bucket": "short",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 0.93444
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9090909090909091,
+          "coverage_pre": 0.9090909090909091,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.75,
+          "coverage_pre": 0.75,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9090909090909091,
+          "coverage_pre": 0.9090909090909091,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 11,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.75,
+          "coverage_pre": 0.75,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 4,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9090909090909091,
+          "coverage_pre": 0.9090909090909091,
+          "factor": 1.0
+        },
+        "h_bucket": "short",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 22,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "long",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 8,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
         "h_bucket": "*",
         "indicator": "B19013_001E",
         "method": "trend_ensemble",
@@ -3919,6 +5713,162 @@
       },
       {
         "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.8666666666666667,
+          "coverage_pre": 0.8666666666666667,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9333333333333333,
+          "coverage_pre": 0.9333333333333333,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9,
+          "coverage_pre": 1.0,
+          "factor": 0.55
+        },
+        "h_bucket": "*",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 0.7150000000000001
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 1.0,
+          "coverage_pre": 1.0,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9333333333333333,
+          "coverage_pre": 1.0,
+          "factor": 0.775
+        },
+        "h_bucket": "*",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 1.0075
+      },
+      {
+        "extra": {
+          "coverage_post": 0.8666666666666667,
+          "coverage_pre": 0.8666666666666667,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "large",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.8666666666666667,
+          "coverage_pre": 0.8666666666666667,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 15,
+        "pop_bucket": "xlarge",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9333333333333333,
+          "coverage_pre": 0.9333333333333333,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
+        "n_folds": 30,
+        "pop_bucket": "medium",
+        "value": 1.3
+      },
+      {
+        "extra": {
           "coverage_post": 0.95,
           "coverage_pre": 0.95,
           "factor": 1.0
@@ -4017,6 +5967,58 @@
         "h_bucket": "*",
         "indicator": "B25077_001E",
         "method": "multi_anchor",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9333333333333333,
+          "coverage_pre": 0.9333333333333333,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "B25071_001E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 1.3
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9,
+          "coverage_pre": 1.0,
+          "factor": 0.55
+        },
+        "h_bucket": "*",
+        "indicator": "S1501_C02_014E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.7150000000000001
+      },
+      {
+        "extra": {
+          "coverage_post": 0.8666666666666667,
+          "coverage_pre": 1.0,
+          "factor": 0.55
+        },
+        "h_bucket": "*",
+        "indicator": "S1501_C02_015E",
+        "method": "trend_ensemble",
+        "n_folds": 60,
+        "pop_bucket": "*",
+        "value": 0.7150000000000001
+      },
+      {
+        "extra": {
+          "coverage_post": 0.9,
+          "coverage_pre": 0.9,
+          "factor": 1.0
+        },
+        "h_bucket": "*",
+        "indicator": "S1701_C03_001E",
+        "method": "trend_ensemble",
         "n_folds": 60,
         "pop_bucket": "*",
         "value": 1.3

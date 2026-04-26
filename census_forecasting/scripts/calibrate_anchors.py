@@ -44,10 +44,16 @@ from census_forecaster.models import AcsObservation
 
 HAWAII_FIPS = "15"
 INDICATORS = [
-    "B19013_001E",
-    "B25058_001E",
-    "B25064_001E",
-    "B25077_001E",
+    # Detail tables (B*) — dollar-denominated and one rent-burden median
+    "B19013_001E",  # Median household income
+    "B25058_001E",  # Median contract rent
+    "B25064_001E",  # Median gross rent
+    "B25077_001E",  # Median home value
+    "B25071_001E",  # Median gross rent as % of household income (renter cost burden)
+    # Subject tables (S*) — pre-computed percentages
+    "S1501_C02_014E",  # % age 25+ with HS or higher
+    "S1501_C02_015E",  # % age 25+ with bachelor's or higher
+    "S1701_C03_001E",  # % below poverty (all people)
 ]
 TRAINING_YEARS = tuple(range(2010, 2025))
 ANCHOR_YEARS = [2015, 2016, 2017, 2019, 2021, 2022]

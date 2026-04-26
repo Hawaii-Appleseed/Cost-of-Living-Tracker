@@ -59,6 +59,12 @@ Lower RMSE → higher weight in the multi-source anchor combiner.
 | multi_anchor | 8.20% | 95.0% |
 | trend_ensemble | 9.57% | 81.7% |
 
+### B25071_001E
+
+| Method | RMSE | CI90 coverage |
+|---|---:|---:|
+| trend_ensemble | 9.59% | 93.3% |
+
 ### B25077_001E
 
 | Method | RMSE | CI90 coverage |
@@ -66,11 +72,31 @@ Lower RMSE → higher weight in the multi-source anchor combiner.
 | multi_anchor | 6.99% | 93.3% |
 | trend_ensemble | 7.65% | 93.3% |
 
+### S1501_C02_014E
+
+| Method | RMSE | CI90 coverage |
+|---|---:|---:|
+| trend_ensemble | 1.30% | 100.0% |
+
+### S1501_C02_015E
+
+| Method | RMSE | CI90 coverage |
+|---|---:|---:|
+| trend_ensemble | 8.67% | 100.0% |
+
+### S1701_C03_001E
+
+| Method | RMSE | CI90 coverage |
+|---|---:|---:|
+| trend_ensemble | 23.44% | 90.0% |
+
 ## SE inflator overrides (where coverage outside [85%, 95%])
 
 | Indicator | Method | Override factor |
 |---|---|---:|
 | B25064_001E | trend_ensemble | 2.600 |
+| S1501_C02_014E | trend_ensemble | 0.715 |
+| S1501_C02_015E | trend_ensemble | 0.715 |
 
 ## v3 bias corrections (cells where bias was applied)
 
@@ -96,12 +122,24 @@ Geometric bias `b = mean(log(point/actual))`, clamped to ±10% multiplicative. A
 | B25064_001E | trend_ensemble | * | * | -0.0420 | -4.11% | 60 |  |
 | B25064_001E | trend_ensemble | medium | * | -0.0734 | -7.08% | 30 |  |
 | B25064_001E | trend_ensemble | medium | short | -0.0605 | -5.87% | 22 |  |
+| B25071_001E | trend_ensemble | * | * | -0.0202 | -2.00% | 60 |  |
+| B25071_001E | trend_ensemble | medium | * | -0.0258 | -2.55% | 30 |  |
+| B25071_001E | trend_ensemble | medium | short | -0.0275 | -2.71% | 22 |  |
 | B25077_001E | multi_anchor | * | * | -0.0115 | -1.14% | 60 |  |
 | B25077_001E | multi_anchor | medium | * | -0.0293 | -2.89% | 30 |  |
 | B25077_001E | multi_anchor | medium | short | -0.0127 | -1.26% | 22 |  |
 | B25077_001E | trend_ensemble | * | * | -0.0609 | -5.91% | 60 |  |
 | B25077_001E | trend_ensemble | medium | * | -0.0798 | -7.67% | 30 |  |
 | B25077_001E | trend_ensemble | medium | short | -0.0552 | -5.37% | 22 |  |
+| S1501_C02_014E | trend_ensemble | * | * | +0.0020 | +0.20% | 60 |  |
+| S1501_C02_014E | trend_ensemble | medium | * | +0.0025 | +0.25% | 30 |  |
+| S1501_C02_014E | trend_ensemble | medium | short | +0.0025 | +0.25% | 22 |  |
+| S1501_C02_015E | trend_ensemble | * | * | +0.0031 | +0.31% | 60 |  |
+| S1501_C02_015E | trend_ensemble | medium | * | -0.0110 | -1.10% | 30 |  |
+| S1501_C02_015E | trend_ensemble | medium | short | -0.0158 | -1.56% | 22 |  |
+| S1701_C03_001E | trend_ensemble | * | * | +0.0107 | +1.08% | 60 |  |
+| S1701_C03_001E | trend_ensemble | medium | * | +0.0499 | +5.12% | 30 |  |
+| S1701_C03_001E | trend_ensemble | medium | short | +0.0429 | +4.39% | 22 |  |
 
 ## v3 SE inflators by stratum (κ ≠ 1.30)
 
@@ -113,4 +151,8 @@ Geometric bias `b = mean(log(point/actual))`, clamped to ±10% multiplicative. A
 | B25058_001E | trend_ensemble | medium | short | 1.008 | 22 |
 | B25077_001E | trend_ensemble | medium | * | 1.008 | 30 |
 | B25077_001E | trend_ensemble | medium | short | 1.008 | 22 |
+| S1501_C02_014E | trend_ensemble | medium | * | 0.715 | 30 |
+| S1501_C02_014E | trend_ensemble | medium | short | 0.715 | 22 |
+| S1501_C02_015E | trend_ensemble | medium | * | 1.008 | 30 |
+| S1501_C02_015E | trend_ensemble | medium | short | 0.934 | 22 |
 
