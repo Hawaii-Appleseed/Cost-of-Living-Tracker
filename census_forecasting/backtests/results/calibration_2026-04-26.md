@@ -12,9 +12,11 @@ Lower RMSE → higher weight in the multi-source anchor combiner.
 
 | Source | RMSE (pct error) |
 |---|---:|
+| bea_hi_percapita_income | 6.97% |
 | qcew_hawaii_wages | 7.22% |
 | pce_deflator | 7.96% |
 | cpi_honolulu_allitems | 8.02% |
+| bea_honolulu_rpp_all | 9.65% |
 
 ### B25058_001E
 
@@ -22,6 +24,7 @@ Lower RMSE → higher weight in the multi-source anchor combiner.
 |---|---:|
 | cpi_honolulu_rent | 9.24% |
 | hud_fmr_honolulu | 9.28% |
+| bea_hi_rpp_housing | 12.47% |
 
 ### B25064_001E
 
@@ -29,6 +32,7 @@ Lower RMSE → higher weight in the multi-source anchor combiner.
 |---|---:|
 | cpi_honolulu_rent | 8.78% |
 | hud_fmr_honolulu | 8.95% |
+| bea_hi_rpp_housing | 12.15% |
 
 ### B25077_001E
 
@@ -36,27 +40,33 @@ Lower RMSE → higher weight in the multi-source anchor combiner.
 |---|---:|
 | fred_hi_hpi | 7.11% |
 
+### S1701_C03_001E
+
+| Source | RMSE (pct error) |
+|---|---:|
+| bea_hi_percapita_income | 32.02% |
+
 ## Per-(indicator, method) RMSE + CI90 coverage
 
 ### B19013_001E
 
 | Method | RMSE | CI90 coverage |
 |---|---:|---:|
-| multi_anchor | 7.27% | 93.3% |
+| multi_anchor | 7.16% | 93.3% |
 | trend_ensemble | 7.30% | 95.0% |
 
 ### B25058_001E
 
 | Method | RMSE | CI90 coverage |
 |---|---:|---:|
-| multi_anchor | 8.47% | 93.3% |
+| multi_anchor | 8.62% | 95.0% |
 | trend_ensemble | 9.78% | 90.0% |
 
 ### B25064_001E
 
 | Method | RMSE | CI90 coverage |
 |---|---:|---:|
-| multi_anchor | 8.20% | 95.0% |
+| multi_anchor | 8.41% | 93.3% |
 | trend_ensemble | 9.57% | 81.7% |
 
 ### B25071_001E
@@ -88,6 +98,7 @@ Lower RMSE → higher weight in the multi-source anchor combiner.
 
 | Method | RMSE | CI90 coverage |
 |---|---:|---:|
+| multi_anchor | 25.47% | 96.7% |
 | trend_ensemble | 23.44% | 90.0% |
 
 ## SE inflator overrides (where coverage outside [85%, 95%])
@@ -97,6 +108,7 @@ Lower RMSE → higher weight in the multi-source anchor combiner.
 | B25064_001E | trend_ensemble | 2.600 |
 | S1501_C02_014E | trend_ensemble | 0.715 |
 | S1501_C02_015E | trend_ensemble | 0.715 |
+| S1701_C03_001E | multi_anchor | 0.715 |
 
 ## v3 bias corrections (cells where bias was applied)
 
@@ -104,21 +116,21 @@ Geometric bias `b = mean(log(point/actual))`, clamped to ±10% multiplicative. A
 
 | Indicator | Method | Pop bucket | h bucket | b (log) | b (pct) | n | clamped |
 |---|---|---|---|---:|---:|---:|---:|
-| B19013_001E | multi_anchor | * | * | -0.0289 | -2.85% | 60 |  |
-| B19013_001E | multi_anchor | medium | * | -0.0447 | -4.37% | 30 |  |
-| B19013_001E | multi_anchor | medium | short | -0.0298 | -2.94% | 22 |  |
+| B19013_001E | multi_anchor | * | * | -0.0278 | -2.74% | 60 |  |
+| B19013_001E | multi_anchor | medium | * | -0.0436 | -4.27% | 30 |  |
+| B19013_001E | multi_anchor | medium | short | -0.0292 | -2.88% | 22 |  |
 | B19013_001E | trend_ensemble | * | * | -0.0131 | -1.30% | 60 |  |
 | B19013_001E | trend_ensemble | medium | * | -0.0292 | -2.88% | 30 |  |
 | B19013_001E | trend_ensemble | medium | short | -0.0231 | -2.28% | 22 |  |
-| B25058_001E | multi_anchor | * | * | -0.0424 | -4.16% | 60 |  |
-| B25058_001E | multi_anchor | medium | * | -0.0595 | -5.78% | 30 |  |
-| B25058_001E | multi_anchor | medium | short | -0.0463 | -4.53% | 22 |  |
+| B25058_001E | multi_anchor | * | * | -0.0534 | -5.20% | 60 |  |
+| B25058_001E | multi_anchor | medium | * | -0.0704 | -6.80% | 30 |  |
+| B25058_001E | multi_anchor | medium | short | -0.0562 | -5.47% | 22 |  |
 | B25058_001E | trend_ensemble | * | * | -0.0447 | -4.37% | 60 |  |
 | B25058_001E | trend_ensemble | medium | * | -0.0795 | -7.64% | 30 |  |
 | B25058_001E | trend_ensemble | medium | short | -0.0659 | -6.38% | 22 |  |
-| B25064_001E | multi_anchor | * | * | -0.0359 | -3.53% | 60 |  |
-| B25064_001E | multi_anchor | medium | * | -0.0520 | -5.07% | 30 |  |
-| B25064_001E | multi_anchor | medium | short | -0.0374 | -3.67% | 22 |  |
+| B25064_001E | multi_anchor | * | * | -0.0465 | -4.55% | 60 |  |
+| B25064_001E | multi_anchor | medium | * | -0.0626 | -6.07% | 30 |  |
+| B25064_001E | multi_anchor | medium | short | -0.0471 | -4.60% | 22 |  |
 | B25064_001E | trend_ensemble | * | * | -0.0420 | -4.11% | 60 |  |
 | B25064_001E | trend_ensemble | medium | * | -0.0734 | -7.08% | 30 |  |
 | B25064_001E | trend_ensemble | medium | short | -0.0605 | -5.87% | 22 |  |
@@ -137,6 +149,9 @@ Geometric bias `b = mean(log(point/actual))`, clamped to ±10% multiplicative. A
 | S1501_C02_015E | trend_ensemble | * | * | +0.0031 | +0.31% | 60 |  |
 | S1501_C02_015E | trend_ensemble | medium | * | -0.0110 | -1.10% | 30 |  |
 | S1501_C02_015E | trend_ensemble | medium | short | -0.0158 | -1.56% | 22 |  |
+| S1701_C03_001E | multi_anchor | * | * | +0.0953 | +10.00% | 60 | ✓ |
+| S1701_C03_001E | multi_anchor | medium | * | +0.0953 | +10.00% | 30 | ✓ |
+| S1701_C03_001E | multi_anchor | medium | short | +0.0953 | +10.00% | 22 | ✓ |
 | S1701_C03_001E | trend_ensemble | * | * | +0.0107 | +1.08% | 60 |  |
 | S1701_C03_001E | trend_ensemble | medium | * | +0.0499 | +5.12% | 30 |  |
 | S1701_C03_001E | trend_ensemble | medium | short | +0.0429 | +4.39% | 22 |  |
@@ -146,7 +161,6 @@ Geometric bias `b = mean(log(point/actual))`, clamped to ±10% multiplicative. A
 | Indicator | Method | Pop bucket | h bucket | κ | n |
 |---|---|---|---|---:|---:|
 | B19013_001E | multi_anchor | medium | short | 1.950 | 22 |
-| B25058_001E | multi_anchor | medium | short | 1.625 | 22 |
 | B25058_001E | trend_ensemble | medium | * | 1.008 | 30 |
 | B25058_001E | trend_ensemble | medium | short | 1.008 | 22 |
 | B25077_001E | trend_ensemble | medium | * | 1.008 | 30 |
