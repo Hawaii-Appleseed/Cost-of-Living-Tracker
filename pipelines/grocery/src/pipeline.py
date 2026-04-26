@@ -93,10 +93,20 @@ def run_pipeline(
                     cpi_data = load_cached_cpi() or {}
 
     # Adjust prices. ratio_info maps cpi_category → { ratio, is_projected,
-    # method, latest_observed, target_period } — used below to flag the
-    # dashboard's "proj." state when any category was forward-extrapolated.
+    # method, latest_observed, target_period, kappa_used, bias_used, ... }
+    # — used below to flag the dashboard's "proj." state when any category
+    # was forward-extrapolated. The v3 BLS calibration (loaded lazily from
+    # the bundled `bls_calibration.json` shipped with `census_forecaster`)
+    # adds per-(series, h_bucket, vol_regime) κ and bias to each projected
+    # ratio's CI; gracefully falls back to legacy κ=1.50 if absent.
+    try:
+        from census_forecaster.bls import load_bls_calibration
+        bls_calibration = load_bls_calibration()
+    except Exception:  # noqa: BLE001 — wide guard; fall back silently
+        bls_calibration = None
     adjusted, ratio_info = adjust_prices(
-        baseline_prices, cpi_data, cpi_config, basket, target_date
+        baseline_prices, cpi_data, cpi_config, basket, target_date,
+        bls_calibration=bls_calibration,
     )
 
     # Collapse to weighted county averages

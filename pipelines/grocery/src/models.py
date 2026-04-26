@@ -42,6 +42,17 @@ class AdjustedPrice:
     per_unit_price: float
     cpi_category: str
     cpi_ratio: float  # current_CPI / baseline_CPI
+    # v3 CPI calibration diagnostics (None for v2 callers / unavailable
+    # ratio paths). Populated from the result dict of `compute_cpi_ratio`
+    # when the bundled `bls_calibration.json` is loaded.
+    #   kappa_used    — absolute κ (SE inflator) applied to forecast SE
+    #   kappa_source  — strata level that fired ("exact", "vol_marg",
+    #                    "h_vol_marg", "global", "floor")
+    #   bias_used     — log-space bias correction (b) applied to ratio
+    #   bias_source   — strata level for the bias lookup
+    #   forecast_se   — final log-space SE on the projected ratio (after
+    #                    κ rescale), or None for non-projected paths
+    cpi_diagnostics: dict | None = None
 
 
 @dataclass

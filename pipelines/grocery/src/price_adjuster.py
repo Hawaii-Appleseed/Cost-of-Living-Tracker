@@ -91,8 +91,17 @@ def adjust_prices(
     cpi_config: CPIConfig,
     basket: BasketConfig,
     target_date: date,
+    *,
+    bls_calibration: dict | None = None,
 ) -> tuple[list[AdjustedPrice], dict]:
-    """Adjust all baseline prices to a target date using CPI ratios."""
+    """Adjust all baseline prices to a target date using CPI ratios.
+
+    When `bls_calibration` is provided (typically loaded via
+    `census_forecaster.bls.load_bls_calibration()`), the v3 stratified
+    κ and bias correction are applied per CPI series. Each `AdjustedPrice`
+    carries a `cpi_diagnostics` dict surfacing the κ source, bias source,
+    and final forecast SE. When None, falls back to the legacy v2 path.
+    """
     adjusted = []
 
     ratios: dict[str, dict] = {}
@@ -113,11 +122,16 @@ def adjust_prices(
                     "implied_annual_rate": None, "forecast_se": None,
                     "ratio_ci90_low": None, "ratio_ci90_high": None,
                     "horizon_months": None,
+                    "kappa_used": None, "kappa_source": None,
+                    "bias_used": None, "bias_source": None,
                 }
                 continue
             series_id = cat_config["series_id"]
             base_date = date.fromisoformat(bp.date)
-            ratios[cpi_cat] = compute_cpi_ratio(cpi_data, series_id, base_date, target_date)
+            ratios[cpi_cat] = compute_cpi_ratio(
+                cpi_data, series_id, base_date, target_date,
+                calibration=bls_calibration,
+            )
 
     for bp in baseline_prices:
         item = basket.get_item(bp.slot_id)
@@ -129,6 +143,22 @@ def adjust_prices(
         ratio = info["ratio"]
         adj_price = round(bp.price * ratio, 2)
         adj_per_unit = round(bp.per_unit_price * ratio, 4)
+
+        # v3 diagnostics surface — None for legacy paths and unavailable
+        # ratios; populated for projected paths when calibration is loaded.
+        diagnostics: dict | None = None
+        if any(info.get(k) is not None for k in
+               ("kappa_used", "bias_used", "forecast_se")):
+            diagnostics = {
+                "kappa_used":   info.get("kappa_used"),
+                "kappa_source": info.get("kappa_source"),
+                "bias_used":    info.get("bias_used"),
+                "bias_source":  info.get("bias_source"),
+                "forecast_se":  info.get("forecast_se"),
+                "ci90_low":     info.get("ratio_ci90_low"),
+                "ci90_high":    info.get("ratio_ci90_high"),
+                "method":       info.get("method"),
+            }
 
         adjusted.append(AdjustedPrice(
             slot_id=bp.slot_id,
@@ -143,6 +173,7 @@ def adjust_prices(
             per_unit_price=adj_per_unit,
             cpi_category=cpi_cat,
             cpi_ratio=round(ratio, 6),
+            cpi_diagnostics=diagnostics,
         ))
 
     return adjusted, ratios
