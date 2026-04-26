@@ -171,6 +171,43 @@ The same smoothing + cap + damping is applied in
 latest BLS Honolulu food-CPI observation — keeps every CPI-driven projection
 in this repo on the same momentum ceiling.
 
+### Simple-ensemble blend with 12-month YoY-implied rate
+
+`tfp-updater.py :: _cpi_value_for()` further blends the Damped-Holt slope
+with a **12-month YoY-implied monthly rate** at 50/50 when 12-month-prior
+data is available in the series:
+
+```
+yoy_rate     = (latest / latest_minus_12mo) ** (1/12) − 1
+monthly_rate = 0.5 · holt_slope + 0.5 · yoy_rate     # n=2 simple mean
+```
+
+The YoY leg is a slow-moving level anchor: it averages 12 monthly moves,
+so a single noisy bimonthly print has roughly 1/12 the influence on it
+that it has on the recency-weighted Damped-Holt slope. Combining the
+two via simple averaging is the n=2 special case of a median-of-methods
+ensemble — the pattern that consistently dominates the M4 (Makridakis
+et al. 2020) and M5 (Makridakis et al. 2022, *Int. J. Forecasting*)
+forecasting competitions, where equal-weight combinations of simple
+methods placed first, second, and third in the M5 accuracy track.
+
+When 12-month-prior history isn't yet available (early series, or runs
+before the second-year-of-S49A coverage), the YoY leg is dropped and
+the projection falls back to the Damped-Holt slope alone — preserving
+the pre-ensemble behaviour and keeping the unit-test contract intact.
+The ±_PROJ_MONTHLY_CAP cap and Gardner-McKenzie damping φ=0.92 are
+applied **after** the blend, so the global momentum ceiling and
+horizon-decay still bind on the combined rate.
+
+This pattern is *not* applied inside `pipelines/grocery/` — that
+codepath relies on the shared `census_forecaster` projection function,
+which uses the recency-weighted slope only. Calibration of an ensemble
+inside the package would require a fresh walk-forward (`backtests/
+cpi_projection_walkforward.py`) across all five Honolulu series, which
+is a larger change tracked separately. The TFP path is the right place
+to start: it has the longest contiguous monthly history (USDA CNPP runs
+monthly, vs. BLS bimonthly), so the YoY leg is reliably available.
+
 **Cross-module note.** The `census_forecasting/` package uses the same
 Gardner-McKenzie damping discipline on its own cadence — φ=0.85 *per
 year* there, vs φ=0.92 *per month* here. Trend half-lives (~8.3 months
@@ -185,17 +222,44 @@ initialize the damped-trend fit in census forecasting; see
 CPI bimonthlies past the latest print: too little training data. The
 Honolulu S49A series only goes back to ~2018 (CPI area-code restructuring
 released the modern S49A codes that year), giving ~50 bimonthly
-observations per series. Recent literature (e.g. *Modeling inflation with
-machine learning: a cross-horizon systematic review*, IJDSA 2025) finds
-LSTMs underperform AR/SARIMA and ridge on small-sample inflation data,
-overfitting noise without a meaningful gain at short horizons. Tree
-ensembles (RF, XGBoost) fare better but require multivariate features
-(national CPI, oil futures, gas prices) that we already incorporate
-upstream of the projection — adding the same signals back through a model
-would double-count them. The `±0.0189/month` cap, recency-weighted slope,
-and 0.92 damping together approximate a damped-Holt point forecast, which
-the academic consensus says is the right baseline class for this kind of
-short-horizon, small-sample series.
+observations per series.
+
+The 2025 literature is consistent on this point:
+
+* *Modeling inflation with machine learning: a cross-horizon systematic
+  review* (IJDSA 2025) — LSTMs underperform AR/SARIMA and ridge on
+  small-sample inflation data, overfitting noise without a meaningful
+  gain at short horizons.
+* *AI meets economics: Can deep learning surpass machine learning and
+  traditional statistical models in inflation time series forecasting?*
+  (DSFE 2025) — finds LSTMs are "on par with SARIMA" at the 3-month
+  horizon and *worse* beyond; LSTMs "tend to underperform compared to
+  simpler models like LASSO regression, AR(p), and SARIMA in the
+  context of inflation forecasting."
+* *Mending the Crystal Ball* (IMF WP 24/206) — tree ensembles (XGBoost,
+  Random Forest) only beat statistical baselines when fed a rich
+  multivariate feature set (national CPI, oil futures, FX, commodity
+  prices). Adding those features here would *double-count* signals we
+  already incorporate upstream — Honolulu food CPI already reflects
+  national wholesale food prices, AAA gas already reflects oil futures.
+* *Selected Topics in Time Series Forecasting* (PMC 2024) — random-walk
+  benchmarks remain hard to beat for US inflation in recent years; any
+  ML claim of out-performance must account for that baseline.
+* *M5 Accuracy competition* (Makridakis et al. 2022) — the winning
+  team's submission was an equal-weighted combination of 6 simple
+  models. Simple ensembles consistently match or beat complex single
+  models in out-of-sample evaluation.
+
+Together these findings argue for a damped-Holt baseline + simple-
+ensemble blending (which is what we do, see "Simple-ensemble blend"
+above) over any deep-learning or gradient-boosted alternative on a
+~50-observation single-series problem.
+
+The `±0.0189/month` cap, recency-weighted slope, 0.92 damping, and
+50/50 YoY blend together approximate a damped-Holt point forecast
+combined with a 12-month random-walk-with-drift anchor — the academic
+consensus baseline class for short-horizon small-sample inflation
+series.
 
 **Seasonal adjustment (X-13ARIMA-SEATS)** before projecting: the BLS
 Honolulu S49A series we consume are NSA (not seasonally adjusted), but the

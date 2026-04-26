@@ -163,15 +163,43 @@ def _damped_compound_factor(monthly_rate: float, months_beyond: int) -> float:
     return _grocery_damped_compound_factor(monthly_rate, months_beyond)
 
 
+def _yoy_implied_monthly_rate(points: list[dict], anchor_year: int, anchor_month: int) -> float | None:
+    """Monthly rate implied by 12-month YoY growth at the anchor period.
+
+    Returns None when the matching observation 12 months prior isn't present.
+    The YoY anchor is a slow-moving "level" view: it averages 12 monthly
+    movements, so single-print bimonthly noise has roughly 1/12 the
+    influence it has on the recency-weighted Damped-Holt slope. Used as
+    the second leg of a 50/50 simple ensemble — a pattern the M5/M4
+    forecasting competitions consistently report as more accurate than
+    any single component (Makridakis et al. 2022, *Int. J. Forecasting*).
+    """
+    older = next(
+        (p for p in points if p["year"] == anchor_year - 1 and p["month"] == anchor_month),
+        None,
+    )
+    newer = next(
+        (p for p in points if p["year"] == anchor_year and p["month"] == anchor_month),
+        None,
+    )
+    if older is None or newer is None or older["value"] <= 0:
+        return None
+    return (newer["value"] / older["value"]) ** (1.0 / 12.0) - 1.0
+
+
 def _cpi_value_for(points: list[dict], year: int, month: int) -> float | None:
     """Return the CPI value at (year, month).
 
     If the exact (year, month) is missing — common for bimonthly Honolulu CPI
     where data lands only in odd months — interpolate linearly between the
     bracketing observations. If the target is *past* the latest observation,
-    forward-project using a recency-weighted compound monthly rate with
-    Gardner-McKenzie damped trend (capped at ±_PROJ_MONTHLY_CAP/month).
-    Returns None if the series has no points at all.
+    forward-project using a 50/50 simple ensemble of (a) the recency-weighted
+    Damped-Holt slope and (b) the 12-month YoY-implied monthly rate, then
+    apply Gardner-McKenzie damped compounding (capped at ±_PROJ_MONTHLY_CAP/
+    month). When 12-month-prior data isn't available, the YoY leg is dropped
+    and the projection falls back to the Damped-Holt slope alone, matching
+    the pre-ensemble behaviour. Returns None if the series has no points at
+    all.
 
     The previous version returned the nearest *earlier* observation, which
     silently flat-lined any reference month past the latest BLS print. That
@@ -224,6 +252,16 @@ def _cpi_value_for(points: list[dict], year: int, month: int) -> float | None:
     monthly_rate = _smoothed_monthly_rate(ordered)
     if monthly_rate is None:
         return before["value"]
+
+    # 50/50 ensemble with 12-month YoY-implied rate when available.
+    # YoY contributes a robust slow-moving anchor that absorbs single-
+    # print bimonthly noise; the Damped-Holt leg keeps the projection
+    # responsive to recent momentum. Falls back gracefully to the Holt
+    # leg alone when 12-month-prior history isn't in the series.
+    yoy_rate = _yoy_implied_monthly_rate(ordered, before["year"], before["month"])
+    if yoy_rate is not None:
+        monthly_rate = 0.5 * monthly_rate + 0.5 * yoy_rate
+
     monthly_rate = max(min(monthly_rate, _PROJ_MONTHLY_CAP), -_PROJ_MONTHLY_CAP)
     return before["value"] * _damped_compound_factor(monthly_rate, months_beyond)
 

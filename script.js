@@ -75,14 +75,14 @@ function renderMetrics() {
     ];
     
     const icons = {
-        'Median Price': '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4a6b52" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
-        'Median Income': '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4a6b52" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
-        'Monthly Payment': '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4a6b52" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
-        'Affordability Index': '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4a6b52" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>'
+        'Median Price': '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+        'Median Income': '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+        'Monthly Payment': '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+        'Affordability Index': '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>'
     };
     
     metricsGrid.innerHTML = metrics.map(metric => `
-        <div class="figure-cell">
+        <div class="figure-cell" role="group" aria-label="${metric.label}: ${metric.value}">
             <div class="figure-cell__accent"></div>
             <div class="figure-cell__icon">${icons[metric.label] || ''}</div>
             <div class="figure-cell__label">${metric.label}</div>
@@ -111,12 +111,13 @@ function renderPriceChart() {
             <div class="bar-separator"></div>
             ${data.counties.slice(1).map((county, i) => {
                 const index = i + 1;
+                const formatted = formatCurrency(data.medianPrice[index]);
                 return `
                 <div class="bar-item">
                     <div class="bar-label">${county}</div>
                     <div class="bar-container">
-                        <div class="bar-fill" style="width: ${(data.medianPrice[index] / maxPrice * 100)}%; animation-delay: ${index * 0.15}s">
-                            <span class="bar-value">${formatCurrency(data.medianPrice[index])}</span>
+                        <div class="bar-fill" style="width: ${(data.medianPrice[index] / maxPrice * 100)}%; animation-delay: ${index * 0.15}s" role="img" aria-label="${county} median price: ${formatted}">
+                            <span class="bar-value">${formatted}</span>
                         </div>
                         <div class="reference-line" style="left: ${statePercent}%"><div class="reference-line-label">${i === 0 ? 'State median' : ''}</div></div>
                     </div>
@@ -149,15 +150,14 @@ function renderAffordabilityChart() {
             ${data.counties.slice(1).map((county, i) => {
                 const index = i + 1;
                 const affordIndex = data.affordabilityIndex[index];
+                const tier = affordIndex >= 80 ? 'good'
+                           : affordIndex >= 60 ? 'moderate'
+                           : 'low';
                 return `
                     <div class="bar-item">
                         <div class="bar-label">${county}</div>
                         <div class="bar-container">
-                            <div class="bar-fill" style="width: ${affordIndex}%; background: ${
-                                affordIndex >= 80 ? 'linear-gradient(90deg, var(--seafoam-700) 0%, var(--seafoam-500) 100%)' :
-                                affordIndex >= 60 ? 'linear-gradient(90deg, var(--coral-300) 0%, #ecb38a 100%)' :
-                                'linear-gradient(90deg, var(--coral-500) 0%, var(--coral-300) 100%)'
-                            }; animation-delay: ${index * 0.15}s">
+                            <div class="bar-fill" data-affordability="${tier}" style="width: ${affordIndex}%; animation-delay: ${index * 0.15}s" role="img" aria-label="${county} affordability index: ${affordIndex} (${getAffordabilityLabel(affordIndex)})">
                                 <span class="bar-value">${affordIndex}</span>
                             </div>
                             <div class="reference-line" style="left: ${stateIndex}%"><div class="reference-line-label">${i === 0 ? 'State median' : ''}</div></div>

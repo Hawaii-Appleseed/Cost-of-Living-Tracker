@@ -284,16 +284,17 @@ body {
 .figure-cell {
     padding: 28px 24px;
     position: relative;
-    transition: background 0.18s;
+    transition: background 0.22s ease, transform 0.22s ease;
 }
 .figure-cell:not(:last-child) {
     border-right: 1px solid var(--border-soft);
 }
 .figure-cell:hover {
-    background: var(--seafoam-100);
+    background: linear-gradient(180deg, rgba(226, 246, 238, 0.55) 0%, rgba(255, 255, 255, 0) 80%);
 }
 .figure-cell__icon {
     margin-bottom: 10px;
+    color: var(--seafoam-700);
 }
 .figure-cell__label {
     font-size: 11px;
@@ -429,6 +430,24 @@ body {
     box-shadow: 0 2px 12px rgba(30, 138, 115, 0.32);
     z-index: 10;
 }
+
+/* Affordability tier gradients — keyed by data attribute so the
+   theme palette stays in CSS rather than scattered through script.js. */
+.bar-fill[data-affordability="good"] {
+    background: linear-gradient(90deg, var(--seafoam-700) 0%, var(--seafoam-500) 100%);
+}
+.bar-fill[data-affordability="moderate"] {
+    background: linear-gradient(90deg, var(--coral-300) 0%, #ecb38a 100%);
+}
+.bar-fill[data-affordability="low"] {
+    background: linear-gradient(90deg, var(--coral-500) 0%, var(--coral-300) 100%);
+}
+.bar-fill[data-affordability="moderate"]:hover {
+    box-shadow: 0 2px 12px rgba(224, 138, 91, 0.32);
+}
+.bar-fill[data-affordability="low"]:hover {
+    box-shadow: 0 2px 12px rgba(201, 79, 58, 0.32);
+}
 .bar-value {
     font-size: 12px;
     color: var(--white);
@@ -537,17 +556,20 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    border-radius: 8px;
+    border-radius: 10px;
     padding: 10px 6px;
     text-align: center;
-    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
     cursor: pointer;
     position: relative;
-    background: var(--sand);
+    background: linear-gradient(180deg, var(--ocean-100) 0%, #f4faf9 100%);
     border: 1px solid var(--border-soft);
     width: 100%;
     height: 140px;
     overflow: hidden;
+}
+.treemap-box:hover {
+    border-color: var(--seafoam-200);
 }
 .treemap-box:hover {
     transform: translateY(-3px);
@@ -734,6 +756,44 @@ tr.state-row:hover td {
         flex: 1;
         justify-content: center;
     }
+    .panel-body {
+        padding: 20px 18px 22px;
+    }
+    .panel-header {
+        padding: 20px 18px 14px;
+    }
+    .bar-label,
+    .bar-label--state {
+        width: 92px;
+        min-width: 92px;
+        font-size: 12px;
+    }
+    .bar-separator {
+        margin-left: 106px;
+    }
+}
+@media (max-width: 400px) {
+    .bar-label,
+    .bar-label--state {
+        width: 78px;
+        min-width: 78px;
+        font-size: 11.5px;
+    }
+    .bar-separator {
+        margin-left: 92px;
+    }
+    .figure-cell {
+        padding: 22px 18px;
+    }
+    .figure-cell__value {
+        font-size: 28px;
+    }
+    .treemap-box {
+        height: 120px;
+    }
+    .treemap-payment-value {
+        font-size: 15px;
+    }
 }
 
 /* =============================
@@ -748,7 +808,18 @@ tr.state-row:hover td {
 }
 button:focus-visible,
 select:focus-visible,
-.toggle-btn:focus-visible {
+.toggle-btn:focus-visible,
+.treemap-box:focus-visible,
+.treemap-payment-box:focus-visible {
     outline: 2px solid var(--seafoam-500);
     outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(63, 196, 160, 0.18);
+}
+
+/* Tabular alignment for currency / percent figures so columns stack cleanly. */
+.figure-cell__value,
+.bar-value,
+.treemap-payment-value,
+.treemap-income-value {
+    font-variant-numeric: tabular-nums;
 }
