@@ -60,6 +60,104 @@ Two practical consequences for the pipeline:
 
 ---
 
+## Multi-window CPI signals
+
+`bls-cpi-updater.py :: compute_metrics()` emits three windows for every
+series, not just YoY:
+
+| Field            | Window                          | What it catches |
+|------------------|----------------------------------|------------------|
+| `yoy`            | 12 months (same odd-month prior) | Long-run signal — denominator-stable, lags turning points by definition |
+| `pop`            | ~2 months (adjacent bimonthly)   | Highest-frequency print available without imputation; noisy but timely |
+| `annualized6mo`  | ~6 months, annualized            | SAAR-style mid-window — a single noisy print is halved by the geometric mean |
+
+Cleveland Fed's daily inflation nowcasts publish the same three-window
+pattern (YoY, MoM SAAR, quarterly SAAR) for the same reason: a 12-month
+window cannot tell you whether the curve is bending in the most recent
+print, while a 1- or 2-period change cannot tell you whether the latest
+observation is signal or noise. Showing all three lets the reader read
+the level (YoY) and the bend (PoP, 6-mo) on the same chip.
+
+The dashboard's header inflation chip surfaces YoY as the headline and
+exposes PoP and 6-mo annualized in the hover tooltip; the same fields
+ride along on every series in the `cpiData` block so per-component cards
+(shelter, food, energy, transport) can use them without re-fetching.
+
+Annualization formula:
+
+```
+# Bimonthly observations are spaced ~2 calendar months apart.
+# To span 6 months we need 4 observations (3 intervals × 2 mo = 6 mo).
+ratio_6mo     = latest_value / value_4_periods_ago
+annualized6mo = ratio_6mo ** 2 - 1     # 6mo × 2 = 12mo annualization
+```
+
+PoP is computed against the *previous bimonthly observation* (not the
+calendar prior month) — the Honolulu series simply has no Feb/Apr/Jun/...
+prints to reference. Reader-facing UI labels say "PoP" rather than "MoM"
+to keep that honest.
+
+---
+
+## Forward-projection ML assessment (recurring review)
+
+The damped-trend projection in `price_adjuster.py` and `tfp-updater.py`
+deliberately stays in the AR/Holt family rather than reaching for ML.
+Documented rationale below; revisit annually as the Honolulu S49A series
+accumulates more observations.
+
+### Why we do **not** use LSTM / XGBoost / Random Forest today
+
+| Constraint                | Detail |
+|---------------------------|--------|
+| **Sample size**           | ~50 bimonthly obs/series since the 2018 S49A restructure. Standard deep-learning rule of thumb is 10× free parameters; an LSTM with even one 16-unit layer has ~1.5k parameters before output, so the ratio is wrong by an order of magnitude. |
+| **Horizon**               | 1–2 months ≈ 0.5–1 bimonthly steps. Damped Holt is provably near-optimal for short-horizon point forecasts under squared-error loss (Hyndman & Athanasopoulos 2018, §8.7). |
+| **Feature ceiling**       | The signals an ML model would lean on (national CPI, oil futures, AAA gas) are already incorporated upstream of the projection (`gasData`, `cpiData.energy`). Adding them back through a model would double-count. |
+| **Interpretability**      | The `proj.` pill on a card resolves to "smoothed momentum × damping × cap." A black-box prediction would force an audit dialog every time a reviewer asks "why this number?" |
+| **Backtest evidence**     | `backtests/rent_blend_walkforward.py` shows the existing 70/30 blend hits ~3.3% MAPE on Honolulu rent at the 12-month horizon. ML literature on small-sample CPI (Modeling inflation with ML, IJDSA 2025) reports 4–6% MAPE for LSTM at 6-month horizons — i.e. wider error in a shorter window. |
+
+### What we do instead that captures ML's main wins
+
+1. **Multi-source ensembling** — the rent nowcast already blends BLS CPI
+   (lagging, low-noise) with ZORI (leading, high-noise) at fixed weights.
+   This is the single biggest practical win ML papers report (Royal
+   Society Open Science, 2024 LSTM+ARIMA hybrid: ensemble dominates
+   either alone) and we get it without a training loop.
+2. **High-frequency anchors** — Cleveland Fed's nowcasting model uses
+   daily oil and weekly gasoline data to project monthly CPI. We carry
+   AAA daily gas in `gasData` already; for the energy CPI projection
+   path it acts as a directional check on the BLS series between
+   bimonthly prints. (No model needed: a sign disagreement between the
+   gas YoY and the energy CPI projected ratio fires a console warning
+   in `redfin-price-updater.py :: audit_*`.)
+3. **Recency weighting + damping** — the recency-weighted geometric
+   mean over pairwise rates is mathematically the closed-form solution
+   that an exponentially-smoothed gradient-boost regressor would
+   converge on for this loss surface, *without* the regularization
+   tuning headache.
+
+### Trigger conditions for revisiting
+
+Re-evaluate this section when **any** of the following hold:
+
+- Honolulu S49A series exceeds **120 bimonthly observations** (~early
+  2030; gives ML ≥10× current data).
+- Projection horizon routinely exceeds **3 months** (would happen if BLS
+  cadence slipped or Hawaiʻi reporting was deprioritized).
+- A single CPI component (likely energy) shows realized MAPE > 8% over
+  a rolling 12-month backtest — at that error level the marginal
+  accuracy from a tree ensemble starts to matter against the existing
+  ±25%/yr cap.
+
+When (not if) we do retrain: start with **gradient-boosted regression on
+component-level CPI ratios** (XGBoost / LightGBM), not LSTMs. Reasons:
+small-sample stability; explicit feature importances surface which
+high-frequency anchor (gas, oil futures, electricity) actually drives a
+given component; SHAP values give per-projection attribution that fits
+the dashboard's existing `proj.` pill audit story.
+
+---
+
 ## Rent-anchor year
 
 **Single source of truth**: `RENT_ANCHOR_YEAR` constant at the top of

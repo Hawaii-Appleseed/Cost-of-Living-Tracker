@@ -195,7 +195,7 @@ body {
 }
 .disclaimer-text {
     font-size: 14px;
-    color: #6e5318;
+    color: #6e5318;        /* warm gold deep — paired with --gold-500 accent */
     font-weight: 500;
 }
 .disclaimer-tooltip {
@@ -425,7 +425,7 @@ body {
     100% { clip-path: inset(0 0 0 0); }
 }
 .bar-fill:hover {
-    filter: brightness(1.08);
+    filter: brightness(1.08) saturate(1.05);
     box-shadow: 0 2px 12px rgba(30, 138, 115, 0.32);
     z-index: 10;
 }
@@ -551,7 +551,8 @@ body {
 }
 .treemap-box:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(7, 56, 74, 0.08);
+    box-shadow: 0 6px 20px rgba(7, 56, 74, 0.08),
+                0 0 0 1px var(--seafoam-200);
 }
 .treemap-payment-box {
     position: absolute;
@@ -655,7 +656,8 @@ tr.state-row td {
     font-weight: 500;
 }
 tr.state-row:hover td {
-    background: #d8ebee;
+    background: var(--ocean-100);
+    box-shadow: inset 3px 0 0 var(--seafoam-500);
 }
 
 .index-indicator {

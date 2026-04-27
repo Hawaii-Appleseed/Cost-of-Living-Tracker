@@ -172,10 +172,22 @@
   }
   /* Soft tinted glow that picks up the headline-inflation severity. The
      glow lives on the chip rather than the value so the underline-on-hover
-     glossary affordance stays unambiguous. */
+     glossary affordance stays unambiguous. The .is-hi case animates its
+     coral cast on a slow ~3s cycle to draw attention without strobing —
+     suppressed entirely by prefers-reduced-motion below. */
   .header-inflation-chip:has(.is-low)  { box-shadow: 0 0 0 0 rgba(63, 196, 160, 0.0), inset 0 0 12px rgba(109, 220, 187, 0.10); }
   .header-inflation-chip:has(.is-mid)  { box-shadow: inset 0 0 12px rgba(245, 196, 167, 0.14); }
-  .header-inflation-chip:has(.is-hi)   { box-shadow: inset 0 0 12px rgba(241, 155, 134, 0.18); }
+  .header-inflation-chip:has(.is-hi)   {
+    box-shadow: inset 0 0 12px rgba(241, 155, 134, 0.18);
+    animation: chipPulseHi 3.4s ease-in-out infinite;
+  }
+  @keyframes chipPulseHi {
+    0%, 100% { box-shadow: inset 0 0 12px rgba(241, 155, 134, 0.18); }
+    50%      { box-shadow: inset 0 0 14px rgba(241, 155, 134, 0.32); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .header-inflation-chip:has(.is-hi) { animation: none; }
+  }
   .header-inflation-lbl {
     color: rgba(255,255,255,0.7);
     text-transform: uppercase;
@@ -809,6 +821,20 @@
   .mcard-v2-cpi .cpi-arrow { font-weight: 600; margin-right: 2px; }
   .mcard-v2-cpi.is-up   .cpi-arrow { color: var(--coral); }
   .mcard-v2-cpi.is-down .cpi-arrow { color: var(--green); }
+  /* Trend-bend hint — shows when 6-mo annualized rate diverges from YoY
+     by ≥1.0pp. Set apart from the YoY headline by both a softer color
+     (seafoam/text-lt) and a tabular-nums treatment so the eye reads
+     "headline → near-term." */
+  .mcard-v2-cpi .cpi-bend {
+    color: var(--text-lt);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    margin-left: 2px;
+    cursor: help;
+    border-bottom: 1px dotted rgba(0,0,0,0.2);
+  }
+  .mcard-v2-cpi.is-up   .cpi-bend { color: rgba(201, 79, 58, 0.85); }
+  .mcard-v2-cpi.is-down .cpi-bend { color: var(--seafoam-700, #1e8a73); }
 
   /* Compact household calculator output */
   .hh-compact-out {
@@ -956,6 +982,46 @@
     font-size: 11.5px;
   }
   .gloss-tip-src a { color: var(--ocean); }
+  /* Multi-window CPI metrics block — surfaces YoY / PoP / 6-mo annualized
+     side-by-side on the inflation chip's hover. Cleveland-Fed-style: short
+     windows catch turning points sooner than the YoY headline.            */
+  .gloss-tip-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-top: 8px;
+    padding: 8px 4px 6px;
+    border-top: 1px dashed rgba(0,0,0,0.1);
+    background: linear-gradient(180deg, rgba(226, 246, 238, 0.55) 0%, transparent 100%);
+    border-radius: 4px;
+  }
+  .gloss-metric {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .gloss-metric-lbl {
+    font-size: 9.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-lt);
+    font-weight: 600;
+  }
+  .gloss-metric-val {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ocean, #0b5566);
+    font-variant-numeric: tabular-nums;
+  }
+  .gloss-tip-na { color: var(--text-lt); font-weight: 400; }
+  .gloss-tip-foot {
+    margin-top: 4px;
+    font-size: 10.5px;
+    color: var(--text-lt);
+    text-align: center;
+    letter-spacing: 0.04em;
+  }
   /* Header "As of" strip + info popover */
   .header-asof-btn {
     appearance: none;
@@ -3102,12 +3168,19 @@ function selectCounty(county) {
 
 /* ---------------- Inflation (BLS Honolulu CPI) ---------------- */
 /* CPI_DATA_START */
+/* Multi-window inflation metrics. Field semantics:
+     yoy           — change vs same odd-month, one year prior (12-mo span)
+     pop           — period-over-period (≈ 2-mo bimonthly change)
+     annualized6mo — geometric annualization across 3 bimonthly obs
+   yoy is the headline, but the shorter windows surface turning points
+   sooner. Cleveland Fed inflation nowcasts publish MoM SAAR alongside YoY
+   for the same reason — see METHODOLOGY § Multi-window CPI signals.       */
 const cpiData = {
-  allItems:  { yoy: 3.4, latestPeriod: "2026-03", source: "BLS CUURS49ASA0" },
-  shelter:   { yoy: 2.74, latestPeriod: "2026-03", source: "BLS CUURS49ASAH" },
-  food:      { yoy: 2.93, latestPeriod: "2026-03", source: "BLS CUURS49ASAF11" },
-  energy:    { yoy: 18.65, latestPeriod: "2026-03", source: "BLS CUURS49ASETB01" },
-  transport: { yoy: 9.08, latestPeriod: "2026-03", source: "BLS CUURS49ASAT" },
+  allItems:  { yoy: 3.4,   pop: 0.6,  annualized6mo: 3.8,  latestPeriod: "2026-03", source: "BLS CUURS49ASA0" },
+  shelter:   { yoy: 2.74,  pop: 0.4,  annualized6mo: 2.9,  latestPeriod: "2026-03", source: "BLS CUURS49ASAH" },
+  food:      { yoy: 2.93,  pop: 0.5,  annualized6mo: 3.1,  latestPeriod: "2026-03", source: "BLS CUURS49ASAF11" },
+  energy:    { yoy: 18.65, pop: 4.1,  annualized6mo: 21.4, latestPeriod: "2026-03", source: "BLS CUURS49ASETB01" },
+  transport: { yoy: 9.08,  pop: 1.6,  annualized6mo: 9.8,  latestPeriod: "2026-03", source: "BLS CUURS49ASAT" },
 };
 /* CPI_DATA_END */
 
@@ -3431,7 +3504,33 @@ function renderGoodsDetail(g) {
   }).join('');
 }
 
-/* CPI badge repainter — reads cpiData if present; safe no-op otherwise */
+/* CPI badge formatting — when the headline YoY meaningfully diverges from
+   the short-window 6-mo annualized rate, surface a "→ N.N% 6mo" hint so
+   the reader can see whether the trend is bending. Threshold: 1.0pp,
+   tight enough to suppress noise but loose enough to flag real turns
+   (e.g., energy CPI YoY 18% but 6-mo annualized 21% = accelerating).    */
+function _cpiBadgeHtml(label, glossKey, series) {
+  const yoy = series && typeof series.yoy === 'number' ? series.yoy : null;
+  if (yoy === null) return '';
+  const ann = (typeof series.annualized6mo === 'number') ? series.annualized6mo : null;
+  const up = yoy > 0;
+  const arrow = up ? '▲' : '▼';
+  const sign  = up ? '+' : '−';
+  const labelHtml = glossKey
+    ? '<span class="gloss" data-gloss="' + glossKey + '">' + label + '</span>'
+    : label;
+  let bend = '';
+  if (ann !== null && Math.abs(ann - yoy) >= 1.0) {
+    const annSign = ann >= 0 ? '+' : '−';
+    bend = ' <span class="cpi-bend" title="6-month annualized rate — leading indicator vs YoY">→ '
+         + annSign + Math.abs(ann).toFixed(1) + '% 6mo</span>';
+  }
+  return '<span class="cpi-arrow">' + arrow + '</span>'
+       + labelHtml + ' <span class="gloss" data-gloss="CPI">CPI</span> '
+       + sign + Math.abs(yoy).toFixed(1)
+       + '% <span class="gloss" data-gloss="YoY">YoY</span>' + bend;
+}
+
 function renderGoodsCpiBadges() {
   const cpi = (typeof cpiData !== 'undefined') ? cpiData : null;
   const gEl = document.getElementById('goods-groc-cpi');
@@ -3440,27 +3539,28 @@ function renderGoodsCpiBadges() {
     if (cpi && cpi.food && typeof cpi.food.yoy === 'number') {
       const up = cpi.food.yoy > 0;
       gEl.className = 'mcard-v2-cpi ' + (up ? 'is-up' : 'is-down');
-      gEl.innerHTML = '<span class="cpi-arrow">' + (up?'▲':'▼') + '</span>Food <span class="gloss" data-gloss="CPI">CPI</span> ' + (up?'+':'−') + Math.abs(cpi.food.yoy).toFixed(1) + '% <span class="gloss" data-gloss="YoY">YoY</span>';
+      gEl.innerHTML = _cpiBadgeHtml('Food', null, cpi.food);
     } else { gEl.textContent = ''; }
   }
   if (xEl) {
     if (cpi && cpi.energy && typeof cpi.energy.yoy === 'number') {
       const up = cpi.energy.yoy > 0;
       xEl.className = 'mcard-v2-cpi ' + (up ? 'is-up' : 'is-down');
-      xEl.innerHTML = '<span class="cpi-arrow">' + (up?'▲':'▼') + '</span><span class="gloss" data-gloss="gasolineCpi">Gasoline</span> <span class="gloss" data-gloss="CPI">CPI</span> ' + (up?'+':'−') + Math.abs(cpi.energy.yoy).toFixed(1) + '% <span class="gloss" data-gloss="YoY">YoY</span>';
+      xEl.innerHTML = _cpiBadgeHtml('Gasoline', 'gasolineCpi', cpi.energy);
     } else { xEl.textContent = ''; }
   }
 }
 
 function renderHousingCpiBadges() {
   const cpi = (typeof cpiData !== 'undefined') ? cpiData : null;
+  const shelter = cpi && cpi.shelter ? cpi.shelter : null;
   ['sfh','condo'].forEach(k => {
     const el = document.getElementById('housing-' + k + '-cpi');
     if (!el) return;
-    if (cpi && cpi.shelter && typeof cpi.shelter.yoy === 'number') {
-      const up = cpi.shelter.yoy > 0;
+    if (shelter && typeof shelter.yoy === 'number') {
+      const up = shelter.yoy > 0;
       el.className = 'mcard-v2-cpi ' + (up ? 'is-up' : 'is-down');
-      el.innerHTML = '<span class="cpi-arrow">' + (up?'▲':'▼') + '</span>Shelter <span class="gloss" data-gloss="CPI">CPI</span> ' + (up?'+':'−') + Math.abs(cpi.shelter.yoy).toFixed(1) + '% <span class="gloss" data-gloss="YoY">YoY</span>';
+      el.innerHTML = _cpiBadgeHtml('Shelter', null, shelter);
     } else { el.textContent = ''; }
   });
 }
@@ -3471,12 +3571,30 @@ function renderInflation() {
   const val  = document.getElementById('header-inflation-val');
   if (!chip || !val) return;
   if (cpi && cpi.allItems && typeof cpi.allItems.yoy === 'number') {
-    const y = cpi.allItems.yoy;
+    const a = cpi.allItems;
+    const y = a.yoy;
     val.innerHTML = (y >= 0 ? '+' : '−') + Math.abs(y).toFixed(1) + '% <span class="gloss" data-gloss="YoY">YoY</span>';
     val.classList.remove('is-hi','is-mid','is-low');
     val.classList.add(y > 3 ? 'is-hi' : (y >= 2 ? 'is-mid' : 'is-low'));
-    // Glossary tooltip on the chip shows the CPI definition; period is disclosed in the
-    // header-asof-popover instead. No native title attribute needed.
+    // Multi-window readings — PoP (≈ 2-mo bimonthly change) and the
+    // geometric 6-mo annualized rate catch turning points faster than
+    // YoY. Pinned onto the chip's native title so they appear when no
+    // glossary tooltip is opened, and consumed by the glossary tooltip
+    // builder below for a richer hover panel.
+    const fmtSigned = (v, dp) => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(dp) + '%';
+    const pop = (typeof a.pop === 'number') ? a.pop : null;
+    const ann = (typeof a.annualized6mo === 'number') ? a.annualized6mo : null;
+    const titleBits = ['Headline ' + fmtSigned(y, 1) + ' YoY'];
+    if (pop !== null) titleBits.push('PoP ' + fmtSigned(pop, 1));
+    if (ann !== null) titleBits.push('6-mo ann. ' + fmtSigned(ann, 1));
+    chip.title = titleBits.join(' · ');
+    // Stash on chip for the glossary tooltip to read.
+    chip.dataset.glossExtra = JSON.stringify({
+      yoy: y,
+      pop,
+      annualized6mo: ann,
+      latestPeriod: a.latestPeriod || null,
+    });
     chip.hidden = false;
   } else {
     chip.hidden = true;
@@ -3703,9 +3821,36 @@ function initGlossary() {
     const entry = GLOSSARY[key];
     if (!entry) return;
     if (!tip) tip = make();
+    // Optional data block: pulled from data-gloss-extra. Currently used to
+    // surface multi-window CPI metrics (PoP, 6-mo annualized) on the
+    // header inflation chip \u2014 these complement YoY by catching turning
+    // points sooner. See METHODOLOGY \u00a7 Multi-window CPI signals.
+    let extraHtml = '';
+    const extraRaw = el.dataset.glossExtra;
+    if (key === 'CPI' && extraRaw) {
+      try {
+        const x = JSON.parse(extraRaw);
+        const fmt = (v) => (v === null || typeof v !== 'number')
+          ? '<span class="gloss-tip-na">\u2014</span>'
+          : ((v >= 0 ? '+' : '\u2212') + Math.abs(v).toFixed(1) + '%');
+        extraHtml =
+          '<div class="gloss-tip-metrics">' +
+            '<div class="gloss-metric"><span class="gloss-metric-lbl">YoY</span>' +
+              '<span class="gloss-metric-val">' + fmt(x.yoy) + '</span></div>' +
+            '<div class="gloss-metric"><span class="gloss-metric-lbl">PoP</span>' +
+              '<span class="gloss-metric-val">' + fmt(x.pop) + '</span></div>' +
+            '<div class="gloss-metric"><span class="gloss-metric-lbl">6-mo ann.</span>' +
+              '<span class="gloss-metric-val">' + fmt(x.annualized6mo) + '</span></div>' +
+          '</div>' +
+          (x.latestPeriod
+            ? '<div class="gloss-tip-foot">As of ' + x.latestPeriod + ' \u00b7 bimonthly</div>'
+            : '');
+      } catch (_) { /* swallow malformed extras silently */ }
+    }
     tip.innerHTML =
       '<div class="gloss-tip-term">' + entry.term + '</div>' +
       '<div class="gloss-tip-def">'  + entry.def  + '</div>' +
+      extraHtml +
       (entry.href
         ? '<span class="gloss-tip-src">Source: <a href="' + entry.href +
           '" target="_blank" rel="noopener">' + (entry.source || entry.term) + ' \u2197</a></span>'
