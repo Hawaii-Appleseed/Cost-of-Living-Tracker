@@ -492,6 +492,20 @@
   .top-items-table td:nth-child(2), .top-items-table td:nth-child(3) { text-align: right; font-variant-numeric: tabular-nums; }
   .top-items-table tr:last-child td { border-bottom: none; }
 
+  /* Staple item price cards */
+  .staple-items-panel { margin-top: 22px; }
+  .staple-items-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  @media (max-width: 580px) { .staple-items-grid { grid-template-columns: repeat(2, 1fr); } }
+  .staple-item-card {
+    background: white; border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 12px 14px; display: flex; flex-direction: column;
+    align-items: center; text-align: center; gap: 6px;
+  }
+  .staple-item-icon { color: var(--green); display: block; }
+  .staple-item-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .staple-item-unit { font-size: 11.5px; color: var(--text-lt); }
+  .staple-item-price { font-size: 22px; font-weight: 700; color: var(--green); font-variant-numeric: tabular-nums; margin-top: 2px; }
+
   .hh-toggle { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
   .hh-toggle-btn {
     padding: 6px 14px;
@@ -769,33 +783,14 @@
   .mcard-v2--gas .mcard-v2-idx-val { color: var(--amber); }
 
   /* Gas YoY bar (signed: –$1 to +$1, centered zero) */
-  .mcard-v2-yoy-bar {
-    position: relative;
-    height: 8px;
-    background: var(--sand);
-    border-radius: 999px;
-    overflow: hidden;
-    margin-bottom: 14px;
+  .gas-sparkline-wrap { margin-bottom: 14px; }
+  .gas-sparkline-svg { width: 100%; height: 44px; display: block; overflow: visible; }
+  .gas-sparkline-labels {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--text-lt);
+    margin-top: 3px;
+    font-variant-numeric: tabular-nums;
   }
-  .mcard-v2-yoy-bar::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: -2px;
-    bottom: -2px;
-    width: 1px;
-    background: rgba(0,0,0,0.2);
-  }
-  .mcard-v2-yoy-fill {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    transition: all 0.45s cubic-bezier(.4,0,.2,1);
-    border-radius: 999px;
-  }
-  .mcard-v2-yoy-fill.is-up   { background: linear-gradient(90deg, var(--amber), var(--coral)); }
-  .mcard-v2-yoy-fill.is-down { background: linear-gradient(90deg, var(--seafoam-500), var(--seafoam-400)); }
-  .mcard-v2-yoy-fill.is-flat { background: var(--text-lt); }
 
   /* CPI sub-badge on .mcard-v2 (top-right, under date) */
   .mcard-v2-cpi {
@@ -897,6 +892,10 @@
   .period-tag--proj {
     background: rgba(245, 158, 11, 0.16);   /* soft amber */
     color: #92500b;
+  }
+  .period-tag--live {
+    background: rgba(63, 196, 160, 0.18);
+    color: #1a6b56;
   }
   .period-tag--stale {
     background: rgba(239, 68, 68, 0.16);    /* soft coral */
@@ -2636,6 +2635,11 @@
       <div class="affordability-note">Groceries are family-of-4 post-tax (4.5% <span class="gloss" data-gloss="GET">GET</span>). Gas is current <span class="gloss" data-gloss="AAA">AAA</span> Hawaiʻi regular unleaded average.</div>
     </div>
 
+    <div class="staple-items-panel">
+      <div class="card-title" style="margin-bottom:12px;">Staple item prices &middot; <span id="goods-staple-county-label">Statewide</span></div>
+      <div class="staple-items-grid" id="goods-staple-items"></div>
+    </div>
+
     <div class="housing-pair-grid" style="margin-top:22px;">
       <div class="card">
         <div class="card-title">Groceries by county</div>
@@ -3140,21 +3144,21 @@ const blsRentLatestPeriod = "2026-03";
 /* ---------------- Goods & Services (groceries) ---------------- */
 /* GROCERY_DATA_START */
 const groceryData = {
-  State:    { basketPretax:172.58, basketWithTax:180.35, monthlyFamily4:781, groceryIdx:100.4, groceryShareOfIncome:0.0762, weeklyPerCap:45, lastUpdated:"2026-04-15", projected:false, originalPeriod:"", household:{ singleFemale:53.74, singleMale:67.27, singleParent1Child:92.7, family4:180.35 }, categories:{ grains:39.0, vegetables:18.27, fruits:18.91, dairy:28.61, protein_meat:20.08, protein_seafood:1.78, protein_other:4.47, fats_oils:7.04, beverages:23.74, condiments:0.0, sugars_sweets:6.35, snacks:0.0, prepared:4.34 }, topItems:[ { name:"Folgers Classic Roast ground coffee", price:23.74, vsHnl:1.004 }, { name:"Calrose rice", price:21.44, vsHnl:1.007 }, { name:"Tropicana No Pulp Orange Juice, 89 oz", price:10.93, vsHnl:1.015 }, { name:"Ground beef 80/20", price:9.25, vsHnl:0.98 }, { name:"Cheerios, 12 oz", price:9.04, vsHnl:0.988 }, { name:"Land O'Lakes Salted Butter, 1 lb", price:7.84, vsHnl:1.002 }, { name:"Whole milk, gallon — any brand", price:7.58, vsHnl:0.992 }, { name:"Vegetable oil, ~40-48 fl oz", price:7.04, vsHnl:1.03 } ], pumd:{ monthlyFamily4:1037, source:"BLS Consumer Expenditure Survey published Honolulu MSA tables (bootstrap; pending PUMD microdata refresh)", asOf:"2024-12", method:"bootstrap_from_published_aggregates_pending_microdata_refresh" } },
-  Honolulu: { basketPretax:171.82, basketWithTax:179.55, monthlyFamily4:777, groceryIdx:100.0, groceryShareOfIncome:0.0721, weeklyPerCap:45, lastUpdated:"2026-04-15", projected:false, originalPeriod:"", household:{ singleFemale:53.5, singleMale:66.97, singleParent1Child:92.29, family4:179.55 }, categories:{ grains:38.85, vegetables:18.5, fruits:18.65, dairy:28.71, protein_meat:19.83, protein_seafood:1.8, protein_other:4.45, fats_oils:6.83, beverages:23.64, condiments:0.0, sugars_sweets:6.28, snacks:0.0, prepared:4.28 }, topItems:[ { name:"Folgers Classic Roast ground coffee", price:23.64, vsHnl:1.0 }, { name:"Calrose rice", price:21.29, vsHnl:1.0 }, { name:"Tropicana No Pulp Orange Juice, 89 oz", price:10.77, vsHnl:1.0 }, { name:"Ground beef 80/20", price:9.44, vsHnl:1.0 }, { name:"Cheerios, 12 oz", price:9.15, vsHnl:1.0 }, { name:"Land O'Lakes Salted Butter, 1 lb", price:7.82, vsHnl:1.0 }, { name:"Whole milk, gallon — any brand", price:7.64, vsHnl:1.0 }, { name:"Vegetable oil, ~40-48 fl oz", price:6.83, vsHnl:1.0 } ], pumd:{ monthlyFamily4:1030, source:"BLS Consumer Expenditure Survey published Honolulu MSA tables (bootstrap; pending PUMD microdata refresh)", asOf:"2024-12", method:"bootstrap_from_published_aggregates_pending_microdata_refresh" } },
-  Maui:     { basketPretax:180.69, basketWithTax:188.82, monthlyFamily4:818, groceryIdx:105.2, groceryShareOfIncome:0.0885, weeklyPerCap:47, lastUpdated:"2026-04-15", projected:false, originalPeriod:"", household:{ singleFemale:56.27, singleMale:70.43, singleParent1Child:97.05, family4:188.82 }, categories:{ grains:41.71, vegetables:19.46, fruits:20.26, dairy:30.25, protein_meat:19.4, protein_seafood:1.87, protein_other:4.63, fats_oils:7.49, beverages:24.55, condiments:0.0, sugars_sweets:6.91, snacks:0.0, prepared:4.16 }, topItems:[ { name:"Folgers Classic Roast ground coffee", price:24.55, vsHnl:1.038 }, { name:"Calrose rice", price:23.15, vsHnl:1.087 }, { name:"Tropicana No Pulp Orange Juice, 89 oz", price:11.3, vsHnl:1.049 }, { name:"Cheerios, 12 oz", price:9.63, vsHnl:1.052 }, { name:"Ground beef 80/20", price:9.38, vsHnl:0.994 }, { name:"Land O'Lakes Salted Butter, 1 lb", price:8.32, vsHnl:1.064 }, { name:"Whole milk, gallon — any brand", price:7.76, vsHnl:1.016 }, { name:"Large eggs, dozen — any brand", price:7.62, vsHnl:1.126 } ], pumd:{ monthlyFamily4:1083, source:"BLS Consumer Expenditure Survey published Honolulu MSA tables (bootstrap; pending PUMD microdata refresh)", asOf:"2024-12", method:"bootstrap_from_published_aggregates_pending_microdata_refresh" } },
-  Hawaii:   { basketPretax:172.31, basketWithTax:180.06, monthlyFamily4:780, groceryIdx:100.3, groceryShareOfIncome:0.0947, weeklyPerCap:45, lastUpdated:"2026-04-15", projected:false, originalPeriod:"", household:{ singleFemale:53.66, singleMale:67.16, singleParent1Child:92.56, family4:180.06 }, categories:{ grains:37.85, vegetables:16.77, fruits:19.31, dairy:27.87, protein_meat:20.99, protein_seafood:1.67, protein_other:4.53, fats_oils:8.05, beverages:24.0, condiments:0.0, sugars_sweets:6.68, snacks:0.0, prepared:4.59 }, topItems:[ { name:"Folgers Classic Roast ground coffee", price:24.0, vsHnl:1.015 }, { name:"Calrose rice", price:20.79, vsHnl:0.977 }, { name:"Tropicana No Pulp Orange Juice, 89 oz", price:11.65, vsHnl:1.082 }, { name:"Boneless skinless chicken breast", price:8.79, vsHnl:1.328 }, { name:"Cheerios, 12 oz", price:8.33, vsHnl:0.91 }, { name:"Ground beef 80/20", price:8.28, vsHnl:0.877 }, { name:"Vegetable oil, ~40-48 fl oz", price:8.05, vsHnl:1.179 }, { name:"Land O'Lakes Salted Butter, 1 lb", price:7.89, vsHnl:1.009 } ], pumd:{ monthlyFamily4:1033, source:"BLS Consumer Expenditure Survey published Honolulu MSA tables (bootstrap; pending PUMD microdata refresh)", asOf:"2024-12", method:"bootstrap_from_published_aggregates_pending_microdata_refresh" } },
-  Kauai:    { basketPretax:165.41, basketWithTax:172.85, monthlyFamily4:748, groceryIdx:96.3, groceryShareOfIncome:0.0675, weeklyPerCap:43, lastUpdated:"2026-04-15", projected:false, originalPeriod:"", household:{ singleFemale:51.51, singleMale:64.48, singleParent1Child:88.85, family4:172.85 }, categories:{ grains:38.06, vegetables:16.48, fruits:18.29, dairy:25.56, protein_meat:22.61, protein_seafood:1.56, protein_other:4.2, fats_oils:6.11, beverages:22.49, condiments:0.0, sugars_sweets:5.1, snacks:0.0, prepared:4.95 }, topItems:[ { name:"Folgers Classic Roast ground coffee", price:22.49, vsHnl:0.951 }, { name:"Calrose rice", price:21.41, vsHnl:1.006 }, { name:"Tropicana No Pulp Orange Juice, 89 oz", price:10.36, vsHnl:0.962 }, { name:"Boneless skinless chicken breast", price:9.78, vsHnl:1.477 }, { name:"Ground beef 80/20", price:8.99, vsHnl:0.952 }, { name:"Cheerios, 12 oz", price:8.13, vsHnl:0.889 }, { name:"Whole milk, gallon — any brand", price:7.04, vsHnl:0.921 }, { name:"Land O'Lakes Salted Butter, 1 lb", price:6.86, vsHnl:0.877 } ], pumd:{ monthlyFamily4:992, source:"BLS Consumer Expenditure Survey published Honolulu MSA tables (bootstrap; pending PUMD microdata refresh)", asOf:"2024-12", method:"bootstrap_from_published_aggregates_pending_microdata_refresh" } },
+  State:    { basketPretax:172.58, basketWithTax:180.35, monthlyFamily4:781, groceryIdx:100.4, groceryShareOfIncome:0.0762, weeklyPerCap:45, lastUpdated:"2026-04-15", projected:false, originalPeriod:"", household:{ singleFemale:53.74, singleMale:67.27, singleParent1Child:92.7, family4:180.35 }, categories:{ grains:39.0, vegetables:18.27, fruits:18.91, dairy:28.61, protein_meat:20.08, protein_seafood:1.78, protein_other:4.47, fats_oils:7.04, beverages:23.74, condiments:0.0, sugars_sweets:6.35, snacks:0.0, prepared:4.34 }, topItems:[ { name:"Folgers Classic Roast ground coffee", price:23.74, vsHnl:1.004 }, { name:"Calrose rice", price:21.44, vsHnl:1.007 }, { name:"Tropicana No Pulp Orange Juice, 89 oz", price:10.93, vsHnl:1.015 }, { name:"Ground beef 80/20", price:9.25, vsHnl:0.98 }, { name:"Cheerios, 12 oz", price:9.04, vsHnl:0.988 }, { name:"Land O'Lakes Salted Butter, 1 lb", price:7.84, vsHnl:1.002 }, { name:"Whole milk, gallon — any brand", price:7.58, vsHnl:0.992 }, { name:"Vegetable oil, ~40-48 fl oz", price:7.04, vsHnl:1.03 } ], stapleItems:[ { key:"bread", name:"Bread", unit:"20 oz loaf", price:5.23 }, { key:"bananas", name:"Bananas", unit:"per lb", price:0.71 }, { key:"beef", name:"Beef", unit:"1 lb, 80/20", price:6.99 }, { key:"spinach", name:"Spinach", unit:"5 oz bag", price:4.39 } ], pumd:{ monthlyFamily4:1037, source:"BLS Consumer Expenditure Survey published Honolulu MSA tables (bootstrap; pending PUMD microdata refresh)", asOf:"2024-12", method:"bootstrap_from_published_aggregates_pending_microdata_refresh" } },
+  Honolulu: { basketPretax:171.82, basketWithTax:179.55, monthlyFamily4:777, groceryIdx:100.0, groceryShareOfIncome:0.0721, weeklyPerCap:45, lastUpdated:"2026-04-15", projected:false, originalPeriod:"", household:{ singleFemale:53.5, singleMale:66.97, singleParent1Child:92.29, family4:179.55 }, categories:{ grains:38.85, vegetables:18.5, fruits:18.65, dairy:28.71, protein_meat:19.83, protein_seafood:1.8, protein_other:4.45, fats_oils:6.83, beverages:23.64, condiments:0.0, sugars_sweets:6.28, snacks:0.0, prepared:4.28 }, topItems:[ { name:"Folgers Classic Roast ground coffee", price:23.64, vsHnl:1.0 }, { name:"Calrose rice", price:21.29, vsHnl:1.0 }, { name:"Tropicana No Pulp Orange Juice, 89 oz", price:10.77, vsHnl:1.0 }, { name:"Ground beef 80/20", price:9.44, vsHnl:1.0 }, { name:"Cheerios, 12 oz", price:9.15, vsHnl:1.0 }, { name:"Land O'Lakes Salted Butter, 1 lb", price:7.82, vsHnl:1.0 }, { name:"Whole milk, gallon — any brand", price:7.64, vsHnl:1.0 }, { name:"Vegetable oil, ~40-48 fl oz", price:6.83, vsHnl:1.0 } ], stapleItems:[ { key:"bread", name:"Bread", unit:"20 oz loaf", price:5.19 }, { key:"bananas", name:"Bananas", unit:"per lb", price:0.69 }, { key:"beef", name:"Beef", unit:"1 lb, 80/20", price:6.99 }, { key:"spinach", name:"Spinach", unit:"5 oz bag", price:4.29 } ], pumd:{ monthlyFamily4:1030, source:"BLS Consumer Expenditure Survey published Honolulu MSA tables (bootstrap; pending PUMD microdata refresh)", asOf:"2024-12", method:"bootstrap_from_published_aggregates_pending_microdata_refresh" } },
+  Maui:     { basketPretax:180.69, basketWithTax:188.82, monthlyFamily4:818, groceryIdx:105.2, groceryShareOfIncome:0.0885, weeklyPerCap:47, lastUpdated:"2026-04-15", projected:false, originalPeriod:"", household:{ singleFemale:56.27, singleMale:70.43, singleParent1Child:97.05, family4:188.82 }, categories:{ grains:41.71, vegetables:19.46, fruits:20.26, dairy:30.25, protein_meat:19.4, protein_seafood:1.87, protein_other:4.63, fats_oils:7.49, beverages:24.55, condiments:0.0, sugars_sweets:6.91, snacks:0.0, prepared:4.16 }, topItems:[ { name:"Folgers Classic Roast ground coffee", price:24.55, vsHnl:1.038 }, { name:"Calrose rice", price:23.15, vsHnl:1.087 }, { name:"Tropicana No Pulp Orange Juice, 89 oz", price:11.3, vsHnl:1.049 }, { name:"Cheerios, 12 oz", price:9.63, vsHnl:1.052 }, { name:"Ground beef 80/20", price:9.38, vsHnl:0.994 }, { name:"Land O'Lakes Salted Butter, 1 lb", price:8.32, vsHnl:1.064 }, { name:"Whole milk, gallon — any brand", price:7.76, vsHnl:1.016 }, { name:"Large eggs, dozen — any brand", price:7.62, vsHnl:1.126 } ], stapleItems:[ { key:"bread", name:"Bread", unit:"20 oz loaf", price:5.49 }, { key:"bananas", name:"Bananas", unit:"per lb", price:0.79 }, { key:"beef", name:"Beef", unit:"1 lb, 80/20", price:7.49 }, { key:"spinach", name:"Spinach", unit:"5 oz bag", price:4.79 } ], pumd:{ monthlyFamily4:1083, source:"BLS Consumer Expenditure Survey published Honolulu MSA tables (bootstrap; pending PUMD microdata refresh)", asOf:"2024-12", method:"bootstrap_from_published_aggregates_pending_microdata_refresh" } },
+  Hawaii:   { basketPretax:172.31, basketWithTax:180.06, monthlyFamily4:780, groceryIdx:100.3, groceryShareOfIncome:0.0947, weeklyPerCap:45, lastUpdated:"2026-04-15", projected:false, originalPeriod:"", household:{ singleFemale:53.66, singleMale:67.16, singleParent1Child:92.56, family4:180.06 }, categories:{ grains:37.85, vegetables:16.77, fruits:19.31, dairy:27.87, protein_meat:20.99, protein_seafood:1.67, protein_other:4.53, fats_oils:8.05, beverages:24.0, condiments:0.0, sugars_sweets:6.68, snacks:0.0, prepared:4.59 }, topItems:[ { name:"Folgers Classic Roast ground coffee", price:24.0, vsHnl:1.015 }, { name:"Calrose rice", price:20.79, vsHnl:0.977 }, { name:"Tropicana No Pulp Orange Juice, 89 oz", price:11.65, vsHnl:1.082 }, { name:"Boneless skinless chicken breast", price:8.79, vsHnl:1.328 }, { name:"Cheerios, 12 oz", price:8.33, vsHnl:0.91 }, { name:"Ground beef 80/20", price:8.28, vsHnl:0.877 }, { name:"Vegetable oil, ~40-48 fl oz", price:8.05, vsHnl:1.179 }, { name:"Land O'Lakes Salted Butter, 1 lb", price:7.89, vsHnl:1.009 } ], stapleItems:[ { key:"bread", name:"Bread", unit:"20 oz loaf", price:5.29 }, { key:"bananas", name:"Bananas", unit:"per lb", price:0.69 }, { key:"beef", name:"Beef", unit:"1 lb, 80/20", price:6.49 }, { key:"spinach", name:"Spinach", unit:"5 oz bag", price:4.49 } ], pumd:{ monthlyFamily4:1033, source:"BLS Consumer Expenditure Survey published Honolulu MSA tables (bootstrap; pending PUMD microdata refresh)", asOf:"2024-12", method:"bootstrap_from_published_aggregates_pending_microdata_refresh" } },
+  Kauai:    { basketPretax:165.41, basketWithTax:172.85, monthlyFamily4:748, groceryIdx:96.3, groceryShareOfIncome:0.0675, weeklyPerCap:43, lastUpdated:"2026-04-15", projected:false, originalPeriod:"", household:{ singleFemale:51.51, singleMale:64.48, singleParent1Child:88.85, family4:172.85 }, categories:{ grains:38.06, vegetables:16.48, fruits:18.29, dairy:25.56, protein_meat:22.61, protein_seafood:1.56, protein_other:4.2, fats_oils:6.11, beverages:22.49, condiments:0.0, sugars_sweets:5.1, snacks:0.0, prepared:4.95 }, topItems:[ { name:"Folgers Classic Roast ground coffee", price:22.49, vsHnl:0.951 }, { name:"Calrose rice", price:21.41, vsHnl:1.006 }, { name:"Tropicana No Pulp Orange Juice, 89 oz", price:10.36, vsHnl:0.962 }, { name:"Boneless skinless chicken breast", price:9.78, vsHnl:1.477 }, { name:"Ground beef 80/20", price:8.99, vsHnl:0.952 }, { name:"Cheerios, 12 oz", price:8.13, vsHnl:0.889 }, { name:"Whole milk, gallon — any brand", price:7.04, vsHnl:0.921 }, { name:"Land O'Lakes Salted Butter, 1 lb", price:6.86, vsHnl:0.877 } ], stapleItems:[ { key:"bread", name:"Bread", unit:"20 oz loaf", price:4.99 }, { key:"bananas", name:"Bananas", unit:"per lb", price:0.79 }, { key:"beef", name:"Beef", unit:"1 lb, 80/20", price:7.19 }, { key:"spinach", name:"Spinach", unit:"5 oz bag", price:4.19 } ], pumd:{ monthlyFamily4:992, source:"BLS Consumer Expenditure Survey published Honolulu MSA tables (bootstrap; pending PUMD microdata refresh)", asOf:"2024-12", method:"bootstrap_from_published_aggregates_pending_microdata_refresh" } },
 };
 /* GROCERY_DATA_END */
 
 /* GAS_DATA_START */
 const gasData = {
-  State:    { regular:5.658, mid_grade:5.883, premium:6.149, diesel:7.177, mom_change:0.452, yoy_change:1.146, asOf:"2026-04-22" },
-  Honolulu: { regular:5.622, mid_grade:5.887, premium:6.158, diesel:6.951, mom_change:0.558, yoy_change:1.188, asOf:"2026-04-22" },
-  Maui:     { regular:5.677, mid_grade:5.847, premium:6.093, diesel:7.786, mom_change:0.313, yoy_change:1.141, asOf:"2026-04-22" },
-  Hawaii:   { regular:5.655, mid_grade:5.887, premium:6.21, diesel:7.012, mom_change:0.275, yoy_change:1.004, asOf:"2026-04-22" },
-  Kauai:    { regular:5.971, mid_grade:6.232, premium:6.399, diesel:7.359, mom_change:0.425, yoy_change:0.87, asOf:"2026-04-22" },
+  State:    { regular:5.658, mid_grade:5.883, premium:6.149, diesel:7.177, mom_change:0.452, yoy_change:1.146, asOf:"2026-04" },
+  Honolulu: { regular:5.622, mid_grade:5.887, premium:6.158, diesel:6.951, mom_change:0.558, yoy_change:1.188, asOf:"2026-04" },
+  Maui:     { regular:5.677, mid_grade:5.847, premium:6.093, diesel:7.786, mom_change:0.313, yoy_change:1.141, asOf:"2026-04" },
+  Hawaii:   { regular:5.655, mid_grade:5.887, premium:6.21, diesel:7.012, mom_change:0.275, yoy_change:1.004, asOf:"2026-04" },
+  Kauai:    { regular:5.971, mid_grade:6.232, premium:6.399, diesel:7.359, mom_change:0.425, yoy_change:0.87, asOf:"2026-04" },
 };
 /* GAS_DATA_END */
 
@@ -3246,7 +3250,7 @@ function renderGoodsPane() {
   const grocCard = `
     <div class="mcard-v2 mcard-v2--groceries">
       <div class="mcard-v2-header">
-        <span class="mcard-v2-title">Groceries</span>
+        <span class="mcard-v2-title">Groceries <span class="gloss" data-gloss="groceryMonthly" tabindex="0" role="button" aria-label="About this figure" style="font-size:13px;font-weight:400;opacity:0.6;cursor:pointer;">ⓘ</span></span>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;">
           <span class="mcard-v2-date">${dateBadge}</span>
           <span class="mcard-v2-cpi" id="goods-groc-cpi"></span>
@@ -3279,18 +3283,13 @@ function renderGoodsPane() {
                      : yoy > 0.05 ? { cls:'chip--amber', lbl:'Rising' }
                      : yoy < -0.05 ? { cls:'chip--green', lbl:'Falling' }
                      :               { cls:'chip--green', lbl:'Stable' };
-    // YoY bar: centered on zero, range –$1.50 to +$1.50
-    const yoyAbs = Math.min(Math.abs(yoy), 1.5);
-    const yoyWidth = (yoyAbs / 1.5) * 50;
-    const yoyOffset = yoy >= 0 ? 50 : (50 - yoyWidth);
-    const yoyCls = yoy > 0.02 ? 'is-up' : yoy < -0.02 ? 'is-down' : 'is-flat';
     const yoySignStr = yoy >= 0 ? '+' : '−';
     gasCard = `
       <div class="mcard-v2 mcard-v2--gas">
         <div class="mcard-v2-header">
-          <span class="mcard-v2-title">Gas &middot; regular</span>
+          <span class="mcard-v2-title">Gas &middot; regular <span class="gloss" data-gloss="gasSource" tabindex="0" role="button" aria-label="About this figure" style="font-size:13px;font-weight:400;opacity:0.6;cursor:pointer;">ⓘ</span></span>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;">
-            <span class="mcard-v2-date">${gas.asOf || 'Apr 2026'}</span>
+            <span class="mcard-v2-date">${formatMonth(gas.asOf)} <span class="period-tag period-tag--live">live</span></span>
             <span class="mcard-v2-cpi" id="goods-gas-cpi"></span>
           </div>
         </div>
@@ -3298,9 +3297,6 @@ function renderGoodsPane() {
         <div class="mcard-v2-idx-row">
           <span class="mcard-v2-idx-lbl">Year over year</span>
           <span class="mcard-v2-idx-val">${yoySignStr}$${Math.abs(yoy).toFixed(2)}</span>
-        </div>
-        <div class="mcard-v2-yoy-bar">
-          <div class="mcard-v2-yoy-fill ${yoyCls}" style="left:${yoyOffset.toFixed(1)}%;width:${yoyWidth.toFixed(1)}%"></div>
         </div>
         <div class="mcard-v2-footer">
           <span class="chip ${yoyVerdict.cls}">${yoyVerdict.lbl}</span>
@@ -3385,6 +3381,46 @@ function renderGoodsPane() {
 
   /* 5. Details — category bars + top items (only rendered when open OR on first render) */
   renderGoodsDetail(g);
+  renderStapleItems();
+}
+
+const STAPLE_ICONS = {
+  bread: `<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m2.37 11.223 8.372-6.777a2 2 0 0 1 2.516 0l8.371 6.777"/>
+    <path d="M21 15a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-5.25"/>
+    <path d="M3 15a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h9"/>
+    <path d="m6.67 15 6.13 4.6a2 2 0 0 0 2.8-.4l3.15-4.2"/>
+    <rect width="20" height="4" x="2" y="11" rx="1"/>
+  </svg>`,
+  bananas: `<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 13c3.5-2 8-2 10 2a5.5 5.5 0 0 1 8 5"/>
+    <path d="M5.15 17.89c5.52-1.52 8.65-6.89 7-12C11.55 4 11.5 2 13 2c3.22 0 5 5.5 5 8 0 6.5-4.2 12-10.49 12C5.11 22 2 22 2 20c0-1.5 1.14-1.55 3.15-2.11Z"/>
+  </svg>`,
+  beef: `<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16.4 13.7A6.5 6.5 0 1 0 6.28 6.6c-1.1 3.13-.78 3.9-3.18 6.08A3 3 0 0 0 5 18c4 0 8.4-1.8 11.4-4.3"/>
+    <path d="m18.5 6 2.19 4.5a6.48 6.48 0 0 1-2.29 7.2C15.4 20.2 11 22 7 22a3 3 0 0 1-2.68-1.66L2.4 16.5"/>
+    <circle cx="12.5" cy="8.5" r="2.5"/>
+  </svg>`,
+  spinach: `<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+    <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+  </svg>`,
+};
+
+function renderStapleItems() {
+  const grid = document.getElementById('goods-staple-items');
+  const lbl  = document.getElementById('goods-staple-county-label');
+  if (!grid) return;
+  const g = groceryData[currentCounty];
+  if (lbl) lbl.textContent = fullLbl[currentCounty] || 'Statewide';
+  if (!g || !g.stapleItems) { grid.innerHTML = ''; return; }
+  grid.innerHTML = g.stapleItems.map(it => `
+    <div class="staple-item-card">
+      <span class="staple-item-icon">${STAPLE_ICONS[it.key] || ''}</span>
+      <span class="staple-item-name">${it.name}</span>
+      <span class="staple-item-unit">${it.unit}</span>
+      <span class="staple-item-price">$${it.price.toFixed(2)}</span>
+    </div>`).join('');
 }
 
 function renderGoodsDetail(g) {
@@ -3670,6 +3706,16 @@ const GLOSSARY = {
     def:  "Blended estimate of what existing tenants pay this month: 70% Honolulu CPI rent (official but lags asking rent by ~12 months) + 30% Zillow ZORI growth (leading indicator). Anchored to ACS 2024 median contract rent by county. The blend accepts some asking-rent signal to cut the lag without over-reacting to new-listing noise.",
     source: "Method: Cleveland Fed WP 22-38r",
     href:   "https://www.clevelandfed.org/publications/working-paper/2023/wp-2238r-disentangling-rent-index-differences" },
+  gasSource: {
+    term: "Regular unleaded gas price",
+    def:  "County-level average price for regular unleaded gasoline, scraped monthly from AAA Hawaiʻi. Reflects pump prices across Oʻahu, Maui, Hawaiʻi Island, and Kauaʻi — not adjusted for brand or station type. MoM and YoY changes are dollar differences, not percentages.",
+    source: "AAA Hawaiʻi Gas Prices",
+    href:   "https://gasprices.aaa.com/?state=HI" },
+  groceryMonthly: {
+    term: "Monthly grocery cost",
+    def:  "Anchored to the USDA Thrifty Food Plan (TFP) for Hawaiʻi — the federally calibrated minimum-cost food budget for a reference family of four (two adults 20–50, two children 6–11). County variation is applied via our priced staple basket index (Honolulu = 100). Hawaiʻi's 4.5% General Excise Tax (GET) is included.",
+    source: "USDA CNPP Alaska–Hawaii TFP",
+    href:   "https://www.fns.usda.gov/cnpp/usda-food-plans-cost-food-reports-monthly-reports" },
 };
 
 function initGlossary() {
