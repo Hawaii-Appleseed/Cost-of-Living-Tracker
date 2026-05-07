@@ -1276,6 +1276,56 @@
     margin-bottom: 20px;
   }
 
+  /* Goods narrative — share-of-income coverage bar with cost-burden tick.
+     0–20% scale; tick at 10% (cost-burden threshold). Fill color shifts
+     green/amber/coral based on which zone the actual share lands in. */
+  .goods-narr-num {
+    border-bottom: 1px dotted rgba(7, 56, 74, 0.35);
+    cursor: help;
+  }
+  .goods-share-legend {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-lt);
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+  }
+  .goods-share-legend-mid {
+    color: var(--text-mid);
+    font-weight: 600;
+  }
+  .goods-share-track {
+    position: relative;
+    height: 10px;
+    background: var(--sand);
+    border-radius: 999px;
+    margin-bottom: 0;
+    overflow: visible;
+  }
+  .goods-share-fill {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    border-radius: 999px;
+    transition: width 0.45s cubic-bezier(.4,0,.2,1);
+  }
+  .goods-share-fill.is-ok {
+    background: linear-gradient(90deg, var(--seafoam-500), var(--seafoam-700));
+  }
+  .goods-share-fill.is-stretched { background: var(--amber); }
+  .goods-share-fill.is-burden {
+    background: linear-gradient(90deg, var(--coral-300), var(--coral-500));
+  }
+  .goods-share-tick {
+    position: absolute;
+    top: -3px; bottom: -3px;
+    width: 2px;
+    background: rgba(7, 56, 74, 0.45);
+    border-radius: 2px;
+    transform: translateX(-1px);
+    z-index: 2;
+  }
+
   /* "Max affordable" caption + big serif price, side-by-side at wide widths. */
   .afford-max-row {
     display: flex;
@@ -2653,7 +2703,7 @@
   </section><!-- /#pane-housing -->
 
   <section id="pane-goods" class="pane" role="tabpanel">
-    <div id="goods-narrative" class="narrative-card"></div>
+    <div id="goods-narrative" class="afford-banner"></div>
 
     <div class="metrics-container">
       <div class="metrics-container-title">Groceries &amp; gas &middot; {{county}}</div>
@@ -3207,16 +3257,39 @@ function renderGoodsPane() {
   const titleEl = document.querySelector('#pane-goods .metrics-container-title');
   if (titleEl) titleEl.textContent = 'Groceries & gas · ' + fullLbl[currentCounty];
 
-  /* 1. Narrative — one sentence */
-  const shareClr = displayShare > 0.09 ? 'var(--coral)' : displayShare > 0.08 ? 'var(--amber)' : 'var(--green)';
+  /* 1. Narrative snapshot — prose + share-of-income coverage bar with
+     10% cost-burden threshold. Mirrors the housing affordability snapshot
+     so both panes lead with the same visual rhythm. */
+  const shareClr = displayShare > 0.09 ? 'var(--coral)' : displayShare > 0.08 ? 'var(--amber)' : 'var(--green-d)';
   const gasTxt = (gas && gas.regular) ? '<strong>$' + gas.regular.toFixed(2) + '/gal</strong> for gas' : '';
-  const narrProv = tfp ? ' <span style="color:var(--text-lt);">(USDA Thrifty Food Plan, county-adjusted)</span>' : '';
+  const sourceTip = tfp
+    ? `USDA Thrifty Food Plan · county-adjusted · incl. 4.5% GET`
+    : `Tracked basket · incl. 4.5% GET`;
+  const sharePct = displayShare * 100;
+  const SHARE_SCALE = 20;
+  const shareFillW = Math.min(sharePct / SHARE_SCALE * 100, 100);
+  const shareTickAt = 10 / SHARE_SCALE * 100;
+  const shareFillCls = sharePct >= 10 ? 'is-burden' : sharePct >= 8 ? 'is-stretched' : 'is-ok';
+  const eyebrowLbl = currentCounty === 'State'
+    ? 'Statewide &middot; Groceries &amp; gas'
+    : `${fullLbl[currentCounty]} &middot; Groceries &amp; gas`;
   document.getElementById('goods-narrative').innerHTML = `
-    <div class="narrative-eyebrow">${fullLbl[currentCounty]} &middot; Goods</div>
-    <div class="narrative-prose">
-      A family of four spends about <strong>$${displayMonthly.toLocaleString()}/mo</strong> on groceries${narrProv}${gasTxt ? ' and pays ' + gasTxt : ''} —
-      <span style="color:${shareClr};font-weight:600;">${(displayShare*100).toFixed(1)}%</span> of median household income goes to food alone.
-      All grocery figures include Hawaiʻi's 4.5% GET.
+    <div class="afford-banner-label">${eyebrowLbl}</div>
+    <div class="afford-narrative">
+      A family of four spends about
+      <strong class="goods-narr-num" data-tip="${sourceTip}">$${displayMonthly.toLocaleString()}/mo</strong>
+      on groceries${gasTxt ? ' and pays ' + gasTxt : ''} —
+      <span style="color:${shareClr};font-weight:700;">${sharePct.toFixed(1)}%</span>
+      of median household income goes to food alone.
+    </div>
+    <div class="goods-share-legend">
+      <span>0%</span>
+      <span class="goods-share-legend-mid">10% &middot; cost-burden line</span>
+      <span>${SHARE_SCALE}%+</span>
+    </div>
+    <div class="goods-share-track">
+      <div class="goods-share-fill ${shareFillCls}" style="width:${shareFillW}%"></div>
+      <div class="goods-share-tick" style="left:${shareTickAt}%"></div>
     </div>`;
 
   /* 2. Paired cards — Groceries + Gas */
