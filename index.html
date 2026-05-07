@@ -617,27 +617,6 @@
   }
   .narrative-prose strong { color: var(--text); font-weight: 600; }
 
-  .narrative-gap {
-    margin-bottom: 16px;
-  }
-  .narrative-gap-lbl {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    font-size: 13px;
-    color: var(--text-lt);
-    margin-bottom: 7px;
-    gap: 12px;
-  }
-  .narrative-gap-lbl .pct { color: var(--ocean); font-weight: 600; }
-  .narrative-gap-val {
-    color: var(--coral);
-    font-weight: 500;
-    white-space: nowrap;
-    font-variant-numeric: tabular-nums;
-  }
-  .narrative-gap-val.is-ok { color: var(--green); }
-
   .narrative-bar {
     height: 9px;
     background: var(--sand);
@@ -669,12 +648,6 @@
     background: linear-gradient(90deg, var(--seafoam-400), var(--seafoam-200));
   }
 
-  .narrative-chips {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 16px;
-  }
   .chip {
     display: inline-flex;
     align-items: center;
@@ -700,7 +673,6 @@
   @media (max-width: 520px) {
     .narrative-card { padding: 18px 18px; }
     .narrative-prose { font-size: 15.5px; }
-    .narrative-gap-lbl { flex-direction: column; gap: 3px; align-items: flex-start; }
   }
 
   .card-title {
@@ -1291,6 +1263,38 @@
     text-transform: uppercase;
   }
 
+  /* Narrative prose — sets the story before the big number. */
+  .afford-narrative {
+    font-size: 16.5px;
+    color: var(--text-mid);
+    line-height: 1.55;
+    margin-bottom: 16px;
+  }
+  .afford-narrative strong { color: var(--text); font-weight: 600; }
+
+  .afford-coverage-bar {
+    margin-bottom: 20px;
+  }
+
+  /* "Max affordable" caption + big serif price, side-by-side at wide widths. */
+  .afford-max-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+  .afford-max-caption {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-lt);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
   /* R1: hero in ocean-900 (dark navy) for authority. Seafoam stays on the
      stripe and the "under" semantic only. Bumped to 3.4rem for gravitas. */
   .afford-price {
@@ -1299,7 +1303,6 @@
     font-weight: 400;
     color: var(--ocean-900);
     line-height: 1;
-    margin-bottom: 14px;
     letter-spacing: -0.01em;
   }
 
@@ -2551,8 +2554,6 @@
   </div>
 
   <section id="pane-housing" class="pane is-active" role="tabpanel">
-  <div id="county-narrative" class="narrative-card"></div>
-
   <div class="afford-banner" id="afford-banner"></div>
 
   <div class="metrics-container">
@@ -2835,6 +2836,14 @@ function updateAfford() {
   const affordPrice = calcAffordPrice(d.income, rate);
   const sfhDiff = d.sfhPrice - affordPrice;
   const condoDiff = d.condoPrice - affordPrice;
+  const incomeNeeded = Math.round(d.income + d.sfhGap);
+  const coverage = Math.max(0, Math.min(d.income / incomeNeeded, 1));
+  const incomePct = Math.round(coverage * 100);
+  const gapPct = 100 - incomePct;
+  const affordable = d.sfhGap <= 0;
+  const eyebrowLbl = currentCounty === 'State'
+    ? 'Statewide affordability'
+    : `${fullLbl[currentCounty]} &middot; Affordability`;
 
   // Per-bar scale: each bar's total width = that home type's market price.
   // Seafoam fill = what the household's max price covers as a % of market.
@@ -2885,15 +2894,26 @@ function updateAfford() {
   }
 
   document.getElementById('afford-banner').innerHTML = `
-    <div class="afford-banner-label">Max affordable home price <span class="afford-loc">· ${fullLbl[currentCounty]}</span></div>
-    <div class="afford-price">${fmt(affordPrice)}</div>
-    <div class="afford-assumptions-summary">
-      Based on county median income at the current rate
-      <span class="afford-assumptions-info" tabindex="0" role="button" aria-label="Show assumptions" data-tip="${fmt(d.income)} income · ${rate.toFixed(2)}% rate · 20% down · 30% DTI">ⓘ</span>
+    <div class="afford-banner-label">${eyebrowLbl}</div>
+    <div class="afford-narrative">
+      The median 4-person household earns <strong>${fmt(d.income)}</strong> but needs
+      <strong>${fmt(incomeNeeded)}</strong> to afford the median single-family home at ${rate.toFixed(2)}%
+      &mdash; income covers <strong>${incomePct}%</strong> of what's needed.
+    </div>
+    <div class="narrative-bar afford-coverage-bar">
+      <div class="narrative-bar-income${affordable ? ' is-affordable is-full' : ''}" style="width:${incomePct}%"></div>
+      <div class="narrative-bar-gap" style="width:${gapPct}%"></div>
     </div>
     <div class="afford-divider"></div>
+    <div class="afford-max-row">
+      <div class="afford-max-caption">Max affordable home price
+        <span class="afford-assumptions-info" tabindex="0" role="button" aria-label="Show assumptions" data-tip="${fmt(d.income)} income · ${rate.toFixed(2)}% rate · 20% down · 30% DTI">ⓘ</span>
+      </div>
+      <div class="afford-price">${fmt(affordPrice)}</div>
+    </div>
     <div class="afford-gaps">
       ${gapRow('Single-family home', d.sfhPrice)}
+      ${gapRow('Condo', d.condoPrice)}
     </div>
   `;
 }
@@ -2938,54 +2958,6 @@ function updateCalc() {
 
 function selectCounty(county) {
   currentCounty = county;
-  // Narrative headline
-  const nEl = document.getElementById('county-narrative');
-  if (nEl) {
-    const d2 = countyData[county];
-    const rate2 = parseFloat(document.getElementById('rate-slider').value);
-    const incomeNeeded = Math.round(d2.income + d2.sfhGap);
-    const coverage = Math.max(0, Math.min(d2.income / incomeNeeded, 1));
-    const incomePct = Math.round(coverage * 100);
-    const gapPct = 100 - incomePct;
-    const affordable = d2.sfhGap <= 0;
-
-    // SFH status chip (green when affordable, coral/amber otherwise)
-    let sfhChip;
-    if (affordable) {
-      sfhChip = `<span class="chip chip--green">&#10003; SFH affordable at median income</span>`;
-    } else {
-      const sfhCls = d2.sfhGap > 50000 ? 'chip--coral' : 'chip--amber';
-      sfhChip = `<span class="chip ${sfhCls}">SFH gap &minus;${fmt(d2.sfhGap)}</span>`;
-    }
-
-    // Condo status chip
-    let condoChip;
-    if (d2.condoIdx >= 100 || d2.condoGap <= 0) {
-      condoChip = `<span class="chip chip--green">Condo within reach</span>`;
-    } else {
-      const chipCls = d2.condoGap > 50000 ? 'chip--coral' : 'chip--amber';
-      condoChip = `<span class="chip ${chipCls}">Condo gap &minus;${fmt(d2.condoGap)}</span>`;
-    }
-
-    const eyebrowLbl = county === 'State' ? 'Statewide affordability' : `${fullLbl[county]} &middot; Affordability`;
-
-    nEl.innerHTML = `
-      <div class="narrative-eyebrow">${eyebrowLbl}</div>
-      <div class="narrative-prose">
-        The median 4-person household earns <strong>${fmt(d2.income)}</strong> but needs
-        <strong>${fmt(incomeNeeded)}</strong> to afford the median single-family home at ${rate2.toFixed(2)}%
-        &mdash; income covers <strong>${incomePct}%</strong> of what's needed.
-      </div>
-      <div class="narrative-bar" style="margin-bottom:14px;">
-        <div class="narrative-bar-income${affordable ? ' is-affordable is-full' : ''}" style="width:${incomePct}%"></div>
-        <div class="narrative-bar-gap" style="width:${gapPct}%"></div>
-      </div>
-      <div class="narrative-chips">
-        ${sfhChip}
-        ${condoChip}
-      </div>
-    `;
-  }
   // Sync the hero county selector (button label + popover state + close popover)
   const nameEl = document.getElementById('county-select-name');
   if (nameEl) nameEl.textContent = fullLbl[county];
