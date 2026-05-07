@@ -764,19 +764,6 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* CPI sub-badge on .mcard-v2 (top-right, under date) */
-  .mcard-v2-cpi {
-    font-size: 10.5px;
-    color: var(--text-lt);
-    letter-spacing: 0.02em;
-    margin-top: 2px;
-    text-align: right;
-    font-weight: 500;
-  }
-  .mcard-v2-cpi .cpi-arrow { font-weight: 600; margin-right: 2px; }
-  .mcard-v2-cpi.is-up   .cpi-arrow { color: var(--coral); }
-  .mcard-v2-cpi.is-down .cpi-arrow { color: var(--green); }
-
   /* Compact household calculator output */
   .hh-compact-out {
     font-size: 15px;
@@ -3039,9 +3026,8 @@ function selectCounty(county) {
       <div class="mcard-v2 mcard-v2--${kind}">
         <div class="mcard-v2-header">
           <span class="mcard-v2-title">${label}</span>
-          <span class="mcard-v2-date">${dateStr}</span>
+          <span class="mcard-v2-date" id="housing-${kind}-date">${dateStr}</span>
         </div>
-        <span class="mcard-v2-cpi" id="housing-${kind}-cpi"></span>
         <div class="mcard-v2-price" data-tip="${fmt(mortgage)}/mo est. mortgage · P&amp;I only, 20% down">${fmtM(price)}</div>
         <div class="mcard-v2-idx-row">
           <span class="mcard-v2-idx-lbl"><span class="gloss" data-gloss="affordabilityIndex">Affordability index</span></span>
@@ -3317,10 +3303,7 @@ function renderGoodsPane() {
     <div class="mcard-v2 mcard-v2--groceries">
       <div class="mcard-v2-header">
         <span class="mcard-v2-title">Groceries <span class="gloss" data-gloss="groceryMonthly" tabindex="0" role="button" aria-label="About this figure" style="font-size:13px;font-weight:400;opacity:0.6;cursor:pointer;">ⓘ</span></span>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;">
-          <span class="mcard-v2-date">${dateBadge}</span>
-          <span class="mcard-v2-cpi" id="goods-groc-cpi"></span>
-        </div>
+        <span class="mcard-v2-date" id="goods-groc-date">${dateBadge}</span>
       </div>
       <div class="mcard-v2-price">${weeklyDisplayTxt}</div>
       <div class="mcard-v2-sublabel">${sourceSubLabel}</div>
@@ -3354,10 +3337,7 @@ function renderGoodsPane() {
       <div class="mcard-v2 mcard-v2--gas">
         <div class="mcard-v2-header">
           <span class="mcard-v2-title">Gas &middot; regular <span class="gloss" data-gloss="gasSource" tabindex="0" role="button" aria-label="About this figure" style="font-size:13px;font-weight:400;opacity:0.6;cursor:pointer;">ⓘ</span></span>
-          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;">
-            <span class="mcard-v2-date">${formatMonth(gas.asOf)} <span class="period-tag period-tag--live">live</span></span>
-            <span class="mcard-v2-cpi" id="goods-gas-cpi"></span>
-          </div>
+          <span class="mcard-v2-date" id="goods-gas-date">${formatMonth(gas.asOf)} <span class="period-tag period-tag--live">live</span></span>
         </div>
         <div class="mcard-v2-price">$${gas.regular.toFixed(2)}</div>
         <div class="mcard-v2-idx-row">
@@ -3533,37 +3513,28 @@ function renderGoodsDetail(g) {
   }).join('');
 }
 
-/* CPI badge repainter — reads cpiData if present; safe no-op otherwise */
+/* CPI badge repainter — reads cpiData if present; folds into date badge tooltip */
 function renderGoodsCpiBadges() {
   const cpi = (typeof cpiData !== 'undefined') ? cpiData : null;
-  const gEl = document.getElementById('goods-groc-cpi');
-  const xEl = document.getElementById('goods-gas-cpi');
-  if (gEl) {
-    if (cpi && cpi.food && typeof cpi.food.yoy === 'number') {
-      const up = cpi.food.yoy > 0;
-      gEl.className = 'mcard-v2-cpi ' + (up ? 'is-up' : 'is-down');
-      gEl.innerHTML = '<span class="cpi-arrow">' + (up?'▲':'▼') + '</span>Food <span class="gloss" data-gloss="CPI">CPI</span> ' + (up?'+':'−') + Math.abs(cpi.food.yoy).toFixed(1) + '% <span class="gloss" data-gloss="YoY">YoY</span>';
-    } else { gEl.textContent = ''; }
+  const gEl = document.getElementById('goods-groc-date');
+  const xEl = document.getElementById('goods-gas-date');
+  if (gEl && cpi && cpi.food && typeof cpi.food.yoy === 'number') {
+    const up = cpi.food.yoy > 0;
+    gEl.dataset.tip = 'Food CPI ' + (up?'▲':'▼') + (up?'+':'−') + Math.abs(cpi.food.yoy).toFixed(1) + '% YoY';
   }
-  if (xEl) {
-    if (cpi && cpi.energy && typeof cpi.energy.yoy === 'number') {
-      const up = cpi.energy.yoy > 0;
-      xEl.className = 'mcard-v2-cpi ' + (up ? 'is-up' : 'is-down');
-      xEl.innerHTML = '<span class="cpi-arrow">' + (up?'▲':'▼') + '</span><span class="gloss" data-gloss="gasolineCpi">Gasoline</span> <span class="gloss" data-gloss="CPI">CPI</span> ' + (up?'+':'−') + Math.abs(cpi.energy.yoy).toFixed(1) + '% <span class="gloss" data-gloss="YoY">YoY</span>';
-    } else { xEl.textContent = ''; }
+  if (xEl && cpi && cpi.energy && typeof cpi.energy.yoy === 'number') {
+    const up = cpi.energy.yoy > 0;
+    xEl.dataset.tip = 'Gasoline CPI ' + (up?'▲':'▼') + (up?'+':'−') + Math.abs(cpi.energy.yoy).toFixed(1) + '% YoY';
   }
 }
 
 function renderHousingCpiBadges() {
   const cpi = (typeof cpiData !== 'undefined') ? cpiData : null;
   ['sfh','condo'].forEach(k => {
-    const el = document.getElementById('housing-' + k + '-cpi');
-    if (!el) return;
-    if (cpi && cpi.shelter && typeof cpi.shelter.yoy === 'number') {
-      const up = cpi.shelter.yoy > 0;
-      el.className = 'mcard-v2-cpi ' + (up ? 'is-up' : 'is-down');
-      el.innerHTML = '<span class="cpi-arrow">' + (up?'▲':'▼') + '</span>Shelter <span class="gloss" data-gloss="CPI">CPI</span> ' + (up?'+':'−') + Math.abs(cpi.shelter.yoy).toFixed(1) + '% <span class="gloss" data-gloss="YoY">YoY</span>';
-    } else { el.textContent = ''; }
+    const el = document.getElementById('housing-' + k + '-date');
+    if (!el || !cpi || !cpi.shelter || typeof cpi.shelter.yoy !== 'number') return;
+    const up = cpi.shelter.yoy > 0;
+    el.dataset.tip = 'Shelter CPI ' + (up?'▲':'▼') + (up?'+':'−') + Math.abs(cpi.shelter.yoy).toFixed(1) + '% YoY';
   });
 }
 
