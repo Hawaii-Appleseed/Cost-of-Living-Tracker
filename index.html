@@ -1802,6 +1802,14 @@
     .top-tab { font-size: 17px; padding: 12px 14px; min-width: 140px; }
     .coming-soon-grid { grid-template-columns: repeat(2, 1fr); }
     .cat-bar-lbl { width: 100px; font-size: 13px; }
+    /* Rent rows: stack value below bar so long "$X,XXX +$X/mo premium"
+       strings don't overflow the narrow viewport. */
+    .rent-row { gap: 8px; }
+    .rent-row-lbl { width: 64px; font-size: 14px; }
+    .rent-hbar-wrap { flex-wrap: wrap; row-gap: 2px; }
+    .rent-hbar { flex-basis: 100%; }
+    .rent-hbar-val { font-size: 13px; white-space: normal; }
+    .rent-gap-label { display: block; margin-left: 0; font-size: 12px; }
   }
 
   /* =========================================================
