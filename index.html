@@ -2695,7 +2695,7 @@
     <div class="metrics-container">
       <div class="metrics-container-title">Groceries &amp; gas &middot; {{county}}</div>
       <div class="housing-pair-grid" id="goods-pair-grid"></div>
-      <div class="affordability-note">Groceries are family-of-4 post-tax (4.5% <span class="gloss" data-gloss="GET">GET</span>). Gas is current <span class="gloss" data-gloss="AAA">AAA</span> Hawaiʻi regular unleaded average.</div>
+      <div class="affordability-note">Groceries are family-of-4 post-tax retail (USDA TFP, built from BLS Urban Hawaiʻi food-at-home CPI which already includes <span class="gloss" data-gloss="GET">GET</span>). Gas is current <span class="gloss" data-gloss="AAA">AAA</span> Hawaiʻi regular unleaded average.</div>
     </div>
 
     <div class="staple-items-panel">
@@ -2738,7 +2738,7 @@
         <div class="note-box" style="border-left-color:var(--green);margin-bottom:0;">
           <strong style="color:var(--text);">Methodology</strong><br>
           <span id="goods-methodology-body">
-            Headline grocery figures are anchored to the <span class="gloss" data-gloss="USDA">USDA</span> <strong><span class="gloss" data-gloss="thriftyFoodPlan">Thrifty Food Plan</span></strong> for Hawaiʻi — a federally calibrated minimum-cost food budget for the reference family of four (two adults 20–50, two children ages 6–8 and 9–11). County-level variation comes from our priced staple basket below (Honolulu = 100 index). Hawaiʻi's 4.5% <span class="gloss" data-gloss="GET">General Excise Tax</span> is applied at the register.
+            Headline grocery figures are anchored to the <span class="gloss" data-gloss="USDA">USDA</span> <strong><span class="gloss" data-gloss="thriftyFoodPlan">Thrifty Food Plan</span></strong> for Hawaiʻi — a federally calibrated minimum-cost food budget for the reference family of four (two adults 20–50, two children ages 6–8 and 9–11). County-level variation comes from our priced staple basket below (Honolulu = 100 index). The USDA TFP for Hawaiʻi is built from BLS Urban Hawaiʻi food-at-home CPI, which BLS collects with sales and excise taxes already included — so Hawaiʻi's 4.5% <span class="gloss" data-gloss="GET">GET</span> is already reflected in the published figure (no separate tax multiplier is applied).
             <br><br>
             Our tracked basket covers staple SKUs collected from member/loyalty pricing at Foodland (Maikaʻi), Safeway (Club Card), Costco, Walmart, Target, and Don Quijote, then combined using per-county market-share weights derived from USDA SNAP retailer data. It is a <strong>price index</strong>, not a complete household food budget — useful for comparing counties month-to-month. The USDA <span class="gloss" data-gloss="TFP">TFP</span> number reflects the full household food basket as calibrated by USDA.
           </span>
@@ -3216,13 +3216,17 @@ function renderGoodsPane() {
 
   // --- TFP anchor (USDA Thrifty Food Plan, HI reference family of 4) -----
   // When tfpData is present, headline groceries card is anchored to USDA TFP
-  // with county variation from our priced basket (groceryIdx) and 4.5% GET.
+  // with county variation from our priced basket (groceryIdx).
+  // GET is NOT applied separately: USDA TFP is built from BLS Urban Hawaii
+  // food-at-home CPI, which BLS collects with sales/excise taxes already
+  // included (see BLS CPI methodology). Adding 4.5% GET on top would
+  // double-count the tax. The published $1,529.60 Hawaii figure already
+  // reflects post-GET retail prices.
   // When null, fall back to the priced-basket numbers on g.
   const tfp = (typeof tfpData !== 'undefined' && tfpData && tfpData.hawaii) ? tfpData : null;
-  const GET_MULT = 1.045;
   const WEEKS_PER_MONTH = 52 / 12;  // 4.3333… — pair with grocery-price-updater.py
   const countyMult = (g.groceryIdx || 100) / 100;
-  const tfpMonthly = tfp ? tfp.hawaii.family4Monthly * countyMult * GET_MULT : null;
+  const tfpMonthly = tfp ? tfp.hawaii.family4Monthly * countyMult : null;
   const tfpWeekly  = tfpMonthly ? tfpMonthly / WEEKS_PER_MONTH : null;
   const displayMonthly = tfpMonthly ? Math.round(tfpMonthly) : g.monthlyFamily4;
   const displayWeekly  = tfpWeekly  ? tfpWeekly              : g.basketWithTax;
@@ -3236,8 +3240,8 @@ function renderGoodsPane() {
         originalPeriod: tfp.hawaii.originalPeriod || null,
       })
     : 'Apr 2026';
-  const sourceSubLabel = tfp ? 'USDA Thrifty Food Plan · Hawaiʻi · incl. 4.5% GET'
-                             : 'Tracked basket · incl. 4.5% GET';
+  const sourceSubLabel = tfp ? 'USDA Thrifty Food Plan · Hawaiʻi · post-tax retail'
+                             : 'Tracked basket · post-tax retail';
 
   // Update section header {{county}} placeholder
   const titleEl = document.querySelector('#pane-goods .metrics-container-title');
@@ -3249,8 +3253,8 @@ function renderGoodsPane() {
   const shareClr = displayShare > 0.09 ? 'var(--coral)' : displayShare > 0.08 ? 'var(--amber)' : 'var(--green-d)';
   const gasTxt = (gas && gas.regular) ? '<strong>$' + gas.regular.toFixed(2) + '/gal</strong> for gas' : '';
   const sourceTip = tfp
-    ? `USDA Thrifty Food Plan · county-adjusted · incl. 4.5% GET`
-    : `Tracked basket · incl. 4.5% GET`;
+    ? `USDA Thrifty Food Plan · county-adjusted · post-tax retail`
+    : `Tracked basket · post-tax retail`;
   const sharePct = displayShare * 100;
   const SHARE_SCALE = 20;
   const shareFillW = Math.min(sharePct / SHARE_SCALE * 100, 100);
@@ -3368,7 +3372,7 @@ function renderGoodsPane() {
       const gx = gasData[c] || {};
       const cIncome = countyData[c].income;
       const cMult   = (gd.groceryIdx || 100) / 100;
-      const cTfpMo  = tfp ? tfp.hawaii.family4Monthly * cMult * GET_MULT : null;
+      const cTfpMo  = tfp ? tfp.hawaii.family4Monthly * cMult : null;
       const cShare  = cTfpMo ? (cTfpMo * 12) / cIncome : gd.groceryShareOfIncome;
       const cWeekly = cTfpMo ? cTfpMo / 4.33 : (gd.household && gd.household.family4) || 0;
       const sharePct = cShare * 100;
@@ -3750,7 +3754,7 @@ const GLOSSARY = {
     href:   "https://gasprices.aaa.com/?state=HI" },
   groceryMonthly: {
     term: "Monthly grocery cost",
-    def:  "Anchored to the USDA Thrifty Food Plan (TFP) for Hawaiʻi — the federally calibrated minimum-cost food budget for a reference family of four (two adults 20–50, two children 6–11). County variation is applied via our priced staple basket index (Honolulu = 100). Hawaiʻi's 4.5% General Excise Tax (GET) is included.",
+    def:  "Anchored to the USDA Thrifty Food Plan (TFP) for Hawaiʻi — the federally calibrated minimum-cost food budget for a reference family of four (two adults 20–50, two children 6–11). County variation is applied via our priced staple basket index (Honolulu = 100). The TFP is built from BLS Urban Hawaiʻi food-at-home CPI, which already includes sales and excise taxes — so Hawaiʻi's 4.5% GET is already reflected; no separate tax multiplier is applied.",
     source: "USDA CNPP Alaska–Hawaii TFP",
     href:   "https://www.fns.usda.gov/cnpp/usda-food-plans-cost-food-reports-monthly-reports" },
 };
@@ -3995,10 +3999,12 @@ function renderSummaryStrip() {
   const grocVal = document.getElementById('kpi-groc-value');
   const tfp_kpi = (typeof tfpData !== 'undefined' && tfpData && tfpData.hawaii) ? tfpData : null;
   if (g) {
-    const GET_MULT_kpi = 1.045;  // Hawaii GET — must match Goods tab
+    // GET not applied: USDA TFP / BLS Urban Hawaii food CPI is already
+    // collected post-tax (BLS includes sales/excise taxes in CPI prices).
+    // Adding 4.5% on top would double-count.
     const countyMult_kpi = (g.groceryIdx || 100) / 100;
     const monthly_kpi = tfp_kpi
-      ? tfp_kpi.hawaii.family4Monthly * countyMult_kpi * GET_MULT_kpi
+      ? tfp_kpi.hawaii.family4Monthly * countyMult_kpi
       : g.monthlyFamily4;
     grocVal.textContent = typeof monthly_kpi === 'number'
       ? '$' + Math.round(monthly_kpi).toLocaleString() + '/mo'
