@@ -1328,6 +1328,23 @@
     font-weight: 700;
   }
 
+  .afford-assumptions-summary {
+    font-size: 12.5px;
+    color: var(--text-lt);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .afford-assumptions-info {
+    font-size: 13px;
+    opacity: 0.55;
+    cursor: pointer;
+    user-select: none;
+    transition: opacity 0.15s;
+  }
+  .afford-assumptions-info:hover { opacity: 1; }
+
   .afford-divider {
     height: 1px;
     background: rgba(7, 56, 74, 0.08);
@@ -1465,7 +1482,7 @@
       rgba(224,138,91,0.13) 35.29%,  rgba(224,138,91,0.13) 70.59%,
       rgba(201,79,58,0.13)  70.59%,  rgba(201,79,58,0.13)  100%);
   }
-  .pti-bar-fill {
+  .pti-bar-track .pti-bar-fill {
     position: absolute;
     top: 0; left: 0; bottom: 0;
     border-radius: 5px;
@@ -2536,33 +2553,6 @@
     <div class="affordability-note"><span class="gloss" data-gloss="affordabilityIndex">Affordability index</span>: 100 = typical Hawaiʻi household can afford the median home at current mortgage rates.</div>
   </div>
 
-  <div class="section-label">Affordability calculator</div>
-  <div class="calc-section">
-    <p style="font-size:15px;color:var(--text-mid);margin-bottom:16px;">Enter your household income and adjust the mortgage rate to see what you can afford — and how it compares to median market prices.</p>
-
-    <div class="slider-row" id="income-slider-row">
-      <div class="slider-label">Household income</div>
-      <input type="range" id="income-slider" class="has-progress" min="30000" max="300000" step="1000" value="98317" oninput="updateCalc()">
-      <div class="slider-bubble" id="income-bubble">$98,317</div>
-      <div class="slider-val" id="income-display">$98,317</div>
-    </div>
-    <div class="slider-row" id="rate-slider-row">
-      <div class="slider-label">Mortgage rate</div>
-      <input type="range" id="rate-slider" class="has-progress" min="3.0" max="9.0" step="0.05" value="6.38" oninput="updateCalc(); updateAfford()">
-      <div class="slider-bubble" id="rate-bubble">6.38%</div>
-      <div class="slider-val" id="rate-display">6.38%</div>
-    </div>
-
-    <div class="calc-result">
-      <div class="calc-result-label">Max affordable home price</div>
-      <div class="calc-big" id="calc-price">$466,032</div>
-      <div class="calc-tiny">20% down &nbsp;·&nbsp; 30% of gross income to P&amp;I</div>
-      <div class="calc-grid" id="calc-grid"></div>
-    </div>
-
-    <div id="market-compare-wrap" style="margin-top:14px;"></div>
-  </div>
-
   <div class="card" style="margin-bottom:1.25rem;">
     <div class="card-title"><span class="gloss" data-gloss="mortgagePayment">Mortgage payment</span> share of income <span style="color:var(--text-lt);font-weight:400;font-size:14px;">(<span class="gloss" data-gloss="PTI">PTI</span>)</span></div>
     <div class="card-sub">All counties &nbsp;·&nbsp; monthly P&amp;I as % of gross income &nbsp;·&nbsp; 20% down, current rate</div>
@@ -2624,6 +2614,33 @@
       </div>
     </div>
   </details>
+
+  <div class="section-label">Affordability calculator</div>
+  <div class="calc-section">
+    <p style="font-size:15px;color:var(--text-mid);margin-bottom:16px;">Enter your household income and adjust the mortgage rate to see what you can afford — and how it compares to median market prices.</p>
+
+    <div class="slider-row" id="income-slider-row">
+      <div class="slider-label">Household income</div>
+      <input type="range" id="income-slider" class="has-progress" min="30000" max="300000" step="1000" value="98317" oninput="updateCalc()">
+      <div class="slider-bubble" id="income-bubble">$98,317</div>
+      <div class="slider-val" id="income-display">$98,317</div>
+    </div>
+    <div class="slider-row" id="rate-slider-row">
+      <div class="slider-label">Mortgage rate</div>
+      <input type="range" id="rate-slider" class="has-progress" min="3.0" max="9.0" step="0.05" value="6.38" oninput="updateCalc(); updateAfford()">
+      <div class="slider-bubble" id="rate-bubble">6.38%</div>
+      <div class="slider-val" id="rate-display">6.38%</div>
+    </div>
+
+    <div class="calc-result">
+      <div class="calc-result-label">Max affordable home price</div>
+      <div class="calc-big" id="calc-price">$466,032</div>
+      <div class="calc-tiny">20% down &nbsp;·&nbsp; 30% of gross income to P&amp;I</div>
+      <div class="calc-grid" id="calc-grid"></div>
+    </div>
+
+    <div id="market-compare-wrap" style="margin-top:14px;"></div>
+  </div>
   </section><!-- /#pane-housing -->
 
   <section id="pane-goods" class="pane" role="tabpanel">
@@ -2835,7 +2852,6 @@ function updateAfford() {
             <div class="afford-gap-bar-fill-coral" style="left:${seaPct}%;width:${coralPct}%"></div>
           </div>
           <div class="afford-gap-footer">
-            <span>budget covers ${coverPct}%</span>
             <span class="gap-delta over">▲ ${fmt(diff)} over budget</span>
           </div>
         </div>
@@ -2863,11 +2879,9 @@ function updateAfford() {
   document.getElementById('afford-banner').innerHTML = `
     <div class="afford-banner-label">Max affordable home price <span class="afford-loc">· ${fullLbl[currentCounty]}</span></div>
     <div class="afford-price">${fmt(affordPrice)}</div>
-    <div class="afford-assumptions">
-      <span class="afford-assumption-chip"><b>${fmt(d.income)}</b> income</span>
-      <span class="afford-assumption-chip"><b>${rate.toFixed(2)}%</b> rate</span>
-      <span class="afford-assumption-chip"><b>20%</b> down</span>
-      <span class="afford-assumption-chip"><b>30%</b> DTI</span>
+    <div class="afford-assumptions-summary">
+      Based on county median income at the current rate
+      <span class="afford-assumptions-info" tabindex="0" role="button" aria-label="Show assumptions" data-tip="${fmt(d.income)} income · ${rate.toFixed(2)}% rate · 20% down · 30% DTI">ⓘ</span>
     </div>
     <div class="afford-divider"></div>
     <div class="afford-gaps">
@@ -2998,7 +3012,7 @@ function selectCounty(county) {
           <span class="mcard-v2-date">${dateStr}</span>
         </div>
         <span class="mcard-v2-cpi" id="housing-${kind}-cpi"></span>
-        <div class="mcard-v2-price">${fmtM(price)}</div>
+        <div class="mcard-v2-price" data-tip="${fmt(mortgage)}/mo est. mortgage · P&amp;I only, 20% down">${fmtM(price)}</div>
         <div class="mcard-v2-idx-row">
           <span class="mcard-v2-idx-lbl"><span class="gloss" data-gloss="affordabilityIndex">Affordability index</span></span>
           <span class="mcard-v2-idx-val">${Math.round(idx)}<span class="tot"> / 100</span></span>
@@ -3009,7 +3023,6 @@ function selectCounty(county) {
         </div>
         <div class="mcard-v2-footer">
           <span class="chip ${v.cls}">${v.lbl}</span>
-          <span class="mcard-v2-mortgage"><b>${fmt(mortgage)}</b>/mo mortgage payment</span>
         </div>
       </div>`;
   };
