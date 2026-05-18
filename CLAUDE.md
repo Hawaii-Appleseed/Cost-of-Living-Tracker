@@ -7,6 +7,7 @@
 - **Recency-weighted geometric mean** for trend initialization, not naive linear regression. BLS rent CPI samples each unit only every 6 months — single-print noise breaks linear fits.
 - **Repo-relative paths only** in commits and prompts (no `/Users/dtomkatsu/...`). Madison's workdir is `~/repos/Housing-Affordability-Tracker/` — absolute laptop paths are invisible.
 - **Census forecasting must stay harmonized** with the standalone [Census-Forecaster](https://github.com/dtomkatsu/Census-Forecaster) repo. Last sync: commit `d7cbdf4`. Backtest must not regress past 6.76% MAPE.
+- **Every UI change must be verified at 375px mobile width**, not just desktop. The dashboard ships to both, and prior edits have shipped clipped zone labels, overflowing pair-grid cards, and uncomfortably tight chrome because they were only checked at 1280px. Specifically: before reporting any layout/text/CSS change as done — (a) resize the preview to mobile (`preview_resize preset:mobile`), (b) screenshot or snapshot the affected section, (c) confirm no text clipping, no horizontal overflow on `<html>`, and that all badges/chips/bars fit. Use a `@media (max-width: 520px)` block to hide or shorten anything that doesn't fit. Existing breakpoints worth respecting: `≤520px` (phones), `≤640px` (header + KPI strip reflow), `≤750px` (PTI panels collapse to one column).
 
 ## Methodology source of truth
 

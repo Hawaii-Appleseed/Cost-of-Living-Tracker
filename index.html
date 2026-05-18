@@ -18,9 +18,9 @@
        Shifted toward teal so the dark chrome (header, hero cards) reads
        as the same coastal family as --seafoam, not a separate navy world.
        Old pure-blue hues: 900 #0a3d58, 700 #0a4f6e, 500 #1a7a9a.          */
-    --ocean-900: #07384a;
-    --ocean-700: #0b5566;       /* = legacy --ocean; HEADER BG */
-    --ocean-500: #1a8496;       /* = legacy --ocean-mid */
+    --ocean-900: #2F3E46;       /* Brand: Charcoal Blue (hero gradient top) */
+    --ocean-700: #52796F;       /* Brand: Deep Teal (HEADER BG, active tab) */
+    --ocean-500: #6B9E78;       /* Brand: Muted Teal (legacy --ocean-mid, hover/secondary chrome) */
     --ocean-300: #7dc8d3;
     --ocean-100: #e6f3f4;       /* = legacy --sky */
 
@@ -78,29 +78,18 @@
   }
 
   header {
-    /* Soft vertical gradient: deep ocean fading to standard ocean. Reads
-       as a single coastal hue rather than a flat block, and gives the
-       seafoam chips at the top of the page a touch more dimensional contrast. */
-    background:
-      radial-gradient(ellipse 90% 60% at 50% -20%, rgba(63, 196, 160, 0.10), transparent 70%),
-      linear-gradient(180deg, var(--ocean-900) 0%, var(--ocean) 65%);
+    /* Sophisticated dark slate — sits between Charcoal Blue (#2F3E46) and
+       Dark Slate Grey (#354F52). Two-stop gradient with ~5% lightness delta
+       gives subtle dimension without banding. Teal moves to accents (active
+       tabs, badges) rather than dominating the chrome.
+       Extra bottom padding leaves room for the floating KPI card to overlap. */
+    background: linear-gradient(180deg, #2A3A40 0%, #324548 100%);
     color: white;
-    padding: 1.1rem 0 2.6rem;
+    padding: 1.1rem 0 3.5rem;
     position: relative;
     overflow: visible;
   }
-
-  /* Shallow modernized arc at the base of the header */
-  header::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 0; right: 0;
-    height: 22px;
-    background: var(--bg);
-    clip-path: ellipse(130% 100% at 50% 100%);
-    pointer-events: none;
-  }
+  /* Arc dropped — the floating KPI card now bridges the hero to the body. */
 
   .brand-bar {
     max-width: 900px;
@@ -268,19 +257,28 @@
   .county-popover-item.is-active:hover { background: var(--ocean-700); color: white; }
 
   /* Summary strip (white KPI row between hero and tabs) */
+  /* Warm off-white strip background — acts as the soft transitional band
+     between the dark hero and the body content. */
   .summary-strip {
-    background: white;
-    border-bottom: 1px solid var(--border);
+    background: #F2F1ED;
   }
+  /* Inner KPI row floats as a white card overlapping the bottom of the hero —
+     bridges the dark hero and the warm strip, modern dashboard pattern. */
   .summary-strip-inner {
     max-width: 900px;
-    margin: 0 auto;
+    margin: -36px auto 0;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    padding: 18px 2rem;
+    padding: 20px 28px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: 0 4px 22px rgba(20,30,40,0.06);
+    position: relative;
+    z-index: 2;
   }
   .kpi {
-    padding: 2px 20px;
+    padding: 8px 22px;
     border-left: 1px solid var(--border);
     min-width: 0;
   }
@@ -335,16 +333,16 @@
   }
   .kpi-value {
     font-family: 'DM Serif Display', serif !important;
-    font-size: 1.55rem;
+    font-size: 1.85rem;
     color: var(--ocean);
     line-height: 1.1;
-    margin-top: 8px;
+    margin-top: 10px;
     letter-spacing: -0.01em;
   }
   .kpi-sub {
     font-size: 12px;
     color: var(--text-lt);
-    margin-top: 4px;
+    margin-top: 6px;
     line-height: 1.35;
   }
 
@@ -358,11 +356,12 @@
     .county-select-wrap { align-self: stretch; flex: 1 1 auto; }
     .county-select { width: 100%; justify-content: space-between; }
     .county-popover { left: 0; right: 0; }
-    .summary-strip-inner { grid-template-columns: repeat(2, minmax(0,1fr)); row-gap: 18px; padding: 16px 1.25rem; }
-    .kpi { padding: 0 12px; }
+    .summary-strip { padding: 0 1rem; }
+    .summary-strip-inner { grid-template-columns: repeat(2, minmax(0,1fr)); row-gap: 18px; padding: 16px 1.25rem; margin-top: -24px; border-radius: 12px; }
+    .kpi { padding: 4px 12px; }
     .kpi:nth-child(3) { border-left: none; padding-left: 0; }
     .kpi:nth-child(2), .kpi:nth-child(4) { padding-right: 0; }
-    .kpi-value { font-size: 1.35rem; }
+    .kpi-value { font-size: 1.55rem; }
   }
 
   main {
@@ -670,6 +669,30 @@
   .chip--amber { background: var(--amber-lt); color: var(--amber); }
   .chip--green { background: var(--green-lt); color: var(--green); }
 
+  /* Inline number badges — encode verdict via color, not just bold */
+  .num-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.92em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.4;
+    letter-spacing: 0.005em;
+    white-space: nowrap;
+  }
+  .num-badge--coral { background: rgba(201,79,58,0.14); color: var(--coral-500); }
+  .num-badge--amber { background: rgba(224,138,91,0.18); color: #b06637; }
+  .num-badge--green { background: rgba(30,138,115,0.14); color: var(--seafoam-700); }
+  /* Outline variant for REFERENCE numbers (the context, not the verdict) */
+  .num-badge--outline {
+    background: transparent;
+    border: 1px solid rgba(7,56,74,0.18);
+    color: var(--text);
+  }
+
   @media (max-width: 520px) {
     .narrative-card { padding: 18px 18px; }
     .narrative-prose { font-size: 15.5px; }
@@ -687,6 +710,14 @@
     font-size: 15px;
     color: var(--text-lt);
     margin-bottom: 14px;
+  }
+  /* Methodology line — quiet, sits behind the data */
+  .card-sub--meta {
+    font-size: 11.5px;
+    color: var(--text-lt);
+    opacity: 0.7;
+    letter-spacing: 0.015em;
+    margin-bottom: 12px;
   }
 
   .metrics-container {
@@ -1000,6 +1031,35 @@
     line-height: 1.25;
     margin-bottom: 12px;
   }
+  /* #1 — frame line under the title that states what question the card answers */
+  .mcard-v2-frame {
+    font-size: 13px;
+    color: var(--text-mid);
+    line-height: 1.35;
+    margin: -2px 0 10px;
+  }
+  /* #2 — plain-English replacement for "Affordability index · 52 / 100" */
+  .mcard-v2-coverage {
+    font-size: 13.5px;
+    color: var(--text-mid);
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+  .mcard-v2-coverage b {
+    font-weight: 700;
+    color: var(--text);
+  }
+  /* #3 — semantic labels under each bar segment */
+  .mcard-v2-bar-foot {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11.5px;
+    letter-spacing: 0.02em;
+    margin-top: -8px;
+    margin-bottom: 10px;
+  }
+  .mcard-v2-bar-foot-l { color: var(--seafoam-700); font-weight: 600; }
+  .mcard-v2-bar-foot-r { color: var(--coral); font-weight: 600; }
   .mcard-v2-idx-row {
     display: flex;
     align-items: baseline;
@@ -1463,6 +1523,24 @@
   .afford-gap-footer .gap-delta.under { color: var(--seafoam-700); }
   .afford-within { color: var(--seafoam-700); font-weight: 700; }
 
+  /* Anchor row: visually distinct so it reads as the reference, not a comparison */
+  .afford-gap--budget {
+    padding: 12px 14px;
+    background: rgba(7, 56, 74, 0.035);
+    border-radius: 10px;
+    border-left: 3px solid var(--ocean);
+  }
+  .afford-gap--budget .afford-gap-bar-fill-sea {
+    background: var(--ocean);
+    opacity: 0.9;
+  }
+  .afford-gap--budget .afford-gap-label {
+    color: var(--ocean);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 12.5px;
+  }
+
   .over { color: var(--coral-500); }
   .under { color: var(--seafoam-700); }
 
@@ -1516,11 +1594,11 @@
     height: 18px;
     border-radius: 5px;
     position: relative;
-    overflow: hidden;
+    overflow: visible; /* allow anchor tick label to overhang above */
     background: linear-gradient(to right,
-      rgba(30,138,115,0.13)  0%,     rgba(30,138,115,0.13) 35.29%,
-      rgba(224,138,91,0.13) 35.29%,  rgba(224,138,91,0.13) 70.59%,
-      rgba(201,79,58,0.13)  70.59%,  rgba(201,79,58,0.13)  100%);
+      rgba(30,138,115,0.20)  0%,     rgba(30,138,115,0.20) 35.29%,
+      rgba(224,138,91,0.20) 35.29%,  rgba(224,138,91,0.20) 70.59%,
+      rgba(201,79,58,0.20)  70.59%,  rgba(201,79,58,0.20)  100%);
   }
   .pti-bar-track .pti-bar-fill {
     position: absolute;
@@ -1531,12 +1609,51 @@
   }
   .pti-bar-tick {
     position: absolute;
-    top: -2px; bottom: -2px;
+    top: -3px; bottom: -3px;
     width: 2px;
-    background: rgba(7,56,74,0.30);
+    background: var(--ocean-900);
     border-radius: 2px;
     z-index: 2;
+    opacity: 0.55;
   }
+  /* Zone labels embedded in the State row's bar background — doubles as legend */
+  .pti-row.is-state { margin-top: 22px; }
+  .pti-zone-label {
+    position: absolute;
+    bottom: 100%;
+    margin-bottom: 3px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: none;
+    opacity: 0.85;
+  }
+  .pti-zone-label--ok   { color: var(--seafoam-700); }
+  .pti-zone-label--mid  { color: var(--amber); }
+  .pti-zone-label--high { color: var(--coral-500); }
+  /* On narrow viewports the zones are too small for the uppercase labels —
+     hide them. The bar zone background tints + the lede sentence already
+     carry the meaning. */
+  @media (max-width: 520px) {
+    .pti-zone-label { display: none; }
+    .pti-row.is-state { margin-top: 0; }
+  }
+  /* Lede sentence above the PTI grid — same pattern as afford-banner narrative */
+  .pti-lede {
+    font-size: 14.5px;
+    color: var(--text-mid);
+    line-height: 1.45;
+    margin-bottom: 14px;
+  }
+  .pti-lede strong { color: var(--text); }
   .pti-row {
     display: flex;
     align-items: center;
@@ -2522,7 +2639,7 @@
         </div>
       </div>
       <div class="kpi-value" id="kpi-groc-value">—</div>
-      <div class="kpi-sub" id="kpi-groc-sub">Family of 4 · monthly</div>
+      <div class="kpi-sub" id="kpi-groc-sub">family of 4</div>
     </div>
     <div class="kpi">
       <div class="kpi-label-row">
@@ -2549,7 +2666,7 @@
         </div>
       </div>
       <div class="kpi-value" id="kpi-gas-value">—</div>
-      <div class="kpi-sub" id="kpi-gas-sub">Regular unleaded · /gal</div>
+      <div class="kpi-sub" id="kpi-gas-sub">regular · /gal</div>
     </div>
     <div class="kpi">
       <div class="kpi-label-row">
@@ -2569,7 +2686,7 @@
         </div>
       </div>
       <div class="kpi-value" id="kpi-income-value">—</div>
-      <div class="kpi-sub" id="kpi-income-sub">4-person · <span class="gloss" data-gloss="HUD">HUD</span> FY 2025</div>
+      <div class="kpi-sub" id="kpi-income-sub"><span class="gloss" data-gloss="HUD">HUD</span> FY 2025</div>
     </div>
   </div>
 </section>
@@ -2600,8 +2717,7 @@
   </div>
 
   <div class="card" style="margin-bottom:1.25rem;">
-    <div class="card-title"><span class="gloss" data-gloss="mortgagePayment">Mortgage payment</span> share of income <span style="color:var(--text-lt);font-weight:400;font-size:14px;">(<span class="gloss" data-gloss="PTI">PTI</span>)</span></div>
-    <div class="card-sub">All counties &nbsp;·&nbsp; monthly P&amp;I as % of gross income &nbsp;·&nbsp; 20% down, current rate</div>
+    <div class="card-title">How much of income goes to a <span class="gloss" data-gloss="mortgagePayment">mortgage</span>? <span class="afford-assumptions-info" tabindex="0" role="button" aria-label="About this chart" data-tip="All counties · monthly P&amp;I as % of gross income · 20% down, current rate">ⓘ</span></div>
     <div id="pti-bars"></div>
   </div>
 
@@ -2853,10 +2969,11 @@ function gaugeArc(val, color) {
   </svg>`;
 }
 const countyPop = { State: 1435000, Honolulu: 1016000, Hawaii: 201000, Maui: 167000, Kauai: 73000 };
-/* Hexes here map 1:1 to --coral-500 / --coral-300 / --seafoam-500;
-   kept inline because these values flow straight into SVG fill attrs. */
-function ptiColor(v)     { return v>0.60?'#c94f3a':v>0.40?'#e08a5b':'#5ab59a'; }
-function ptiTextColor(v) { return v>0.60?'#c94f3a':v>0.40?'#e08a5b':'#5ab59a'; }
+/* Thresholds (30%/60%) and hexes are locked to the PTI bar zone backgrounds:
+   --seafoam-700 / --coral-300 (--amber) / --coral-500.
+   Inline hex because these values flow straight into SVG fill attrs. */
+function ptiColor(v)     { return v>0.60?'#c94f3a':v>0.30?'#e08a5b':'#1e8a73'; }
+function ptiTextColor(v) { return v>0.60?'#c94f3a':v>0.30?'#e08a5b':'#1e8a73'; }
 function idxClass(v) { return v<55?'danger':v<80?'warning':'ok'; }
 
 function calcAffordPrice(income, ratePct) {
@@ -2933,24 +3050,14 @@ function updateAfford() {
   document.getElementById('afford-banner').innerHTML = `
     <div class="afford-banner-label">${eyebrowLbl}</div>
     <div class="afford-narrative">
-      The median 4-person household earns <strong>${fmt(d.income)}</strong> but needs
-      <strong>${fmt(incomeNeeded)}</strong> to afford the median single-family home at ${rate.toFixed(2)}%
-      &mdash; income covers <strong>${incomePct}%</strong> of what's needed.
+      A typical household can afford a home up to <span class="num-badge num-badge--outline">${fmt(affordPrice)}</span>
+      ${affordable
+        ? `&mdash; at or above the <span class="num-badge num-badge--green">✓ ${fmt(d.sfhPrice)}</span> median single-family price.`
+        : `&mdash; but the median single-family sells for <span class="num-badge num-badge--coral">▲ ${fmt(d.sfhPrice)}</span>.`}
     </div>
     <div class="narrative-bar afford-coverage-bar">
       <div class="narrative-bar-income${affordable ? ' is-affordable is-full' : ''}" style="width:${incomePct}%"></div>
       <div class="narrative-bar-gap" style="width:${gapPct}%"></div>
-    </div>
-    <div class="afford-divider"></div>
-    <div class="afford-max-row">
-      <div class="afford-max-caption">Max affordable home price
-        <span class="afford-assumptions-info" tabindex="0" role="button" aria-label="Show assumptions" data-tip="${fmt(d.income)} income · ${rate.toFixed(2)}% rate · 20% down · 30% DTI">ⓘ</span>
-      </div>
-      <div class="afford-price">${fmt(affordPrice)}</div>
-    </div>
-    <div class="afford-gaps">
-      ${gapRow('Single-family home', d.sfhPrice)}
-      ${gapRow('Condo', d.condoPrice)}
     </div>
   `;
 }
@@ -3022,20 +3129,30 @@ function selectCounty(county) {
     const incomeFull = idx >= 100;
     const incomeCls  = 'mcard-v2-bar-income'
                      + (incomeFull ? ' is-full is-affordable' : '');
+    const coverPct   = Math.round(idx);
+    const coverBadgeCls = idx >= 100 ? 'num-badge--green'
+                       : idx >= 80  ? 'num-badge--green'
+                       : idx >= 55  ? 'num-badge--amber'
+                       :              'num-badge--coral';
+    const coverageLine = idx >= 100
+      ? `Typical income covers <span class="num-badge num-badge--green">the full cost</span> at this price.`
+      : `Typical income covers <span class="num-badge ${coverBadgeCls}">${coverPct}%</span> of what's needed.`;
     return `
       <div class="mcard-v2 mcard-v2--${kind}">
         <div class="mcard-v2-header">
           <span class="mcard-v2-title">${label}</span>
           <span class="mcard-v2-date" id="housing-${kind}-date">${dateStr}</span>
         </div>
+        <div class="mcard-v2-frame">Can a typical household afford this?</div>
         <div class="mcard-v2-price" data-tip="${fmt(mortgage)}/mo est. mortgage · P&amp;I only, 20% down">${fmtM(price)}</div>
-        <div class="mcard-v2-idx-row">
-          <span class="mcard-v2-idx-lbl"><span class="gloss" data-gloss="affordabilityIndex">Affordability index</span></span>
-          <span class="mcard-v2-idx-val">${Math.round(idx)}<span class="tot"> / 100</span></span>
-        </div>
+        <div class="mcard-v2-coverage">${coverageLine}</div>
         <div class="mcard-v2-bar">
           <div class="${incomeCls}" style="width:${incomePct}%"></div>
           ${gapPct > 0 ? `<div class="mcard-v2-bar-gap" style="width:${gapPct}%"></div>` : ''}
+        </div>
+        <div class="mcard-v2-bar-foot">
+          <span class="mcard-v2-bar-foot-l">Income covers</span>
+          ${gapPct > 0 ? `<span class="mcard-v2-bar-foot-r">Shortfall</span>` : ''}
         </div>
         <div class="mcard-v2-footer">
           <span class="chip ${v.cls}">${v.lbl}</span>
@@ -3060,14 +3177,19 @@ function selectCounty(county) {
 
   // Build one row inside a PTI panel. Reuses ptiColor() for semantic color.
   // Rows are clickable → selecting one filters the dashboard to that county.
+  // State row embeds the zone legend inside its bar background (Rec C).
   const ptiRow = (c, v, isState) => {
     const w = Math.min(v / maxPTI * 100, 100).toFixed(1);
     const clr = ptiColor(v);
     const isCurrent = c === currentCounty;
+    const zoneLabels = isState ? `
+          <span class="pti-zone-label pti-zone-label--ok"   style="left:0%;width:35.29%">Affordable</span>
+          <span class="pti-zone-label pti-zone-label--mid"  style="left:35.29%;width:35.30%">Cost-burdened</span>
+          <span class="pti-zone-label pti-zone-label--high" style="left:70.59%;width:29.41%">Severe</span>` : '';
     return `
-      <div class="pti-row is-clickable${isCurrent ? ' is-current' : ''}" role="button" tabindex="0" data-county="${c}" title="View ${fullLbl[c]}">
+      <div class="pti-row is-clickable${isCurrent ? ' is-current' : ''}${isState ? ' is-state' : ''}" role="button" tabindex="0" data-county="${c}" title="View ${fullLbl[c]}">
         <div class="pti-row-lbl${isState ? ' pti-row-lbl--state' : ''}">${shortLbl[c]}</div>
-        <div class="pti-bar-track">
+        <div class="pti-bar-track">${zoneLabels}
           <div class="pti-bar-fill" style="width:${w}%;background:${clr};" data-tip="${pct(v)} of income to mortgage P&amp;I"></div>
           <div class="pti-bar-tick" style="left:${threshPct}%;" title="30% cost-burden threshold"></div>
         </div>
@@ -3077,21 +3199,20 @@ function selectCounty(county) {
     `;
   };
 
+  // Lede: count counties (excluding statewide) whose SFH PTI exceeds 30%.
+  const ledeCountyKeys = counties.filter(c => c !== 'State');
+  const sfhOver = ledeCountyKeys.filter(c => countyData[c].sfhPTI > 0.30).length;
+  const sfhTotal = ledeCountyKeys.length;
+  const ledeBadgeCls = sfhOver === 0 ? 'num-badge--green'
+                     : sfhOver < sfhTotal ? 'num-badge--amber'
+                     : 'num-badge--coral';
+  const ledeFrag = sfhOver === sfhTotal
+    ? `<span class="num-badge ${ledeBadgeCls}">all ${sfhTotal} counties</span>`
+    : `<span class="num-badge ${ledeBadgeCls}">${sfhOver} of ${sfhTotal} counties</span>`;
+  const ledeText = `In ${ledeFrag}, a typical single-family mortgage exceeds the 30% cost-burden line.`;
+
   document.getElementById('pti-bars').innerHTML = `
-    <div class="pti-legend">
-      <span class="pti-legend-item">
-        <span class="pti-legend-dot" style="background:rgba(30,138,115,0.55);"></span>
-        Under 30% — affordable
-      </span>
-      <span class="pti-legend-item">
-        <span class="pti-legend-dot" style="background:rgba(224,138,91,0.75);"></span>
-        30–60% — <span class="gloss" data-gloss="costBurdened">cost-burdened</span>
-      </span>
-      <span class="pti-legend-item">
-        <span class="pti-legend-dot" style="background:rgba(201,79,58,0.80);"></span>
-        Over 60% — severely burdened
-      </span>
-    </div>
+    <div class="pti-lede">${ledeText}</div>
     <div class="pti-split-grid">
       <div class="pti-panel">
         <div class="pti-panel-header pti-panel-header--sfh">Single-family home</div>
@@ -3250,8 +3371,7 @@ function renderGoodsPane() {
   /* 1. Narrative snapshot — prose + share-of-income coverage bar with
      10% cost-burden threshold. Mirrors the housing affordability snapshot
      so both panes lead with the same visual rhythm. */
-  const shareClr = displayShare > 0.09 ? 'var(--coral)' : displayShare > 0.08 ? 'var(--amber)' : 'var(--green-d)';
-  const gasTxt = (gas && gas.regular) ? '<strong>$' + gas.regular.toFixed(2) + '/gal</strong> for gas' : '';
+  const gasTxt = (gas && gas.regular) ? '<span class="num-badge num-badge--outline">$' + gas.regular.toFixed(2) + '/gal</span> for gas' : '';
   const sourceTip = tfp
     ? `USDA Thrifty Food Plan · county-adjusted · post-tax retail`
     : `Tracked basket · post-tax retail`;
@@ -3260,6 +3380,9 @@ function renderGoodsPane() {
   const shareFillW = Math.min(sharePct / SHARE_SCALE * 100, 100);
   const shareTickAt = 10 / SHARE_SCALE * 100;
   const shareFillCls = sharePct >= 10 ? 'is-burden' : sharePct >= 8 ? 'is-stretched' : 'is-ok';
+  const shareBadgeCls = sharePct >= 10 ? 'num-badge--coral'
+                      : sharePct >= 8  ? 'num-badge--amber'
+                      :                  'num-badge--green';
   const eyebrowLbl = currentCounty === 'State'
     ? 'Statewide &middot; Groceries &amp; gas'
     : `${fullLbl[currentCounty]} &middot; Groceries &amp; gas`;
@@ -3267,19 +3390,10 @@ function renderGoodsPane() {
     <div class="afford-banner-label">${eyebrowLbl}</div>
     <div class="afford-narrative">
       A family of four spends about
-      <strong class="goods-narr-num" data-tip="${sourceTip}">$${displayMonthly.toLocaleString()}/mo</strong>
+      <span class="num-badge num-badge--outline goods-narr-num" data-tip="${sourceTip}">$${displayMonthly.toLocaleString()}/mo</span>
       on groceries${gasTxt ? ' and pays ' + gasTxt : ''} —
-      <span style="color:${shareClr};font-weight:700;">${sharePct.toFixed(1)}%</span>
+      <span class="num-badge ${shareBadgeCls}">${sharePct.toFixed(1)}%</span>
       of median household income goes to food alone.
-    </div>
-    <div class="goods-share-legend">
-      <span>0%</span>
-      <span class="goods-share-legend-mid">10% &middot; cost-burden line</span>
-      <span>${SHARE_SCALE}%+</span>
-    </div>
-    <div class="goods-share-track">
-      <div class="goods-share-fill ${shareFillCls}" style="width:${shareFillW}%"></div>
-      <div class="goods-share-tick" style="left:${shareTickAt}%"></div>
     </div>`;
 
   /* 2. Paired cards — Groceries + Gas */
@@ -3295,25 +3409,22 @@ function renderGoodsPane() {
   const monthlyFmt = '$' + displayMonthly.toLocaleString();
   const weeklyDisplayTxt = '$' + Math.round(displayWeekly).toLocaleString() + '/wk';
   // BLS CE PUMD side-statistic — actual measured monthly food-at-home for
-  // a "typical" household. Honolulu directly from PUMD; neighbor islands
-  // scaled by receipt basket gradient. Omitted if no pumd block present.
-  const pumdLine = (g.pumd && g.pumd.monthlyFamily4)
-    ? `<div class="mcard-v2-pumd" title="${g.pumd.source || 'BLS CE PUMD'}${g.pumd.asOf ? ' · ' + g.pumd.asOf : ''}">
-         Typical: <b>$${g.pumd.monthlyFamily4.toLocaleString()}</b>/mo
-         <span class="mcard-v2-pumd-src">per BLS CE PUMD</span>
-       </div>`
+  // a "typical" household. Folded into the title ⓘ tooltip rather than
+  // shown as a competing dollar figure in the card body.
+  const pumdTipFrag = (g.pumd && g.pumd.monthlyFamily4)
+    ? ` · BLS CE PUMD typical: $${g.pumd.monthlyFamily4.toLocaleString()}/mo`
     : '';
+  const grocTitleTip = `${sourceSubLabel}${pumdTipFrag}`;
   const grocCard = `
     <div class="mcard-v2 mcard-v2--groceries">
       <div class="mcard-v2-header">
-        <span class="mcard-v2-title">Groceries <span class="gloss" data-gloss="groceryMonthly" tabindex="0" role="button" aria-label="About this figure" style="font-size:13px;font-weight:400;opacity:0.6;cursor:pointer;">ⓘ</span></span>
+        <span class="mcard-v2-title">Groceries <span class="gloss" tabindex="0" role="button" aria-label="About this figure" data-tip="${grocTitleTip}" style="font-size:13px;font-weight:400;opacity:0.6;cursor:pointer;">ⓘ</span></span>
         <span class="mcard-v2-date" id="goods-groc-date">${dateBadge}</span>
       </div>
       <div class="mcard-v2-price">${weeklyDisplayTxt}</div>
-      <div class="mcard-v2-sublabel">${sourceSubLabel}</div>
       <div class="mcard-v2-idx-row">
         <span class="mcard-v2-idx-lbl">Share of median income</span>
-        <span class="mcard-v2-idx-val">${grocSharePct.toFixed(1)}<span class="tot"> %</span></span>
+        <span class="num-badge ${shareBadgeCls}">${grocSharePct.toFixed(1)}%</span>
       </div>
       <div class="mcard-v2-bar">
         <div class="${grocFillCls}" style="width:${grocFillPct.toFixed(1)}%"></div>
@@ -3321,9 +3432,7 @@ function renderGoodsPane() {
       </div>
       <div class="mcard-v2-footer">
         <span class="chip ${grocVerdict.cls}">${grocVerdict.lbl}</span>
-        <span class="mcard-v2-mortgage"><b>${monthlyFmt}</b>/mo &middot; family of 4</span>
       </div>
-      ${pumdLine}
     </div>`;
 
   // Gas card
@@ -3331,12 +3440,15 @@ function renderGoodsPane() {
   if (gas && typeof gas.regular === 'number') {
     const momArrow = gas.mom_change > 0.02 ? '▲' : gas.mom_change < -0.02 ? '▼' : '•';
     const yoy = gas.yoy_change || 0;
-    const yoySign = yoy > 0.02 ? 'up' : yoy < -0.02 ? 'down' : 'flat';
-    const yoyVerdict = yoy > 0.20 ? { cls:'chip--coral', lbl:'Rising fast' }
-                     : yoy > 0.05 ? { cls:'chip--amber', lbl:'Rising' }
-                     : yoy < -0.05 ? { cls:'chip--green', lbl:'Falling' }
-                     :               { cls:'chip--green', lbl:'Stable' };
-    const yoySignStr = yoy >= 0 ? '+' : '−';
+    // Year-over-year as a percentage: yoy_change is $-delta, so prior price = current - delta
+    const priorPrice = gas.regular - yoy;
+    const yoyPct = priorPrice > 0 ? yoy / priorPrice : 0;
+    const yoyVerdict = yoyPct > 0.10 ? { cls:'chip--coral', badge:'num-badge--coral', arrow:'▲', lbl:'Rising fast' }
+                     : yoyPct > 0.02 ? { cls:'chip--amber', badge:'num-badge--amber', arrow:'▲', lbl:'Rising' }
+                     : yoyPct < -0.02 ? { cls:'chip--green', badge:'num-badge--green', arrow:'▼', lbl:'Falling' }
+                     :                  { cls:'chip--green', badge:'num-badge--green', arrow:'•', lbl:'Stable' };
+    const yoyPctSign = yoyPct >= 0 ? '+' : '−';
+    const yoyPctTxt = `${yoyPctSign}${Math.abs(yoyPct * 100).toFixed(0)}%`;
     gasCard = `
       <div class="mcard-v2 mcard-v2--gas">
         <div class="mcard-v2-header">
@@ -3346,7 +3458,7 @@ function renderGoodsPane() {
         <div class="mcard-v2-price">$${gas.regular.toFixed(2)}</div>
         <div class="mcard-v2-idx-row">
           <span class="mcard-v2-idx-lbl">Year over year</span>
-          <span class="mcard-v2-idx-val">${yoySignStr}$${Math.abs(yoy).toFixed(2)}</span>
+          <span class="num-badge ${yoyVerdict.badge}">${yoyVerdict.arrow} ${yoyPctTxt}</span>
         </div>
         <div class="mcard-v2-footer">
           <span class="chip ${yoyVerdict.cls}">${yoyVerdict.lbl}</span>
@@ -3935,7 +4047,7 @@ function renderSummaryStrip() {
   const homeSub = document.getElementById('kpi-home-sub');
   if (currentHomeView === 'rent') {
     homeVal.textContent = fmt(d.rent) + '/mo';
-    homeSub.innerHTML = 'Median gross rent · <span class="gloss" data-gloss="ACS">ACS</span> 5-yr';
+    homeSub.innerHTML = 'median gross rent';
   } else {
     homeVal.textContent = fmtMoneyBig(d.sfhPrice);
     // Pull period (same logic as hero card): prefer global marker, fallback to countyData.
@@ -3944,7 +4056,7 @@ function renderSummaryStrip() {
           ? housingLatestPeriod
           : ((countyData.State && countyData.State.period) ? countyData.State.period.slice(0, 7) : null);
     const _kpiHousingBadge = _kpiHousingPeriod ? formatMonth(_kpiHousingPeriod) : '—';
-    homeSub.innerHTML = '<span class="gloss" data-gloss="medianPrice">Median</span> single-family · ' + _kpiHousingBadge;
+    homeSub.innerHTML = _kpiHousingBadge;
   }
   document.querySelectorAll('#kpi-home .kpi-seg-opt').forEach(b => {
     const on = b.getAttribute('data-view') === currentHomeView;
@@ -4022,13 +4134,13 @@ function renderSummaryStrip() {
       const arrow = gas.mom_change > 0.005 ? '▲' : gas.mom_change < -0.005 ? '▼' : '•';
       const clr   = gas.mom_change > 0.005 ? 'var(--coral)' : gas.mom_change < -0.005 ? 'var(--green)' : 'var(--text-lt)';
       const sign  = gas.mom_change >= 0 ? '+' : '−';
-      gasSub.innerHTML = 'Regular · <span style="color:' + clr + ';font-weight:500;">' + arrow + ' ' + sign + '$' + Math.abs(gas.mom_change).toFixed(2) + ' <span class="gloss" data-gloss="MoM">MoM</span></span>';
+      gasSub.innerHTML = '<span style="color:' + clr + ';font-weight:600;">' + arrow + ' ' + sign + '$' + Math.abs(gas.mom_change).toFixed(2) + ' <span class="gloss" data-gloss="MoM">MoM</span></span>';
     } else {
-      gasSub.textContent = 'Regular unleaded · /gal';
+      gasSub.textContent = 'regular · /gal';
     }
   } else {
     gasVal.textContent = '—';
-    gasSub.textContent = 'Regular unleaded · /gal';
+    gasSub.textContent = 'regular · /gal';
   }
 
   // Tile 4 — Median income (4-person, HUD)
