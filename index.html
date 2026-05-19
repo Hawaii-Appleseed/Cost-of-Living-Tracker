@@ -2739,43 +2739,48 @@
     <div id="rent-grid"></div>
   </div>
 
-  <details class="goods-detail" id="housing-detail-disclosure">
-    <summary>Construction costs &amp; methodology</summary>
-    <div class="goods-detail-body">
-      <div class="card">
-        <div class="card-title">Construction hard costs &nbsp;·&nbsp; Honolulu (Q1 2026)</div>
-        <div class="card-sub"><span class="gloss" data-gloss="RLB">RLB</span> Quarterly Cost Report &nbsp;·&nbsp; change measured from Q1 2020</div>
-        <div class="rlb-grid">
-          <div class="rlb-card">
-            <div class="rlb-label">Multifamily</div>
-            <div class="rlb-range">$310 – $520/sf</div>
-            <div class="rlb-change">+51% low end since Q1 2020</div>
-          </div>
-          <div class="rlb-card">
-            <div class="rlb-label">Single-family</div>
-            <div class="rlb-range">$345 – $645/sf</div>
-            <div class="rlb-change">+19% low end since Q1 2020</div>
-          </div>
-          <div class="rlb-card">
-            <div class="rlb-label">Ground parking</div>
-            <div class="rlb-range">$190 – $245/sf</div>
-            <div class="rlb-change">+81% low end since Q1 2020</div>
-          </div>
-        </div>
-        <div class="card-sub" style="margin-bottom:8px;">Low-end cost indices &nbsp;·&nbsp; Q1 2020 = 100</div>
-        <div class="legend-row" style="margin-bottom:10px;">
-          <span><span class="swatch" style="background:var(--ocean-500);"></span>Multifamily</span>
-          <span><span class="swatch" style="background:var(--seafoam-500);"></span>Single-family</span>
-          <span><span class="swatch" style="background:var(--coral-300);"></span>Ground parking</span>
-          <span><span class="swatch" style="background:var(--ocean-900);"></span>Composite</span>
-        </div>
-        <div style="position:relative;width:100%;height:180px;"><canvas id="rlb-chart"></canvas></div>
-
-        <div class="card-sub" style="margin-top:20px;margin-bottom:10px;">Private building authorizations by county &nbsp;·&nbsp; <span class="gloss" data-gloss="DBEDT">DBEDT</span> QSER · 2025 annual total</div>
-        <div id="build-auth-bars"></div>
+  <div class="card" id="construction-card">
+    <div class="card-title">Construction hard costs &nbsp;·&nbsp; Honolulu (Q1 2026)</div>
+    <div class="card-sub"><span class="gloss" data-gloss="RLB">RLB</span> Quarterly Cost Report &nbsp;·&nbsp; change measured from Q1 2020</div>
+    <div class="rlb-grid">
+      <div class="rlb-card">
+        <div class="rlb-label">Multifamily</div>
+        <div class="rlb-range">$310 – $520/sf</div>
+        <div class="rlb-change">+51% low end since Q1 2020</div>
       </div>
+      <div class="rlb-card">
+        <div class="rlb-label">Single-family</div>
+        <div class="rlb-range">$345 – $645/sf</div>
+        <div class="rlb-change">+19% low end since Q1 2020</div>
+      </div>
+      <div class="rlb-card">
+        <div class="rlb-label">Ground parking</div>
+        <div class="rlb-range">$190 – $245/sf</div>
+        <div class="rlb-change">+81% low end since Q1 2020</div>
+      </div>
+    </div>
 
-      <div class="note-box" style="margin-bottom:0;">
+    <div class="staple-more-row" style="margin-top:16px;">
+      <button class="staple-more-btn" id="construction-more-btn" aria-expanded="false">
+        <span>More</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+
+    <div id="construction-more" style="display:none;margin-top:12px;">
+      <div class="card-sub" style="margin-bottom:8px;">Low-end cost indices &nbsp;·&nbsp; Q1 2020 = 100</div>
+      <div class="legend-row" style="margin-bottom:10px;">
+        <span><span class="swatch" style="background:var(--ocean-500);"></span>Multifamily</span>
+        <span><span class="swatch" style="background:var(--seafoam-500);"></span>Single-family</span>
+        <span><span class="swatch" style="background:var(--coral-300);"></span>Ground parking</span>
+        <span><span class="swatch" style="background:var(--ocean-900);"></span>Composite</span>
+      </div>
+      <div style="position:relative;width:100%;height:180px;"><canvas id="rlb-chart"></canvas></div>
+
+      <div class="card-sub" style="margin-top:20px;margin-bottom:10px;">Private building authorizations by county &nbsp;·&nbsp; <span class="gloss" data-gloss="DBEDT">DBEDT</span> QSER · 2025 annual total</div>
+      <div id="build-auth-bars"></div>
+
+      <div class="note-box" style="margin-top:16px;margin-bottom:0;">
         <strong style="color:var(--text);">Note on condos &amp; construction costs</strong><br>
         Condo <span class="gloss" data-gloss="mortgagePayment">mortgage payments</span> exclude HOA fees, which average ~$762/month statewide — among the highest in the nation. At $310–$520/sf for multifamily hard costs alone, up ~30% since 2020, building to price points accessible to median-income households requires substantial public subsidy. <span class="gloss" data-gloss="affordabilityIndex">Affordability index</span>: 100 = perfectly affordable at median income; below 100 = median income falls short.
         <br><br>
@@ -2783,7 +2788,7 @@
         The cost indices track the <em>low end</em> of each published <span class="gloss" data-gloss="RLB">RLB</span> cost range (e.g., $310/sf for multifamily, not $520/sf), rebased to Q1 2020 = 100. Using the low end understates actual cost growth for higher-complexity projects, so the increases shown — +51% multifamily, +19% single-family, +81% ground parking — should be read as a floor, not a ceiling.
       </div>
     </div>
-  </details>
+  </div>
 
   <div class="section-label">Affordability calculator</div>
   <div class="calc-section">
@@ -4525,6 +4530,23 @@ setupSlider('rate-slider',   'rate-bubble',   v => v.toFixed(2) + '%');
 maybeShowHint();
 if (typeof initAsofPopover === 'function') initAsofPopover();
 if (typeof initGlossary === 'function') initGlossary();
+
+(function() {
+  const btn  = document.getElementById('construction-more-btn');
+  const more = document.getElementById('construction-more');
+  if (!btn || !more) return;
+  btn.addEventListener('click', function() {
+    const open = more.style.display === 'block';
+    more.style.display = open ? 'none' : 'block';
+    this.classList.toggle('is-open', !open);
+    this.setAttribute('aria-expanded', !open);
+    this.querySelector('span').textContent = open ? 'More' : 'Less';
+    if (!open) {
+      // Chart.js needs a resize tick after the canvas becomes visible
+      if (typeof rlbChart !== 'undefined') rlbChart.resize();
+    }
+  });
+})();
 
 const rlbLabels = ["Q1 2020","Q2 2020","Q3 2020","Q4 2020","Q1 2021","Q2 2021","Q3 2021","Q4 2021","Q1 2022","Q2 2022","Q3 2022","Q4 2022","Q1 2023","Q2 2023","Q3 2023","Q4 2023","Q1 2024","Q2 2024","Q3 2024","Q4 2024","Q1 2025","Q2 2025","Q3 2025","Q4 2025","Q1 2026"];
 const rlbMF  = [100.0,100.0,100.0,100.0,100.0,104.9,122.0,122.0,124.4,124.4,129.3,129.3,131.7,131.7,131.7,131.7,134.1,134.1,136.6,136.6,141.5,141.5,146.3,146.3,151.2];
