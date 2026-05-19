@@ -2502,16 +2502,17 @@
     bottom: calc(100% + 6px);
     left: 50%;
     transform: translateX(-50%);
-    background: var(--ocean-900);
-    color: white;
+    background: #1b2d34;
+    color: #fff;
     padding: 5px 10px;
     border-radius: 6px;
     font-size: 11.5px;
     font-weight: 500;
     letter-spacing: 0.02em;
     white-space: nowrap;
-    z-index: 20;
+    z-index: 200;
     pointer-events: none;
+    opacity: 1;
   }
 
   /* ── KPI tile: seg buttons + clickable whole-tile cursor ── */
@@ -2829,7 +2830,7 @@
     </div>
 
     <div class="staple-items-panel">
-      <div class="card-title" style="margin-bottom:12px;">Staple item prices &middot; <span id="goods-staple-county-label">Statewide</span></div>
+      <div class="card-title" style="margin-bottom:12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">Food Prices &middot; <span id="goods-staple-county-label">Statewide</span> <span class="gloss" data-gloss="foodPrices" tabindex="0" role="button" aria-label="About food prices" style="font-size:13px;font-weight:400;opacity:0.6;cursor:pointer;">ⓘ</span></div>
       <div class="staple-items-grid" id="goods-staple-items"></div>
     </div>
 
@@ -3504,7 +3505,7 @@ function renderGoodsPane() {
       const cMult   = (gd.groceryIdx || 100) / 100;
       const cTfpMo  = tfp ? tfp.hawaii.family4Monthly * cMult : null;
       const cShare  = cTfpMo ? (cTfpMo * 12) / cIncome : gd.groceryShareOfIncome;
-      const cWeekly = cTfpMo ? cTfpMo / 4.33 : (gd.household && gd.household.family4) || 0;
+      const cMonthly = cTfpMo ? Math.round(cTfpMo) : (gd.monthlyFamily4 || 0);
       const sharePct = cShare * 100;
       const shareFill = Math.min(sharePct / 15 * 100, 100);
       const shareClr = sharePct > 10 ? 'var(--coral)' : sharePct > 8 ? 'var(--amber)' : 'var(--green)';
@@ -3512,11 +3513,11 @@ function renderGoodsPane() {
       const gasPct = Math.max(0, Math.min(100, (gasRatio - 0.85) / 0.30 * 100));
       const gasClr = gasRatio > 1.04 ? 'var(--coral)' : gasRatio < 0.96 ? 'var(--green)' : 'var(--amber)';
       const isState = c === 'State';
-      return { c, isState, cWeekly, gx, sharePct, shareFill, shareClr, gasRatio, gasPct, gasClr };
+      return { c, isState, cMonthly, gx, sharePct, shareFill, shareClr, gasRatio, gasPct, gasClr };
     });
     const rowHTML = (r, kind) => {
       const lblSub = kind === 'groc'
-        ? (r.cWeekly ? '$' + Math.round(r.cWeekly) + '/wk' : '')
+        ? (r.cMonthly ? '$' + r.cMonthly.toLocaleString() + '/mo' : '')
         : (r.gx.regular ? r.gx.regular.toFixed(2) + ' /gal' : '');
       const fill = kind === 'groc' ? r.shareFill : r.gasPct;
       const clr  = kind === 'groc' ? r.shareClr  : r.gasClr;
@@ -3866,6 +3867,8 @@ function renderDataFreshness() {
    Wire-up: any <span class="gloss" data-gloss="KEY">…</span> becomes a hoverable/tappable term.
    `entry.href` is optional — when present, tooltip renders a "Source ↗" link row. */
 const GLOSSARY = {
+  foodPrices: { term: "Food Prices",
+                def:  "Average prices from three major grocery chains (Safeway, Foodland, Walmart), adjusted for inflation." },
   SFH:        { term: "Single-family home",
                 def:  "A detached residential property on its own parcel. Excludes condos, townhomes, and multi-family units." },
   PTI:        { term: "Payment-to-Income",
