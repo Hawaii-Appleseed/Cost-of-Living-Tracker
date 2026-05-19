@@ -783,13 +783,14 @@
     border-radius: 14px;
     padding: 20px 22px 20px;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
   }
   .mcard-v2::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 3px;
+    border-radius: 14px 14px 0 0;
   }
   .mcard-v2--sfh::before       { background: var(--ocean); }
   .mcard-v2--condo::before     { background: var(--ocean-mid); }
@@ -2647,7 +2648,7 @@
         </div>
       </div>
       <div class="kpi-value" id="kpi-groc-value">—</div>
-      <div class="kpi-sub" id="kpi-groc-sub">family of 4</div>
+      <div class="kpi-sub" id="kpi-groc-sub"><span class="gloss" data-gloss="thriftyFoodPlan">family of 4</span></div>
     </div>
     <div class="kpi">
       <div class="kpi-label-row">
@@ -3694,8 +3695,8 @@ function renderStapleItems() {
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
   </button>`;
 
-  panel.appendChild(moreRow);
   panel.appendChild(moreGrid);
+  panel.appendChild(moreRow);
 
   moreRow.querySelector('#staple-more-btn').addEventListener('click', function() {
     const open = moreGrid.classList.toggle('is-open');
