@@ -2626,13 +2626,6 @@
       </div>
       <div class="kpi-value" id="kpi-home-value">—</div>
       <div class="kpi-sub" id="kpi-home-sub">—</div>
-      <div class="kpi-idx-mini" id="kpi-home-idx-mini">
-        <div class="kpi-idx-bar">
-          <div class="kpi-idx-bar-income" id="kpi-home-idx-fill" style="width:0%"></div>
-          <div class="kpi-idx-bar-gap" id="kpi-home-idx-gap" style="width:0%"></div>
-        </div>
-        <div class="kpi-idx-text" id="kpi-home-idx-text">—</div>
-      </div>
     </div>
     <div class="kpi">
       <div class="kpi-label-row">
@@ -4168,13 +4161,7 @@ function renderSummaryStrip() {
     homeSub.innerHTML = 'median gross rent';
   } else {
     homeVal.textContent = fmtMoneyBig(d.sfhPrice);
-    // Pull period (same logic as hero card): prefer global marker, fallback to countyData.
-    const _kpiHousingPeriod =
-        (typeof housingLatestPeriod !== 'undefined' && housingLatestPeriod)
-          ? housingLatestPeriod
-          : ((countyData.State && countyData.State.period) ? countyData.State.period.slice(0, 7) : null);
-    const _kpiHousingBadge = _kpiHousingPeriod ? formatMonth(_kpiHousingPeriod) : '—';
-    homeSub.innerHTML = _kpiHousingBadge;
+    homeSub.innerHTML = 'median home price';
   }
   document.querySelectorAll('#kpi-home .kpi-seg-opt').forEach(b => {
     const on = b.getAttribute('data-view') === currentHomeView;
