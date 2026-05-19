@@ -2733,8 +2733,8 @@
     <div class="card-title">Rental market</div>
     <div class="card-sub">Median <span class="gloss" data-gloss="contractRent">contract rent</span> (existing leases) vs. <span class="gloss" data-gloss="askingRent">asking rent</span> for new listings &nbsp;·&nbsp; both exclude utilities</div>
     <div class="legend-row">
-      <span><span class="swatch" style="background:var(--ocean-300);"></span><span class="gloss" data-gloss="rentNowcast">Tenant rent · nowcast</span> <span style="color:var(--text-lt);font-size:13px;">(70% <span class="gloss" data-gloss="BLS">BLS</span> <span class="gloss" data-gloss="CPI">CPI</span> + 30% <span class="gloss" data-gloss="ZORI">ZORI</span>, anchored to <span class="gloss" data-gloss="ACS">ACS</span> 2024)</span></span>
-      <span><span class="swatch" style="background:var(--coral-500);"></span>Asking rent <span style="color:var(--text-lt);font-size:13px;">(Zillow <span class="gloss" data-gloss="ZORI">ZORI</span>)</span></span>
+      <span><span class="swatch" style="background:var(--ocean-300);"></span><span class="gloss" data-gloss="rentNowcast">Tenant rent · nowcast</span></span>
+      <span><span class="swatch" style="background:var(--coral-500);"></span>Asking rent</span>
     </div>
     <div id="rent-grid"></div>
   </div>
@@ -3066,6 +3066,10 @@ function updateAfford() {
     <div class="narrative-bar afford-coverage-bar">
       <div class="narrative-bar-income${affordable ? ' is-affordable is-full' : ''}" style="width:${incomePct}%"></div>
       <div class="narrative-bar-gap" style="width:${gapPct}%"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:5px;">
+      <span style="font-size:12px;font-weight:600;color:var(--seafoam-700);">${incomePct}% covered</span>
+      ${!affordable ? `<span style="font-size:12px;font-weight:600;color:var(--coral);">${gapPct}% gap</span>` : ''}
     </div>
   `;
 }
