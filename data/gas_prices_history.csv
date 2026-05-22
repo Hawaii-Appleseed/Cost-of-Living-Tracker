@@ -19,3 +19,8 @@ date,region,regular,mid_grade,premium,diesel,mom_change,yoy_change,source_url,fe
 2026-04-22,Maui,5.677,5.847,6.093,7.786,0.313,1.141,https://gasprices.aaa.com/?state=HI,2026-04-22T21:46:26Z
 2026-04-22,Honolulu,5.622,5.887,6.158,6.951,0.558,1.188,https://gasprices.aaa.com/?state=HI,2026-04-22T21:46:26Z
 2026-04-22,Kauai,5.971,6.232,6.399,7.359,0.425,0.87,https://gasprices.aaa.com/?state=HI,2026-04-22T21:46:26Z
+2026-05-22,State,5.653,5.925,6.151,7.139,-0.005,1.162,https://gasprices.aaa.com/?state=HI,2026-05-22T20:52:40Z
+2026-05-22,Hawaii,5.644,5.941,6.179,7.049,-0.011,0.984,https://gasprices.aaa.com/?state=HI,2026-05-22T20:52:40Z
+2026-05-22,Maui,5.666,5.903,5.99,7.548,-0.011,1.179,https://gasprices.aaa.com/?state=HI,2026-05-22T20:52:40Z
+2026-05-22,Honolulu,5.622,5.911,6.155,6.944,0.0,1.211,https://gasprices.aaa.com/?state=HI,2026-05-22T20:52:40Z
+2026-05-22,Kauai,5.955,6.239,6.489,7.399,-0.016,0.897,https://gasprices.aaa.com/?state=HI,2026-05-22T20:52:40Z
