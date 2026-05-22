@@ -11,4 +11,10 @@ plotly>=5.18
 # propagation, multi-source anchors, and hidden-data calibration are
 # imported from there. Use a git pin (or `pip install -e
 # /path/to/Census-Forecaster` for local development).
-census-forecaster @ git+https://github.com/dtomkatsu/Census-Forecaster.git@main
+#
+# Census-Forecaster is a uv workspace: the repo root has no build backend,
+# so each package must be installed from its own subdirectory. census-common
+# is listed first because census-forecaster depends on it by name — pip needs
+# the direct URL on hand to resolve that dependency.
+census-common @ git+https://github.com/dtomkatsu/Census-Forecaster.git@main#subdirectory=packages/common
+census-forecaster @ git+https://github.com/dtomkatsu/Census-Forecaster.git@main#subdirectory=packages/census_forecaster
