@@ -43,7 +43,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(GROCERY_ROOT))
 
 from src.cpi_fetcher import fetch_cpi_data      # noqa: E402 (grocery pipeline)
-from common.html_patcher import patch_html_files   # noqa: E402
+from ha_common.html_patcher import patch_html_files   # noqa: E402
 
 # ---------------------------------------------------------------
 SERIES = {

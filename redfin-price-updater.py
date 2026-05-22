@@ -36,8 +36,8 @@ from pathlib import Path
 
 # Shared HTTP helper — adds timeout + retry to all fetches
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common.http_client import fetch_bytes, fetch_text   # noqa: E402
-from common.html_patcher import patch_html_files  # noqa: E402
+from ha_common.http_client import fetch_bytes, fetch_text   # noqa: E402
+from ha_common.html_patcher import patch_html_files  # noqa: E402
 
 try:
     import openpyxl

@@ -38,7 +38,7 @@ GROCERY_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(GROCERY_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from common.http_client import fetch_bytes  # noqa: E402
+from ha_common.http_client import fetch_bytes  # noqa: E402
 from src.pumd_extractor import (              # noqa: E402
     extract_honolulu_fah,
     pool_years,

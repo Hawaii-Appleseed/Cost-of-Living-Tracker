@@ -37,7 +37,7 @@ from pathlib import Path
 # -----------------------------------------------------------------
 PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
-from common.html_patcher import patch_html_files  # noqa: E402
+from ha_common.html_patcher import patch_html_files  # noqa: E402
 GROCERY_PIPELINE_ROOT = PROJECT_ROOT / "pipelines" / "grocery"
 HOUSEHOLD_CSV = GROCERY_PIPELINE_ROOT / "data" / "output" / "household_estimates.csv"
 COUNTY_CSV    = GROCERY_PIPELINE_ROOT / "data" / "output" / "county_comparison.csv"

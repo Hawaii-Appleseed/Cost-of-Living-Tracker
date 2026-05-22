@@ -47,7 +47,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from common.http_client import fetch_bytes, fetch_text  # noqa: E402
+from ha_common.http_client import fetch_bytes, fetch_text  # noqa: E402
 
 _RPU_SPEC = importlib.util.spec_from_file_location("rpu", ROOT / "redfin-price-updater.py")
 _RPU = importlib.util.module_from_spec(_RPU_SPEC)

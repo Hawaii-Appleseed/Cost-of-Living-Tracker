@@ -44,7 +44,7 @@ import requests
 # -----------------------------------------------------------------
 PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
-from common.html_patcher import patch_html_files  # noqa: E402
+from ha_common.html_patcher import patch_html_files  # noqa: E402
 DEFAULT_FILES = [
     PROJECT_ROOT / "squarespace-single-file.html",
     PROJECT_ROOT / "index.html",
