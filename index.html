@@ -2513,6 +2513,20 @@
     pointer-events: none;
     opacity: 1;
   }
+  /* When the data-tip host (e.g. .mcard-v2-date, the grocery ⓘ icon) sits
+     inside a dimmed container OR carries its own reduced opacity, the
+     ::after pseudo-element inherits that opacity and the dark tooltip pill
+     renders washed-out. Restore full opacity while the host is hovered —
+     the tooltip is only visible during hover anyway. */
+  [data-tip]:hover { opacity: 1 !important; }
+
+  /* When a glossary chip sits inside a data-tip host (e.g. the "proj."
+     period-tag inside #goods-groc-date), hovering the chip puts BOTH the
+     parent's data-tip ::after pill AND the gloss-tip on screen at once.
+     Suppress the outer data-tip pill in that case so only the gloss tip
+     shows. */
+  [data-tip]:has(.gloss:hover)::after,
+  [data-tip]:has(.gloss[aria-expanded="true"])::after { content: none !important; }
 
   /* ── KPI tile: seg buttons + clickable whole-tile cursor ── */
   .kpi-seg-opt {
