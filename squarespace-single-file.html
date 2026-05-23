@@ -642,7 +642,8 @@
        gap exists. Full-width affordable state pushes to brighter tints. */
     background: linear-gradient(90deg, var(--seafoam-500), var(--seafoam-700));
     height: 100%;
-    transition: width 0.45s cubic-bezier(.4,0,.2,1);
+    transition: width 0.45s cubic-bezier(.4,0,.2,1),
+                transform 0.65s cubic-bezier(0.16,1,.3,1) var(--bar-delay,0ms);
     border-radius: 999px 0 0 999px;
   }
   .narrative-bar-income.is-full { border-radius: 999px; }
@@ -655,7 +656,8 @@
       rgba(201,79,58,0.08) 10px
     );
     height: 100%;
-    transition: width 0.45s cubic-bezier(.4,0,.2,1);
+    transition: width 0.45s cubic-bezier(.4,0,.2,1),
+                transform 0.65s cubic-bezier(0.16,1,.3,1) var(--bar-delay,0ms);
   }
   .narrative-bar-income.is-affordable {
     background: linear-gradient(90deg, var(--seafoam-400), var(--seafoam-200));
@@ -1115,7 +1117,8 @@
        coastal palette, not a navy bar-of-the-day.                      */
     background: linear-gradient(90deg, var(--seafoam-500), var(--seafoam-700));
     height: 100%;
-    transition: width 0.45s cubic-bezier(.4,0,.2,1);
+    transition: width 0.45s cubic-bezier(.4,0,.2,1),
+                transform 0.65s cubic-bezier(0.16,1,.3,1) var(--bar-delay,0ms);
     border-radius: 999px 0 0 999px;
   }
   .mcard-v2-bar-income.is-full { border-radius: 999px; }
@@ -1131,7 +1134,8 @@
       rgba(201,79,58,0.08) 10px
     );
     height: 100%;
-    transition: width 0.45s cubic-bezier(.4,0,.2,1);
+    transition: width 0.45s cubic-bezier(.4,0,.2,1),
+                transform 0.65s cubic-bezier(0.16,1,.3,1) var(--bar-delay,0ms);
   }
   .mcard-v2-footer {
     display: flex;
@@ -1620,7 +1624,8 @@
     top: 0; left: 0; bottom: 0;
     border-radius: 5px;
     opacity: 0.82;
-    transition: width 0.35s ease;
+    transition: filter 0.2s, width 0.35s ease,
+                transform 0.65s cubic-bezier(0.16,1,.3,1) var(--bar-delay,0ms);
   }
   .pti-bar-tick {
     position: absolute;
@@ -1718,7 +1723,7 @@
   .rent-row-lbl { font-size: 15px; font-weight: 500; color: var(--text-mid); width: 72px; flex-shrink: 0; }
   .rent-bar-group { flex: 1; display: flex; flex-direction: column; gap: 4px; }
   .rent-hbar-wrap { display: flex; align-items: center; gap: 6px; }
-  .rent-hbar { height: 16px; border-radius: 3px; min-width: 2px; transition: width 0.3s; }
+  .rent-hbar { height: 16px; border-radius: 3px; min-width: 2px; transition: width 0.3s, transform 0.65s cubic-bezier(0.16,1,.3,1) var(--bar-delay,0ms); }
   .rent-hbar-val { font-size: 14px; color: var(--text-mid); white-space: nowrap; }
   .rent-gap-label { font-size: 13px; color: var(--coral); margin-left: 2px; }
 
@@ -2119,7 +2124,8 @@
   .rent-hbar,
   .afford-gap-bar-fill-sea,
   .afford-gap-bar-fill-coral {
-    transition: filter 0.2s, box-shadow 0.2s, width 0.45s cubic-bezier(.4,0,.2,1);
+    transition: filter 0.2s, box-shadow 0.2s, width 0.45s cubic-bezier(.4,0,.2,1),
+                transform 0.65s cubic-bezier(0.16,1,.3,1) var(--bar-delay,0ms);
   }
   .pti-row:hover .pti-bar-fill,
   .bar-row:hover .bar-fill,
@@ -2127,6 +2133,54 @@
   .afford-gap:hover .afford-gap-bar-fill-sea,
   .afford-gap:hover .afford-gap-bar-fill-coral {
     filter: brightness(1.08);
+  }
+
+  /* ── Bar entrance: scaleX fill-from-left on scroll-into-view ─────────── */
+  .pti-bar-fill,
+  .bar-fill,
+  .cat-bar-fill,
+  .afford-gap-bar-fill-sea,
+  .afford-gap-bar-fill-coral,
+  .rent-hbar,
+  .narrative-bar-income,
+  .narrative-bar-gap,
+  .mcard-v2-bar-income,
+  .mcard-v2-bar-gap {
+    transform-origin: left center;
+    transform: scaleX(0);
+    will-change: transform;
+  }
+  /* cat-bar-fill has no other transition rule — declare it explicitly */
+  .cat-bar-fill {
+    transition: transform 0.65s cubic-bezier(0.16,1,.3,1) var(--bar-delay,0ms);
+  }
+  /* Animated state — added by IntersectionObserver */
+  .pti-bar-fill.is-in,
+  .bar-fill.is-in,
+  .cat-bar-fill.is-in,
+  .afford-gap-bar-fill-sea.is-in,
+  .afford-gap-bar-fill-coral.is-in,
+  .rent-hbar.is-in,
+  .narrative-bar-income.is-in,
+  .narrative-bar-gap.is-in,
+  .mcard-v2-bar-income.is-in,
+  .mcard-v2-bar-gap.is-in {
+    transform: scaleX(1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pti-bar-fill,
+    .bar-fill,
+    .cat-bar-fill,
+    .afford-gap-bar-fill-sea,
+    .afford-gap-bar-fill-coral,
+    .rent-hbar,
+    .narrative-bar-income,
+    .narrative-bar-gap,
+    .mcard-v2-bar-income,
+    .mcard-v2-bar-gap {
+      transform: scaleX(1) !important;
+      transition-delay: 0ms !important;
+    }
   }
 
   /* ── Popover open animation ─────────────────────────────── */
@@ -4645,6 +4699,69 @@ if (housingDetail && rlbChart) {
     if (housingDetail.open) requestAnimationFrame(() => rlbChart.resize());
   });
 }
+
+/* ── Bar entrance animations (IntersectionObserver) ─────────────────────
+   All fill elements start at scaleX(0) via CSS. When their container
+   section scrolls into view, staggered `is-in` classes scale them to 1.
+   Re-renders after county/tab/household switches reveal bars instantly
+   (no re-animation) once the section has been seen. ─────────────────── */
+(function () {
+  const BAR_SEL = [
+    '.pti-bar-fill', '.bar-fill', '.cat-bar-fill',
+    '.afford-gap-bar-fill-sea', '.afford-gap-bar-fill-coral',
+    '.rent-hbar',
+    '.narrative-bar-income', '.narrative-bar-gap',
+    '.mcard-v2-bar-income', '.mcard-v2-bar-gap',
+  ].join(',');
+  const STAGGER_MS = 55;
+  const seen = new WeakSet(); // containers already animated
+
+  const obs = new IntersectionObserver((entries, o) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      seen.add(e.target);
+      const fills = Array.from(e.target.querySelectorAll(BAR_SEL));
+      fills.forEach((f, i) => f.style.setProperty('--bar-delay', (i * STAGGER_MS) + 'ms'));
+      requestAnimationFrame(() => fills.forEach(f => f.classList.add('is-in')));
+      o.unobserve(e.target);
+    });
+  }, { threshold: 0.05, rootMargin: '0px 0px -10px 0px' });
+
+  const GROUPS = [
+    '#housing-pair-grid', '#afford-banner',
+    '#pti-bars', '#rent-grid',
+    '#build-auth-bars',
+    '#goods-county-compare-groc', '#goods-county-compare-gas',
+    '#goods-category-bars',
+  ];
+
+  function observeBarGroups() {
+    GROUPS.forEach(sel => {
+      const el = document.querySelector(sel);
+      if (!el) return;
+      if (seen.has(el)) {
+        // Already animated — just reveal new fills instantly after re-render
+        el.querySelectorAll(BAR_SEL).forEach(f => f.classList.add('is-in'));
+      } else {
+        obs.observe(el);
+      }
+    });
+  }
+
+  // Patch dynamic render functions so re-renders also trigger reveal
+  ['selectCounty', 'selectPane', 'setHH', 'renderBuildAuth'].forEach(name => {
+    const orig = window[name];
+    if (typeof orig !== 'function') return;
+    window[name] = function (...a) {
+      const r = orig.apply(this, a);
+      requestAnimationFrame(observeBarGroups);
+      return r;
+    };
+  });
+
+  // Initial observe — after the first render paints
+  requestAnimationFrame(observeBarGroups);
+})();
 </script>
 </body>
 </html>
