@@ -401,6 +401,7 @@
     margin: 0 0 1.5rem;
     padding-bottom: 1.25rem;
     border-bottom: 1px solid var(--border);
+    position: relative; /* pill anchor */
   }
   .top-tab {
     flex: 1 1 0;
@@ -437,12 +438,28 @@
   .top-tab:hover { border-color: var(--ocean-mid); color: var(--ocean); }
   .top-tab:hover .top-tab-sub { color: var(--ocean-mid); }
   .top-tab.active {
-    background: var(--ocean);
-    border-color: var(--ocean);
+    background: transparent;
+    border-color: transparent;
     color: white;
-    box-shadow: 0 4px 16px rgba(10, 79, 110, 0.18);
+    box-shadow: none;
   }
   .top-tab.active .top-tab-sub { color: rgba(255,255,255,0.72); }
+  /* Sliding pill — sits behind buttons, provides background */
+  .top-tab-pill {
+    position: absolute;
+    top: 0; left: 0;
+    height: 1px; width: 1px; /* sized by JS */
+    border-radius: 14px;
+    background: var(--ocean);
+    box-shadow: 0 4px 20px rgba(10, 79, 110, 0.22);
+    pointer-events: none;
+    z-index: 0;
+    transition: left 0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+                width 0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+                top 0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+                height 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .top-tab { position: relative; z-index: 1; }
 
   .pane { display: none; }
   .pane.is-active { display: block; }
@@ -1049,11 +1066,18 @@
     margin-bottom: 12px;
   }
   /* #1 — frame line under the title that states what question the card answers */
+  /* Gauge arc — sits between card header and "Can a household afford this?" */
+  .mcard-v2-gauge {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0 6px;
+  }
+  .mcard-v2-gauge .gauge-svg { max-width: 144px; }
   .mcard-v2-frame {
     font-size: 13px;
     color: var(--text-mid);
     line-height: 1.35;
-    margin: -2px 0 10px;
+    margin: 0 0 10px;
   }
   /* #2 — plain-English replacement for "Affordability index · 52 / 100" */
   .mcard-v2-coverage {
@@ -2192,7 +2216,7 @@
   /* ── Top-tab press feedback ─────────────────────────────── */
   .top-tab { position: relative; }
   .top-tab:active { transform: scale(0.985); }
-  .top-tab.active { transform: translateY(-1px); }
+  .top-tab.active { transform: none; }
 
   /* ── Focus-visible rings (keyboard users get clear affordance,
      mouse users don't see the ring) ─────────────────────────── */
@@ -2768,7 +2792,8 @@
 </section>
 
 <main>
-  <div class="top-tabs" role="tablist">
+  <div class="top-tabs" role="tablist" id="top-tabs">
+    <div class="top-tab-pill" id="top-tab-pill" aria-hidden="true"></div>
     <button class="top-tab active" role="tab" aria-selected="true" onclick="selectPane('housing')">
       <div class="top-tab-inner">
         <span>Housing</span>
@@ -3051,10 +3076,11 @@ function fmtM(n) {
 function gaugeArc(val, color) {
   const total = 157;
   const filled = Math.min(val / 100, 1) * total;
-  return `<svg viewBox="0 0 120 72" width="100%" style="max-width:140px;display:block;margin:0 auto;">
+  // Arc starts at 0; animated to target by animateGauges() via IntersectionObserver
+  return `<svg class="gauge-svg" data-filled="${filled.toFixed(1)}" data-val="${Math.round(val)}" viewBox="0 0 120 72" width="100%" style="max-width:140px;display:block;margin:0 auto;">
     <path d="M 10 62 A 50 50 0 0 1 110 62" fill="none" stroke="var(--ocean-100)" stroke-width="10" stroke-linecap="round"/>
-    <path d="M 10 62 A 50 50 0 0 1 110 62" fill="none" stroke="${color}" stroke-width="10" stroke-linecap="round" stroke-dasharray="${filled.toFixed(1)} ${total}"/>
-    <text x="60" y="60" text-anchor="middle" font-family="DM Serif Display, serif" font-size="26" fill="${color}">${Math.round(val)}</text>
+    <path class="gauge-arc-fill" d="M 10 62 A 50 50 0 0 1 110 62" fill="none" stroke="${color}" stroke-width="10" stroke-linecap="round" stroke-dasharray="0 ${total}"/>
+    <text class="gauge-num" x="60" y="60" text-anchor="middle" font-family="DM Serif Display, serif" font-size="26" fill="${color}">0</text>
   </svg>`;
 }
 const countyPop = { State: 1435000, Honolulu: 1016000, Hawaii: 201000, Maui: 167000, Kauai: 73000 };
@@ -3230,12 +3256,18 @@ function selectCounty(county) {
     const coverageLine = idx >= 100
       ? `Typical income covers <span class="num-badge num-badge--green">the full cost</span> at this price.`
       : `Typical income covers <span class="num-badge ${coverBadgeCls}">${coverPct}%</span> of what's needed.`;
+    // Gauge color mirrors verdict
+    const gaugeClr = idx >= 100 ? 'var(--seafoam-700)'
+                   : idx >= 80  ? 'var(--seafoam-600)'
+                   : idx >= 55  ? 'var(--amber)'
+                   :              'var(--coral)';
     return `
       <div class="mcard-v2 mcard-v2--${kind}">
         <div class="mcard-v2-header">
           <span class="mcard-v2-title">${label}</span>
           <span class="mcard-v2-date" id="housing-${kind}-date">${dateStr}</span>
         </div>
+        <div class="mcard-v2-gauge">${gaugeArc(idx, gaugeClr)}</div>
         <div class="mcard-v2-frame">Can a typical household afford this?</div>
         <div class="mcard-v2-price" data-tip="${fmt(mortgage)}/mo est. mortgage · P&amp;I only, 20% down">${fmtM(price)}</div>
         <div class="mcard-v2-coverage">${coverageLine}</div>
@@ -4246,10 +4278,10 @@ function renderSummaryStrip() {
   const homeVal = document.getElementById('kpi-home-value');
   const homeSub = document.getElementById('kpi-home-sub');
   if (currentHomeView === 'rent') {
-    homeVal.textContent = fmt(d.rent) + '/mo';
+    countUpKPI(homeVal, d.rent, v => fmt(v) + '/mo');
     homeSub.innerHTML = 'median gross rent';
   } else {
-    homeVal.textContent = fmtMoneyBig(d.sfhPrice);
+    countUpKPI(homeVal, d.sfhPrice, fmtMoneyBig);
     homeSub.innerHTML = 'median home price';
   }
   document.querySelectorAll('#kpi-home .kpi-seg-opt').forEach(b => {
@@ -4312,9 +4344,8 @@ function renderSummaryStrip() {
     const monthly_kpi = tfp_kpi
       ? tfp_kpi.hawaii.family4Monthly * countyMult_kpi
       : g.monthlyFamily4;
-    grocVal.textContent = typeof monthly_kpi === 'number'
-      ? '$' + Math.round(monthly_kpi).toLocaleString() + '/mo'
-      : '—';
+    if (typeof monthly_kpi === 'number') countUpKPI(grocVal, monthly_kpi, v => '$' + Math.round(v).toLocaleString() + '/mo');
+    else grocVal.textContent = '—';
   } else {
     grocVal.textContent = '—';
   }
@@ -4323,7 +4354,7 @@ function renderSummaryStrip() {
   const gasVal = document.getElementById('kpi-gas-value');
   const gasSub = document.getElementById('kpi-gas-sub');
   if (gas && typeof gas.regular === 'number') {
-    gasVal.textContent = '$' + gas.regular.toFixed(2);
+    countUpKPI(gasVal, gas.regular, v => '$' + v.toFixed(2));
     if (typeof gas.mom_change === 'number') {
       const arrow = gas.mom_change > 0.005 ? '▲' : gas.mom_change < -0.005 ? '▼' : '';
       const clr   = gas.mom_change > 0.005 ? 'var(--coral)' : gas.mom_change < -0.005 ? 'var(--green)' : 'var(--text-lt)';
@@ -4339,7 +4370,7 @@ function renderSummaryStrip() {
   }
 
   // Tile 4 — Median income (4-person, HUD)
-  document.getElementById('kpi-income-value').textContent = fmtMoneyBig(d.income);
+  countUpKPI(document.getElementById('kpi-income-value'), d.income, fmtMoneyBig);
 }
 
 function setHomeView(view) {
@@ -4761,6 +4792,138 @@ if (housingDetail && rlbChart) {
 
   // Initial observe — after the first render paints
   requestAnimationFrame(observeBarGroups);
+})();
+
+/* ── 1. Count-up animation for KPI headline numbers ──────────────────────
+   Call before any selectCounty/setHomeView re-render so numbers animate
+   both on initial load and on county/view switch.                       */
+function countUpKPI(el, targetVal, formatFn, dur) {
+  if (!el || typeof targetVal !== 'number' || isNaN(targetVal)) return;
+  dur = dur || 820;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    el.textContent = formatFn(targetVal); return;
+  }
+  // Cancel any in-progress animation on this element
+  if (el._countRaf) { cancelAnimationFrame(el._countRaf); el._countRaf = null; }
+  const ease = t => 1 - Math.pow(1 - t, 4); // easeOutQuart
+  const t0 = performance.now();
+  (function tick(now) {
+    const p = Math.min((now - t0) / dur, 1);
+    el.textContent = formatFn(targetVal * ease(p));
+    if (p < 1) el._countRaf = requestAnimationFrame(tick);
+    else el._countRaf = null;
+  })(t0);
+}
+
+/* ── 2. Gauge arc draw-in (IntersectionObserver per housing-pair-grid) ───
+   gaugeArc() renders arcs at stroke-dasharray="0 157". This function
+   finds those SVGs, measures their targets, and animates them.          */
+(function () {
+  const TOTAL = 157;
+  const DUR   = 950;
+  const ease  = t => 1 - Math.pow(1 - t, 3); // easeOutCubic
+
+  function animateGauges(container) {
+    if (!container) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      container.querySelectorAll('.gauge-svg').forEach(svg => {
+        const filled = parseFloat(svg.dataset.filled) || 0;
+        const val    = parseInt(svg.dataset.val, 10) || 0;
+        const arc = svg.querySelector('.gauge-arc-fill');
+        const txt = svg.querySelector('.gauge-num');
+        if (arc) arc.setAttribute('stroke-dasharray', `${filled} ${TOTAL}`);
+        if (txt) txt.textContent = val;
+      });
+      return;
+    }
+    container.querySelectorAll('.gauge-svg').forEach((svg, i) => {
+      const filled = parseFloat(svg.dataset.filled) || 0;
+      const val    = parseInt(svg.dataset.val, 10)  || 0;
+      const arc    = svg.querySelector('.gauge-arc-fill');
+      const txt    = svg.querySelector('.gauge-num');
+      if (!arc) return;
+      const delay = i * 120; // stagger cards
+      const t0 = performance.now() + delay;
+      (function tick(now) {
+        if (now < t0) { requestAnimationFrame(tick); return; }
+        const p = Math.min((now - t0) / DUR, 1);
+        const e = ease(p);
+        arc.setAttribute('stroke-dasharray', `${(filled * e).toFixed(1)} ${TOTAL}`);
+        if (txt) txt.textContent = Math.round(val * e);
+        if (p < 1) requestAnimationFrame(tick);
+      })(performance.now());
+    });
+  }
+
+  const seen = new WeakSet();
+  const obs  = new IntersectionObserver((entries, o) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      seen.add(e.target);
+      animateGauges(e.target);
+      o.unobserve(e.target);
+    });
+  }, { threshold: 0.25 });
+
+  function observeGaugeGrid() {
+    const el = document.getElementById('housing-pair-grid');
+    if (!el) return;
+    if (seen.has(el)) {
+      // Re-render after county switch — replay immediately
+      animateGauges(el);
+    } else {
+      obs.observe(el);
+    }
+  }
+
+  // Piggyback on selectCounty (already wrapped by bar anim IIFE — safe to wrap again)
+  const _origSC = window.selectCounty;
+  if (typeof _origSC === 'function') {
+    window.selectCounty = function (...a) {
+      const r = _origSC.apply(this, a);
+      requestAnimationFrame(observeGaugeGrid);
+      return r;
+    };
+  }
+  requestAnimationFrame(observeGaugeGrid);
+})();
+
+/* ── 5. Sliding pill on Housing / Goods tab bar ──────────────────────────
+   A <div class="top-tab-pill"> sits behind the buttons at z-index:0.
+   syncTabPill() measures the active button and positions the pill.      */
+(function () {
+  function syncTabPill(instant) {
+    const pill = document.getElementById('top-tab-pill');
+    const active = document.querySelector('#top-tabs .top-tab.active');
+    if (!pill || !active) return;
+    if (instant) {
+      pill.style.transition = 'none';
+      // Force reflow so the next transition re-enables cleanly
+      void pill.offsetWidth;
+    }
+    pill.style.left   = active.offsetLeft   + 'px';
+    pill.style.top    = active.offsetTop    + 'px';
+    pill.style.width  = active.offsetWidth  + 'px';
+    pill.style.height = active.offsetHeight + 'px';
+    if (instant) {
+      requestAnimationFrame(() => { pill.style.transition = ''; });
+    }
+  }
+
+  // Wrap selectPane to sync pill after tab switch
+  const _origSP = window.selectPane;
+  if (typeof _origSP === 'function') {
+    window.selectPane = function (...a) {
+      const r = _origSP.apply(this, a);
+      requestAnimationFrame(() => syncTabPill(false));
+      return r;
+    };
+  }
+
+  // Position pill instantly on load (no slide animation on first paint)
+  requestAnimationFrame(() => syncTabPill(true));
+  // Re-sync on resize so pill tracks button dimensions
+  window.addEventListener('resize', () => syncTabPill(true), { passive: true });
 })();
 </script>
 </body>
