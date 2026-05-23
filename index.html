@@ -44,6 +44,12 @@
     --border:   #d0dde5;
     --white:    #ffffff;
 
+    /* Cool neutral specifically for bar tracks — unifies the bar palette
+       with the ocean/seafoam fills instead of clashing warm sand vs cool
+       fill. Used by .bar-bg, .cat-bar-bg, .narrative-bar, .mcard-v2-bar,
+       .kpi-idx-bar, .goods-share-track. Card bodies and chips keep --sand. */
+    --bar-track: #eaf1f3;
+
     /* Text scale */
     --text:     #1a2630;
     --text-mid: #4a6070;
@@ -78,12 +84,24 @@
   }
 
   header {
-    /* Sophisticated dark slate — sits between Charcoal Blue (#2F3E46) and
-       Dark Slate Grey (#354F52). Two-stop gradient with ~5% lightness delta
-       gives subtle dimension without banding. Teal moves to accents (active
-       tabs, badges) rather than dominating the chrome.
-       Extra bottom padding leaves room for the floating KPI card to overlap. */
-    background: linear-gradient(180deg, #2A3A40 0%, #324548 100%);
+    /* Sophisticated dark slate with layered depth:
+       Layer 1 (top): a soft teal halo behind the brand bar — like a
+       gentle spotlight that subtly reinforces the coastal palette
+       without competing with the chrome.
+       Layer 2 (bottom): three-stop linear gradient — deeper top
+       (#243339), mid slate (#2C3F44), and a slightly lifted bottom
+       (#354A4D) so the floating KPI card has a brighter band to
+       overlap into.
+       Together these give the hero genuine dimension instead of a flat slab.
+       Teal stays as an accent (active tabs, badges) elsewhere. */
+    background:
+      radial-gradient(ellipse 110% 65% at 50% 0%,
+        rgba(82, 121, 111, 0.20) 0%,
+        transparent 70%),
+      linear-gradient(180deg,
+        #243339 0%,
+        #2C3F44 50%,
+        #354A4D 100%);
     color: white;
     padding: 1.1rem 0 3.5rem;
     position: relative;
@@ -484,7 +502,7 @@
   /* Category bars on Goods pane */
   .cat-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
   .cat-bar-lbl { font-size: 14px; color: var(--text-mid); width: 130px; flex-shrink: 0; }
-  .cat-bar-bg { flex: 1 1 40px; min-width: 40px; height: 20px; background: var(--sand); border-radius: 4px; position: relative; overflow: hidden; }
+  .cat-bar-bg { flex: 1 1 40px; min-width: 40px; height: 20px; background: var(--bar-track); border-radius: 4px; position: relative; overflow: hidden; }
   .cat-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--ocean-mid), var(--ocean)); }
   .cat-bar-val { font-size: 13px; color: var(--text-mid); width: 58px; text-align: right; flex-shrink: 0; }
 
@@ -635,7 +653,7 @@
 
   .narrative-bar {
     height: 9px;
-    background: var(--sand);
+    background: var(--bar-track);
     border-radius: 999px;
     overflow: hidden;
     display: flex;
@@ -1110,7 +1128,7 @@
   }
   .mcard-v2-bar {
     height: 8px;
-    background: var(--sand);
+    background: var(--bar-track);
     border-radius: 999px;
     overflow: hidden;
     display: flex;
@@ -1196,7 +1214,7 @@
   }
   .kpi-idx-bar {
     height: 5px;
-    background: var(--sand);
+    background: var(--bar-track);
     border-radius: 999px;
     overflow: hidden;
     display: flex;
@@ -1368,7 +1386,7 @@
   .goods-share-track {
     position: relative;
     height: 10px;
-    background: var(--sand);
+    background: var(--bar-track);
     border-radius: 999px;
     margin-bottom: 0;
     overflow: visible;
@@ -1571,7 +1589,7 @@
 
   .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
   .bar-lbl { font-size: 16px; color: var(--text-mid); width: 70px; flex-shrink: 0; }
-  .bar-bg { flex: 1; height: 22px; background: var(--sand); border-radius: 4px; overflow: visible; position: relative; }
+  .bar-bg { flex: 1; height: 22px; background: var(--bar-track); border-radius: 4px; overflow: visible; position: relative; }
   .bar-fill { height: 100%; border-radius: 4px; }
   .bar-val { font-size: 16px; font-weight: 500; width: 50px; text-align: right; flex-shrink: 0; }
   .tline { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--text-lt); opacity: 0.5; z-index: 2; }
@@ -2285,10 +2303,18 @@
 
   /* Softer hero: replace the chunky 8px border-left with a 5px
      gradient stripe + a subtle inner highlight ring. Reads as a
-     finished edge rather than a slab. */
+     finished edge rather than a slab.
+     Adds a barely-perceptible seafoam wash at the top (layer 1) that
+     reinforces the brand color without overwhelming the white body
+     — gives editorial narrative cards a subtle "tinted page" feel
+     distinct from the plain-white data cards. */
   .afford-banner {
     border-left: none;
     background:
+      linear-gradient(180deg,
+        rgba(176, 236, 213, 0.18) 0%,
+        rgba(176, 236, 213, 0.04) 45%,
+        transparent 85%),
       linear-gradient(to right,
         var(--seafoam-500) 0, var(--seafoam-500) 5px,
         var(--seafoam-400) 5px, var(--seafoam-400) 5px,
