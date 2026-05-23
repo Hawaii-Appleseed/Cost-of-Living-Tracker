@@ -3463,7 +3463,8 @@ function renderGoodsPane() {
   // Gas card
   let gasCard = '';
   if (gas && typeof gas.regular === 'number') {
-    const momArrow = gas.mom_change > 0.02 ? '▲' : gas.mom_change < -0.02 ? '▼' : '•';
+    const momArrow = gas.mom_change > 0.02 ? '▲' : gas.mom_change < -0.02 ? '▼' : '';
+    const momArrowPfx = momArrow ? momArrow + ' ' : '';
     const yoy = gas.yoy_change || 0;
     // Year-over-year as a percentage: yoy_change is $-delta, so prior price = current - delta
     const priorPrice = gas.regular - yoy;
@@ -3471,9 +3472,10 @@ function renderGoodsPane() {
     const yoyVerdict = yoyPct > 0.10 ? { cls:'chip--coral', badge:'num-badge--coral', arrow:'▲', lbl:'Rising fast' }
                      : yoyPct > 0.02 ? { cls:'chip--amber', badge:'num-badge--amber', arrow:'▲', lbl:'Rising' }
                      : yoyPct < -0.02 ? { cls:'chip--green', badge:'num-badge--green', arrow:'▼', lbl:'Falling' }
-                     :                  { cls:'chip--green', badge:'num-badge--green', arrow:'•', lbl:'Stable' };
+                     :                  { cls:'chip--green', badge:'num-badge--green', arrow:'', lbl:'Stable' };
     const yoyPctSign = yoyPct >= 0 ? '+' : '−';
-    const yoyPctTxt = `${yoyPctSign}${Math.abs(yoyPct * 100).toFixed(0)}%`;
+    const yoyBadgeArrow = yoyVerdict.arrow ? yoyVerdict.arrow + ' ' : '';
+    const yoyPctTxt = `${yoyBadgeArrow}<span style="font-size:1.15em;font-weight:800;line-height:1;">${yoyPctSign}</span>${Math.abs(yoyPct * 100).toFixed(0)}%`;
     gasCard = `
       <div class="mcard-v2 mcard-v2--gas">
         <div class="mcard-v2-header">
@@ -3483,11 +3485,11 @@ function renderGoodsPane() {
         <div class="mcard-v2-price">$${gas.regular.toFixed(2)}</div>
         <div class="mcard-v2-idx-row">
           <span class="mcard-v2-idx-lbl">Year over year</span>
-          <span class="num-badge ${yoyVerdict.badge}">${yoyVerdict.arrow} ${yoyPctTxt}</span>
+          <span class="num-badge ${yoyVerdict.badge}">${yoyPctTxt}</span>
         </div>
         <div class="mcard-v2-footer">
           <span class="chip ${yoyVerdict.cls}">${yoyVerdict.lbl}</span>
-          <span class="mcard-v2-mortgage">${momArrow} <b>${gas.mom_change>=0?'+':'−'}$${Math.abs(gas.mom_change).toFixed(2)}</b> vs. last mo.</span>
+          <span class="mcard-v2-mortgage">${momArrowPfx}<b><span style="font-size:1.15em;line-height:1;">${gas.mom_change>=0?'+':'−'}</span>$${Math.abs(gas.mom_change).toFixed(2)}</b> vs. last mo.</span>
         </div>
       </div>`;
   } else {
@@ -3789,7 +3791,7 @@ function renderInflation() {
   if (!chip || !val) return;
   if (cpi && cpi.allItems && typeof cpi.allItems.yoy === 'number') {
     const y = cpi.allItems.yoy;
-    val.innerHTML = (y >= 0 ? '+' : '−') + Math.abs(y).toFixed(1) + '% <span class="gloss" data-gloss="YoY">over last year</span>';
+    val.innerHTML = '<span style="font-size:1.2em;font-weight:800;line-height:1;">' + (y >= 0 ? '+' : '−') + '</span>' + Math.abs(y).toFixed(1) + '% <span class="gloss" data-gloss="YoY">over last year</span>';
     val.classList.remove('is-hi','is-mid','is-low');
     val.classList.add(y > 3 ? 'is-hi' : (y >= 2 ? 'is-mid' : 'is-low'));
     // Glossary tooltip on the chip shows the CPI definition; period is disclosed in the
@@ -4255,10 +4257,11 @@ function renderSummaryStrip() {
   if (gas && typeof gas.regular === 'number') {
     gasVal.textContent = '$' + gas.regular.toFixed(2);
     if (typeof gas.mom_change === 'number') {
-      const arrow = gas.mom_change > 0.005 ? '▲' : gas.mom_change < -0.005 ? '▼' : '•';
+      const arrow = gas.mom_change > 0.005 ? '▲' : gas.mom_change < -0.005 ? '▼' : '';
       const clr   = gas.mom_change > 0.005 ? 'var(--coral)' : gas.mom_change < -0.005 ? 'var(--green)' : 'var(--text-lt)';
       const sign  = gas.mom_change >= 0 ? '+' : '−';
-      gasSub.innerHTML = '<span style="color:' + clr + ';font-weight:600;">' + arrow + ' ' + sign + '$' + Math.abs(gas.mom_change).toFixed(2) + ' <span class="gloss" data-gloss="MoM">over last month</span></span>';
+      const arrowPfx = arrow ? arrow + ' ' : '';
+      gasSub.innerHTML = '<span style="color:' + clr + ';font-weight:600;">' + arrowPfx + '<span style="font-size:1.25em;font-weight:800;line-height:1;">' + sign + '</span>$' + Math.abs(gas.mom_change).toFixed(2) + ' <span class="gloss" data-gloss="MoM">over last month</span></span>';
     } else {
       gasSub.textContent = 'regular · /gal';
     }
