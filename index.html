@@ -834,7 +834,11 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* Compact household calculator output */
+  /* Compact household calculator output —
+     Three-cell grid (Weekly / Monthly / Annual) makes the cadence label
+     scannable rather than buried in a sea of bold serif dollar signs.
+     Each cell has its own uppercase eyebrow above the value so a user
+     can find "Monthly" without parsing "/mo" suffixes inline. */
   .hh-compact-out {
     font-size: 15px;
     color: var(--text-mid);
@@ -844,12 +848,45 @@
     margin-top: 12px;
     line-height: 1.55;
   }
-  .hh-compact-out b {
+  .hh-out-header { margin-bottom: 6px; }
+  .hh-out-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 10px 0 8px;
+  }
+  .hh-out-cell {
+    background: rgba(255, 255, 255, 0.55);
+    border-radius: 8px;
+    padding: 9px 12px;
+    text-align: left;
+  }
+  .hh-out-cell-lbl {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 3px;
+  }
+  .hh-out-cell-val {
     font-family: 'DM Serif Display', serif !important;
-    font-size: 1.15rem;
+    font-size: 1.25rem;
     color: var(--green);
     font-weight: 400;
-    margin: 0 2px;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+  .hh-out-share {
+    font-size: 13px;
+    color: var(--text-lt);
+    margin-top: 6px;
+  }
+  @media (max-width: 520px) {
+    .hh-out-grid { gap: 6px; }
+    .hh-out-cell { padding: 8px 10px; }
+    .hh-out-cell-lbl { font-size: 10px; letter-spacing: 0.07em; }
+    .hh-out-cell-val { font-size: 1.05rem; }
   }
 
   /* Collapsible methodology disclosure */
@@ -3663,9 +3700,22 @@ function renderGoodsPane() {
   const hhShare = hhAnnual / income;
   const hhLabel = HH_OPTIONS.find(o => o.key === currentHH).label;
   document.getElementById('goods-hh-out').innerHTML =
-    `<strong>${hhLabel}</strong> in ${fullLbl[currentCounty]}: ` +
-    `<b>${fmt(hhWeekly)}/wk</b> &middot; <b>${fmt(hhMonthly)}/mo</b> &middot; <b>${fmt(hhAnnual)}/yr</b> ` +
-    `<span style="color:var(--text-lt);">(${(hhShare*100).toFixed(1)}% of 4-person median income)</span>`;
+    `<div class="hh-out-header"><strong>${hhLabel}</strong> in ${fullLbl[currentCounty]}</div>
+     <div class="hh-out-grid">
+       <div class="hh-out-cell">
+         <div class="hh-out-cell-lbl">Weekly</div>
+         <div class="hh-out-cell-val">${fmt(hhWeekly)}</div>
+       </div>
+       <div class="hh-out-cell">
+         <div class="hh-out-cell-lbl">Monthly</div>
+         <div class="hh-out-cell-val">${fmt(hhMonthly)}</div>
+       </div>
+       <div class="hh-out-cell">
+         <div class="hh-out-cell-lbl">Annual</div>
+         <div class="hh-out-cell-val">${fmt(hhAnnual)}</div>
+       </div>
+     </div>
+     <div class="hh-out-share">${(hhShare*100).toFixed(1)}% of 4-person median income</div>`;
 
   /* 5. Details — category bars + top items (only rendered when open OR on first render) */
   renderGoodsDetail(g);
@@ -4793,22 +4843,27 @@ if (housingDetail && rlbChart) {
   requestAnimationFrame(observeBarGroups);
 })();
 
-/* ── 1. Count-up animation for KPI headline numbers ──────────────────────
-   Call before any selectCounty/setHomeView re-render so numbers animate
-   both on initial load and on county/view switch.                       */
+/* ── 1. Settle animation for KPI headline numbers ────────────────────────
+   Previously: counted from $0 → target over 820ms (slot-machine effect on
+   every render). Now: starts at 92% of target and settles the final 8%
+   over 380ms. Reads as a precision instrument calibrating rather than
+   a counter spinning up — communicates "fresh value" without making
+   the user wait for the animation to finish before reading.            */
 function countUpKPI(el, targetVal, formatFn, dur) {
   if (!el || typeof targetVal !== 'number' || isNaN(targetVal)) return;
-  dur = dur || 820;
+  dur = dur || 380;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     el.textContent = formatFn(targetVal); return;
   }
   // Cancel any in-progress animation on this element
   if (el._countRaf) { cancelAnimationFrame(el._countRaf); el._countRaf = null; }
-  const ease = t => 1 - Math.pow(1 - t, 4); // easeOutQuart
+  const startVal = targetVal * 0.92;       // settle starts here
+  const delta    = targetVal - startVal;   // animate this slice only
+  const ease = t => 1 - Math.pow(1 - t, 3); // easeOutCubic — gentler than quart
   const t0 = performance.now();
   (function tick(now) {
     const p = Math.min((now - t0) / dur, 1);
-    el.textContent = formatFn(targetVal * ease(p));
+    el.textContent = formatFn(startVal + delta * ease(p));
     if (p < 1) el._countRaf = requestAnimationFrame(tick);
     else el._countRaf = null;
   })(t0);
