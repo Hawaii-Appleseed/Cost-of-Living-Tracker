@@ -1200,12 +1200,17 @@
     line-height: 1.25;
     margin-bottom: 12px;
   }
-  /* #1 — frame line under the title that states what question the card answers */
+  /* #1 — frame line under the title that states what question the card answers.
+     Editorial italic serif treatment: small "question" that feels like a lede,
+     quiet but distinctive against the surrounding sans-serif body. */
   .mcard-v2-frame {
-    font-size: 16px;
-    color: var(--text-mid);
-    line-height: 1.35;
-    margin: 0 0 10px;
+    font-family: 'DM Serif Display', serif !important;
+    font-style: italic;
+    font-size: 21px;
+    color: var(--ocean-700);
+    line-height: 1.25;
+    margin: 2px 0 14px;
+    letter-spacing: 0.005em;
   }
   /* #2 — plain-English replacement for "Affordability index · 52 / 100" */
   .mcard-v2-coverage {
