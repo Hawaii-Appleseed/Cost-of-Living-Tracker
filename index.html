@@ -1802,8 +1802,8 @@
   }
 
   /* Zone-tinted bar track: three background bands (seafoam / amber / coral)
-     reflect the 0-30% / 30-60% / 60%+ severity zones. The tick marks exactly
-     where 30% falls so the threshold is a landmark, not a hairline. */
+     mark the share-of-burdened-households brackets — <30% of households,
+     30–50%, 50%+. 50% tick marks the "majority burdened" threshold. */
   .pti-bar-track {
     flex: 1;
     height: 18px;
@@ -1811,9 +1811,17 @@
     position: relative;
     overflow: visible; /* allow anchor tick label to overhang above */
     background: linear-gradient(to right,
-      rgba(30,138,115,0.20)  0%,     rgba(30,138,115,0.20) 35.29%,
-      rgba(224,138,91,0.20) 35.29%,  rgba(224,138,91,0.20) 70.59%,
-      rgba(201,79,58,0.20)  70.59%,  rgba(201,79,58,0.20)  100%);
+      rgba(30,138,115,0.20)  0%,   rgba(30,138,115,0.20) 30%,
+      rgba(224,138,91,0.20) 30%,   rgba(224,138,91,0.20) 50%,
+      rgba(201,79,58,0.20)  50%,   rgba(201,79,58,0.20)  100%);
+  }
+  /* Severe-share overlay: darker coral inner bar drawn over the primary
+     burdened bar to show what fraction of the burdened share is severe
+     (≥50% of income on housing). */
+  .pti-bar-fill.pti-bar-fill--severe {
+    background: var(--coral-700, #8a3525) !important;
+    opacity: 0.92;
+    z-index: 1;
   }
   .pti-bar-track .pti-bar-fill {
     position: absolute;
@@ -3060,7 +3068,7 @@
     <div class="card-title">How much of income goes to <span class="pti-mode-anchor"><button type="button" id="pti-mode-btn" class="pti-mode-btn" aria-haspopup="listbox" aria-expanded="false" onclick="togglePtiModePopover(event)" title="Switch between mortgage and rent"><span id="pti-mode-name">a mortgage</span><span class="caret" aria-hidden="true"></span></button><div class="pti-mode-popover" id="pti-mode-popover" role="listbox">
         <button class="pti-mode-popover-item is-active" data-mode="mortgage" onclick="setPtiMode('mortgage')">Mortgage <span class="pti-mode-popover-item-sub">owners w/ mortgage · ACS B25092</span></button>
         <button class="pti-mode-popover-item"           data-mode="rent"     onclick="setPtiMode('rent')">Rent <span class="pti-mode-popover-item-sub">renter households · ACS B25071</span></button>
-      </div></span>? <span class="afford-assumptions-info" tabindex="0" role="button" aria-label="About this chart" id="pti-mode-tip" data-tip="Median owner’s monthly housing cost as % of their own income, for owners with a mortgage (ACS B25092, 5-yr 2020-2024 nowcast via Honolulu CPI / Hawaiʻi wages)">ⓘ</span>
+      </div></span>? <span class="afford-assumptions-info" tabindex="0" role="button" aria-label="About this chart" id="pti-mode-tip" data-tip="Share of owner households (with a mortgage) spending ≥30% of income on housing — mortgage, taxes, insurance, utilities (ACS B25091, 5-yr 2020-2024). Darker overlay = ≥50%.">ⓘ</span>
     </div>
     <div id="pti-bars"></div>
   </div>
@@ -3533,33 +3541,38 @@ function selectCounty(county) {
       mcardV2('sfh',   'Single-family home', d.sfhPrice,   d.sfhIdx,   d.sfhMortgage,   housingBadge)
     + mcardV2('condo', 'Condo',              d.condoPrice, d.condoIdx, d.condoMortgage, housingBadge);
 
-  const maxPTI = 0.85;
-  // 30% threshold lands at 35.29% of the bar (30/85). Used for tick position
-  // and for the zone gradient stops in CSS.
-  const threshPct = (0.30 / maxPTI * 100).toFixed(2);
+  // Bar scale: 0–100% of households. The 50% tick marks the "majority of
+  // households are burdened" threshold; gradient bands behind the bar
+  // mirror the share buckets (<30 / 30–50 / 50+).
+  const majorityTickPct = 50;
+  const shareColor = v => v >= 0.50 ? '#c94f3a' : v >= 0.30 ? '#e08a5b' : '#1e8a73';
 
-  // Build one row inside a PTI panel. Reuses ptiColor() for semantic color.
-  // Rows are clickable → selecting one filters the dashboard to that county.
-  // State row embeds the zone legend inside its bar background (Rec C).
-  const ptiRow = (c, v, isState, mode) => {
-    const w = Math.min(v / maxPTI * 100, 100).toFixed(1);
-    const clr = ptiColor(v);
+  // Build one row: each bar shows the SHARE of households that are
+  // cost-burdened (≥30% of income on housing). An inner darker-coral
+  // overlay shows the subset that's severely burdened (≥50% of income).
+  // This swaps the previous median-PTI visualization, which didn't match
+  // the headline "X% of households are cost-burdened" lede.
+  const ptiRow = (c, isState, mode) => {
+    const burd = (typeof burdenShare === 'function' ? burdenShare(c) : 0) || 0;
+    const sev  = (typeof severeShare === 'function' ? severeShare(c) : 0) || 0;
+    const wBurd = Math.min(burd * 100, 100).toFixed(1);
+    const wSev  = Math.min(sev  * 100, 100).toFixed(1);
+    const clr = shareColor(burd);
     const isCurrent = c === currentCounty;
+    const householdNoun = mode === 'rent' ? 'renter households' : 'owner households w/ mortgage';
     const zoneLabels = isState ? `
-          <span class="pti-zone-label pti-zone-label--ok"   style="left:0%;width:35.29%">Affordable</span>
-          <span class="pti-zone-label pti-zone-label--mid"  style="left:35.29%;width:35.30%">Burdened</span>
-          <span class="pti-zone-label pti-zone-label--high" style="left:70.59%;width:29.41%">Severe</span>` : '';
-    const tipMetric = mode === 'rent'
-      ? "median renter's rent / income (ACS B25071)"
-      : "median owner's housing costs / income (ACS B25092)";
+          <span class="pti-zone-label pti-zone-label--ok"   style="left:0%;width:30%">&lt;30%</span>
+          <span class="pti-zone-label pti-zone-label--mid"  style="left:30%;width:20%">30–50%</span>
+          <span class="pti-zone-label pti-zone-label--high" style="left:50%;width:50%">50%+ of households</span>` : '';
     return `
       <div class="pti-row is-clickable${isCurrent ? ' is-current' : ''}${isState ? ' is-state' : ''}" role="button" tabindex="0" data-county="${c}" title="View ${fullLbl[c]}">
         <div class="pti-row-lbl${isState ? ' pti-row-lbl--state' : ''}">${shortLbl[c]}</div>
         <div class="pti-bar-track">${zoneLabels}
-          <div class="pti-bar-fill" style="width:${w}%;background:${clr};" data-tip="${pct(v)} · ${tipMetric}"></div>
-          <div class="pti-bar-tick" style="left:${threshPct}%;" title="30% cost-burden threshold"></div>
+          <div class="pti-bar-fill" style="width:${wBurd}%;background:${clr};" data-tip="${pct(burd)} of ${shortLbl[c]} ${householdNoun} are cost-burdened · ${pct(sev)} severely"></div>
+          <div class="pti-bar-fill pti-bar-fill--severe" style="width:${wSev}%;"></div>
+          <div class="pti-bar-tick" style="left:${majorityTickPct}%;" title="50% — majority of households burdened"></div>
         </div>
-        <div class="pti-row-val" style="color:${clr}">${pct(v)}</div>
+        <div class="pti-row-val" style="color:${clr}">${pct(burd)}</div>
       </div>
       ${isState ? '<div class="pti-row-sep"></div>' : ''}
     `;
@@ -3580,8 +3593,8 @@ function selectCounty(county) {
   const severeShare = c => isRent ? countyData[c].rentSeverelyBurdenedPct
                                   : countyData[c].ownerSeverelyBurdenedPct;
   const panelLabel    = isRent ? 'Renters' : 'Owners with mortgage';
-  const panelSubLabel = isRent ? 'what share of income the typical renter pays for housing'
-                               : 'what share of income the typical owner-with-mortgage pays for housing';
+  const panelSubLabel = isRent ? 'share of renter households that are cost-burdened, by county'
+                               : 'share of owner households (w/ mortgage) that are cost-burdened, by county';
   const householdType = isRent ? 'renter' : 'owner';
   const householdTypePl = isRent ? 'renter households' : 'owner households with a mortgage';
 
@@ -3597,14 +3610,14 @@ function selectCounty(county) {
   const severeBadgeCls = stateSevere   >= 0.25 ? 'num-badge--coral'
                        : stateSevere   >= 0.15 ? 'num-badge--amber'
                        : 'num-badge--green';
-  const ledeText = `In Hawaiʻi, <span class="num-badge ${burdenBadgeCls}">${fmtPct(stateBurdened)}</span> of ${householdTypePl} are cost-burdened (spend 30% or more of their income on housing) — and <span class="num-badge ${severeBadgeCls}">${fmtPct(stateSevere)}</span> are severely cost-burdened (spend 50% or more).`;
+  const ledeText = `In Hawaiʻi, <span class="num-badge ${burdenBadgeCls}">${fmtPct(stateBurdened)}</span> of ${householdTypePl} are <span class="gloss" data-gloss="costBurdened">cost-burdened</span> — and <span class="num-badge ${severeBadgeCls}">${fmtPct(stateSevere)}</span> are <span class="gloss" data-gloss="severelyCostBurdened">severely cost-burdened</span>.`;
 
   document.getElementById('pti-bars').innerHTML = `
     <div class="pti-lede">${ledeText}</div>
     <div class="pti-single-grid">
       <div class="pti-panel">
         <div class="pti-panel-header pti-panel-header--${isRent ? 'sfh' : 'condo'}">${panelLabel} <span class="pti-panel-sub">· ${panelSubLabel}</span></div>
-        ${counties.map(c => ptiRow(c, burdenPTI(c), c === 'State', mode)).join('')}
+        ${counties.map(c => ptiRow(c, c === 'State', mode)).join('')}
       </div>
     </div>
   `;
@@ -4336,7 +4349,10 @@ const GLOSSARY = {
   /* --- methodology terms --- */
   costBurdened: {
     term: "Cost-burdened",
-    def:  "HUD definition: a household paying more than 30% of gross income toward housing. Above 50% is \"severely cost-burdened.\"" },
+    def:  "HUD definition: a household that spends 30% or more of gross income on housing (rent + utilities for renters; mortgage, taxes, insurance, utilities for owners)." },
+  severelyCostBurdened: {
+    term: "Severely cost-burdened",
+    def:  "HUD definition: a household that spends 50% or more of gross income on housing — the deepest tier of housing stress, typically forcing tradeoffs against food, healthcare, or savings." },
   affordabilityIndex: {
     term: "Affordability index",
     def:  "100 = a typical Hawaiʻi household can just afford the median home at a 30% payment-to-income ratio on the current mortgage rate. Below 100 = unaffordable; above 100 = affordable." },
@@ -4717,8 +4733,8 @@ function setPtiMode(mode) {
   const tipEl = document.getElementById('pti-mode-tip');
   if (tipEl) {
     tipEl.setAttribute('data-tip', mode === 'rent'
-      ? 'Median renter’s rent as % of their own income (ACS B25071, 5-yr 2020-2024 nowcast to current via Honolulu rent CPI / Hawaiʻi wages)'
-      : 'Median owner’s monthly housing cost as % of their own income, for owners with a mortgage (ACS B25092, 5-yr 2020-2024 nowcast via Honolulu CPI / Hawaiʻi wages)');
+      ? 'Share of renter households spending ≥30% of income on rent + utilities (ACS B25070, 5-yr 2020-2024). Darker overlay = ≥50% (severely burdened).'
+      : 'Share of owner households (with a mortgage) spending ≥30% of income on housing — mortgage, taxes, insurance, utilities (ACS B25091, 5-yr 2020-2024). Darker overlay = ≥50%.');
   }
   closePtiModePopover();
   // Re-render the housing pane (which contains the PTI section) by
