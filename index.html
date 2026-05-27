@@ -314,9 +314,14 @@
     transition: transform 0.15s;
   }
   .pti-mode-btn.is-open .caret { transform: rotate(-135deg) translate(-1px, -2px); }
-  /* Anchor the popover relative to the .card-title — the toggle button is
-     inline so its own bounding box doesn't span enough to host the popover. */
-  .card-title { position: relative; }
+  /* Anchor the popover to a tight inline-block wrapper that sits exactly
+     under the toggle button — using .card-title as the anchor pushed the
+     popover all the way to the left edge of the title row. */
+  .pti-mode-anchor {
+    position: relative;
+    display: inline-block;
+    vertical-align: baseline;
+  }
   .pti-mode-popover {
     position: absolute;
     top: calc(100% + 8px);
@@ -3052,11 +3057,10 @@
   </div>
 
   <div class="card" style="margin-bottom:1.25rem;">
-    <div class="card-title">How much of income goes to <button type="button" id="pti-mode-btn" class="pti-mode-btn" aria-haspopup="listbox" aria-expanded="false" onclick="togglePtiModePopover(event)" title="Switch between mortgage and rent">a <span id="pti-mode-name">mortgage</span><span class="caret" aria-hidden="true"></span></button>? <span class="afford-assumptions-info" tabindex="0" role="button" aria-label="About this chart" id="pti-mode-tip" data-tip="Median owner’s monthly housing cost as % of their own income, for owners with a mortgage (ACS B25092, 5-yr 2020-2024 nowcast via Honolulu CPI / Hawaiʻi wages)">ⓘ</span>
-      <div class="pti-mode-popover" id="pti-mode-popover" role="listbox">
+    <div class="card-title">How much of income goes to <span class="pti-mode-anchor"><button type="button" id="pti-mode-btn" class="pti-mode-btn" aria-haspopup="listbox" aria-expanded="false" onclick="togglePtiModePopover(event)" title="Switch between mortgage and rent"><span id="pti-mode-name">a mortgage</span><span class="caret" aria-hidden="true"></span></button><div class="pti-mode-popover" id="pti-mode-popover" role="listbox">
         <button class="pti-mode-popover-item is-active" data-mode="mortgage" onclick="setPtiMode('mortgage')">Mortgage <span class="pti-mode-popover-item-sub">owners w/ mortgage · ACS B25092</span></button>
         <button class="pti-mode-popover-item"           data-mode="rent"     onclick="setPtiMode('rent')">Rent <span class="pti-mode-popover-item-sub">renter households · ACS B25071</span></button>
-      </div>
+      </div></span>? <span class="afford-assumptions-info" tabindex="0" role="button" aria-label="About this chart" id="pti-mode-tip" data-tip="Median owner’s monthly housing cost as % of their own income, for owners with a mortgage (ACS B25092, 5-yr 2020-2024 nowcast via Honolulu CPI / Hawaiʻi wages)">ⓘ</span>
     </div>
     <div id="pti-bars"></div>
   </div>
@@ -3576,8 +3580,8 @@ function selectCounty(county) {
   const severeShare = c => isRent ? countyData[c].rentSeverelyBurdenedPct
                                   : countyData[c].ownerSeverelyBurdenedPct;
   const panelLabel    = isRent ? 'Renters' : 'Owners with mortgage';
-  const panelSubLabel = isRent ? 'median gross rent as % of income (ACS B25071)'
-                               : 'median monthly owner costs as % of income (ACS B25092)';
+  const panelSubLabel = isRent ? 'what share of income the typical renter pays for housing'
+                               : 'what share of income the typical owner-with-mortgage pays for housing';
   const householdType = isRent ? 'renter' : 'owner';
   const householdTypePl = isRent ? 'renter households' : 'owner households with a mortgage';
 
@@ -3593,7 +3597,7 @@ function selectCounty(county) {
   const severeBadgeCls = stateSevere   >= 0.25 ? 'num-badge--coral'
                        : stateSevere   >= 0.15 ? 'num-badge--amber'
                        : 'num-badge--green';
-  const ledeText = `In Hawaiʻi, <span class="num-badge ${burdenBadgeCls}">${fmtPct(stateBurdened)}</span> of ${householdTypePl} are cost-burdened (pay ≥30% of income to housing) — and <span class="num-badge ${severeBadgeCls}">${fmtPct(stateSevere)}</span> are severely cost-burdened (pay ≥50%).`;
+  const ledeText = `In Hawaiʻi, <span class="num-badge ${burdenBadgeCls}">${fmtPct(stateBurdened)}</span> of ${householdTypePl} are cost-burdened (spend 30% or more of their income on housing) — and <span class="num-badge ${severeBadgeCls}">${fmtPct(stateSevere)}</span> are severely cost-burdened (spend 50% or more).`;
 
   document.getElementById('pti-bars').innerHTML = `
     <div class="pti-lede">${ledeText}</div>
@@ -4701,9 +4705,10 @@ function closePtiModePopover() {
 function setPtiMode(mode) {
   if (mode !== 'mortgage' && mode !== 'rent') return;
   currentPtiMode = mode;
-  // Update button label
+  // Update button label — keep the article inside the span so the title
+  // reads grammatically in both modes ("a mortgage" / "rent").
   const nameEl = document.getElementById('pti-mode-name');
-  if (nameEl) nameEl.textContent = mode;
+  if (nameEl) nameEl.textContent = (mode === 'rent') ? 'rent' : 'a mortgage';
   // Update active-state in popover items
   document.querySelectorAll('.pti-mode-popover-item').forEach(b => {
     b.classList.toggle('is-active', b.getAttribute('data-mode') === mode);
@@ -4721,7 +4726,7 @@ function setPtiMode(mode) {
   if (typeof selectCounty === 'function') selectCounty(currentCounty);
 }
 document.addEventListener('click', (ev) => {
-  const wrap = document.querySelector('.card-title:has(#pti-mode-btn)') || document.getElementById('pti-mode-btn')?.parentElement;
+  const wrap = document.querySelector('.pti-mode-anchor') || document.getElementById('pti-mode-btn')?.parentElement;
   if (wrap && !wrap.contains(ev.target)) closePtiModePopover();
 });
 
