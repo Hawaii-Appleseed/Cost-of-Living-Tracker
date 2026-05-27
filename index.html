@@ -3158,11 +3158,17 @@
       <div class="slider-bubble" id="rate-bubble">6.38%</div>
       <div class="slider-val" id="rate-display">6.38%</div>
     </div>
+    <div class="slider-row" id="down-slider-row">
+      <div class="slider-label">Down payment</div>
+      <input type="range" id="down-slider" class="has-progress" min="0" max="50" step="1" value="20" oninput="updateCalc()">
+      <div class="slider-bubble" id="down-bubble">20%</div>
+      <div class="slider-val" id="down-display">20%</div>
+    </div>
 
     <div class="calc-result">
       <div class="calc-result-label">Max affordable home price</div>
       <div class="calc-big" id="calc-price">$466,032</div>
-      <div class="calc-tiny">20% down &nbsp;·&nbsp; 30% of gross income to P&amp;I</div>
+      <div class="calc-tiny" id="calc-assumptions">20% down &nbsp;·&nbsp; 30% of gross income to P&amp;I</div>
       <div class="calc-grid" id="calc-grid"></div>
     </div>
 
@@ -3343,12 +3349,14 @@ function ptiColor(v)     { return v>0.60?'#c94f3a':v>0.30?'#e08a5b':'#1e8a73'; }
 function ptiTextColor(v) { return v>0.60?'#c94f3a':v>0.30?'#e08a5b':'#1e8a73'; }
 function idxClass(v) { return v<55?'danger':v<80?'warning':'ok'; }
 
-function calcAffordPrice(income, ratePct) {
+function calcAffordPrice(income, ratePct, downPct = 20) {
   const monthlyMax = income / 12 * 0.30;
   const r = ratePct / 100 / 12;
   const n = 360;
   const loanAmt = r === 0 ? monthlyMax * n : monthlyMax * (1 - Math.pow(1+r,-n)) / r;
-  return loanAmt / 0.80;
+  // LTV (loan-to-value) = 1 - down%. Clamp to avoid divide-by-zero at 100% down.
+  const ltv = Math.max(0.001, 1 - downPct / 100);
+  return loanAmt / ltv;
 }
 
 function updateAfford() {
@@ -3436,18 +3444,27 @@ function updateAfford() {
 function updateCalc() {
   const income = parseInt(document.getElementById('income-slider').value);
   const rate = parseFloat(document.getElementById('rate-slider').value);
+  const downEl = document.getElementById('down-slider');
+  const downPct = downEl ? parseInt(downEl.value) : 20;
   document.getElementById('income-display').textContent = fmt(income);
   document.getElementById('rate-display').textContent = rate.toFixed(2)+'%';
+  const downDisplay = document.getElementById('down-display');
+  if (downDisplay) downDisplay.textContent = downPct + '%';
+  const downBubble = document.getElementById('down-bubble');
+  if (downBubble) downBubble.textContent = downPct + '%';
 
-  const price = calcAffordPrice(income, rate);
+  const price = calcAffordPrice(income, rate, downPct);
   const monthlyMax = income / 12 * 0.30;
-  const downPay = price * 0.20;
-  const loanAmt = price * 0.80;
+  const downFrac = downPct / 100;
+  const downPay = price * downFrac;
+  const loanAmt = price * (1 - downFrac);
 
   document.getElementById('calc-price').textContent = fmt(price);
+  const assumpEl = document.getElementById('calc-assumptions');
+  if (assumpEl) assumpEl.innerHTML = `${downPct}% down &nbsp;·&nbsp; 30% of gross income to P&amp;I`;
   document.getElementById('calc-grid').innerHTML = `
     <div class="calc-mini"><div class="calc-mini-label">Monthly budget (P&amp;I)</div><div class="calc-mini-val">${fmt(monthlyMax)}</div></div>
-    <div class="calc-mini"><div class="calc-mini-label">Down payment (20%)</div><div class="calc-mini-val">${fmt(downPay)}</div></div>
+    <div class="calc-mini"><div class="calc-mini-label">Down payment (${downPct}%)</div><div class="calc-mini-val">${fmt(downPay)}</div></div>
     <div class="calc-mini"><div class="calc-mini-label">Loan amount</div><div class="calc-mini-val">${fmt(loanAmt)}</div></div>
   `;
 
@@ -4982,6 +4999,7 @@ renderBuildAuth();
 updateScrollBtn();
 setupSlider('income-slider', 'income-bubble', v => '$' + Math.round(v).toLocaleString());
 setupSlider('rate-slider',   'rate-bubble',   v => v.toFixed(2) + '%');
+setupSlider('down-slider',   'down-bubble',   v => Math.round(v) + '%');
 maybeShowHint();
 if (typeof initAsofPopover === 'function') initAsofPopover();
 if (typeof initGlossary === 'function') initGlossary();
