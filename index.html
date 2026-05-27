@@ -1797,7 +1797,10 @@
     grid-template-columns: 1fr;
   }
   .pti-single-grid .pti-panel {
-    max-width: 720px;
+    /* Stretch to the card's full width — the bars are easier to read,
+       per-county differences register more clearly, and the 30/50%
+       zone bands have room to breathe. */
+    width: 100%;
     margin: 0 auto;
   }
 
