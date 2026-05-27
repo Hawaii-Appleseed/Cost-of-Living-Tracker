@@ -3066,7 +3066,7 @@
     <div class="card-sub"><span class="gloss" data-gloss="contractRent">Tenant rent</span> on existing leases vs. <span class="gloss" data-gloss="askingRent">asking rent</span> on new listings &nbsp;·&nbsp; both exclude utilities</div>
     <div class="legend-row">
       <span><span class="swatch" style="background:var(--ocean-300);"></span><span class="gloss" data-gloss="rentNowcast">Tenant rent</span></span>
-      <span><span class="swatch" style="background:var(--coral-500);"></span>Asking rent</span>
+      <span><span class="swatch" style="background:var(--coral-500);"></span><span class="gloss" data-gloss="askingRent">Asking rent</span></span>
     </div>
     <div id="rent-grid"></div>
   </div>
@@ -4341,7 +4341,9 @@ const GLOSSARY = {
     def:  "The rent actually being paid under current leases, excluding utilities. Reflects existing tenants (Census ACS table B25058)." },
   askingRent: {
     term: "Asking rent",
-    def:  "Rent advertised on new listings. Leading indicator of what new tenants will pay — typically runs higher than contract rent (Zillow ZORI)." },
+    def:  "Median rent advertised on new listings — what a tenant would pay starting a lease today. Source: Zillow Observed Rent Index (ZORI) county SFR+condo+MF series, reported monthly. We smooth a 3-month trailing mean to absorb single-month spikes (especially on thin-market islands like Kauaʻi). Typically runs well above contract rent because it reflects only the small slice of units turning over, not the full stock of occupied leases.",
+    source: "Zillow Research — ZORI",
+    href:   "https://www.zillow.com/research/methodology-zori-repeat-rent-27092/" },
   projected: {
     term: "Projected",
     def:  "Latest raw value forward-scaled to the reference month via the relevant BLS CPI ratio. Used when the primary source lags 1–2 months behind the dashboard's reference month." },
