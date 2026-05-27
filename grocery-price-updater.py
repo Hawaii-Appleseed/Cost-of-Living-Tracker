@@ -14,7 +14,8 @@ Fields written per county:
     groceryShareOfIncome, weeklyPerCap, lastUpdated,
     household{singleFemale,singleMale,singleParent1Child,family4},
     categories{grains,vegetables,fruits,...},
-    topItems[{name,price,vsHnl}]
+    topItems[{name,price,vsHnl}],
+    stapleItems[{key,name,unit,price}]   (from config/staple_items.json)
 
 Patch strategy: replace everything between
     /* GROCERY_DATA_START */  ...  /* GROCERY_DATA_END */
@@ -43,6 +44,7 @@ HOUSEHOLD_CSV = GROCERY_PIPELINE_ROOT / "data" / "output" / "household_estimates
 COUNTY_CSV    = GROCERY_PIPELINE_ROOT / "data" / "output" / "county_comparison.csv"
 CPI_STATUS_JSON = GROCERY_PIPELINE_ROOT / "data" / "output" / "cpi_status.json"
 PUMD_JSON     = GROCERY_PIPELINE_ROOT / "data" / "pumd_honolulu_monthly.json"
+STAPLE_ITEMS_JSON = GROCERY_PIPELINE_ROOT / "config" / "staple_items.json"
 
 DEFAULT_FILES = [
     PROJECT_ROOT / "squarespace-single-file.html",
@@ -264,6 +266,29 @@ def load_pumd_data() -> dict:
     }
 
 
+def load_staple_items() -> dict:
+    """Load the curated supplementary staple-SKU prices (bread / bananas / …).
+
+    These are hand-collected, not pipeline-derived, and live in
+    pipelines/grocery/config/staple_items.json so the monthly CI run can
+    re-emit them without overwriting curated values. Missing or malformed
+    file → empty dict; the Food Prices grid falls back to topItems only.
+    """
+    if not STAPLE_ITEMS_JSON.exists():
+        print(f"  WARNING: {STAPLE_ITEMS_JSON} not found; stapleItems will be omitted.")
+        return {}
+    try:
+        d = json.loads(STAPLE_ITEMS_JSON.read_text())
+    except (json.JSONDecodeError, OSError):
+        print(f"  WARNING: {STAPLE_ITEMS_JSON} malformed; skipping stapleItems.")
+        return {}
+    items  = d.get("items") or []
+    prices = d.get("prices") or {}
+    if not items or not prices:
+        return {}
+    return {"items": items, "prices": prices}
+
+
 def build_grocery_data() -> dict:
     hh_by_cty, pretax, withtax, last_date = load_household_estimates()
     items, cat_totals = load_county_items()
@@ -275,6 +300,7 @@ def build_grocery_data() -> dict:
     original_period = cpi_status.get("latest_actual_period") if is_projected else None
 
     pumd = load_pumd_data()
+    staple_cfg = load_staple_items()
 
     state_pretax, state_withtax, state_hh, state_cats, state_items = \
         compute_statewide(pretax, withtax, hh_by_cty, cat_totals, items)
@@ -320,6 +346,19 @@ def build_grocery_data() -> dict:
             "categories":          {k: round(v, 2) for k, v in cats.items()},
             "topItems":            top,
         }
+
+        # Curated supplementary staple SKUs (bread/bananas/beef/spinach).
+        # Hand-collected, lives in config/staple_items.json so monthly CI
+        # runs don't clobber it. Omitted if config missing or county absent.
+        if staple_cfg:
+            cty_prices = staple_cfg["prices"].get(cty)
+            if cty_prices:
+                out[cty]["stapleItems"] = [
+                    {"key": it["key"], "name": it["name"], "unit": it["unit"],
+                     "price": round(float(cty_prices[it["key"]]), 2)}
+                    for it in staple_cfg["items"]
+                    if it["key"] in cty_prices
+                ]
 
         # BLS CE PUMD side-statistic — actual measured monthly food-at-home
         # spending for "typical" households. Renders the "Typical: $Y/mo per

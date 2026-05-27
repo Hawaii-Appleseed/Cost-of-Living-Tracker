@@ -204,23 +204,39 @@ def extract_hawaii_prices(rows: list[dict], region_col: str, region_values: dict
     return result
 
 
+ZORI_SMOOTHING_WINDOW = 3   # months for trailing mean — see comment below
+
 def fetch_zori_asking_rents() -> dict:
     """
     Download Zillow ZORI county CSV and extract:
-      - The most recent asking rent for each Hawaii county (→ result[key])
+      - A ZORI_SMOOTHING_WINDOW-month trailing mean of asking rent per
+        Hawaiʻi county, written as result[key] and used as the displayed
+        askRent (and as numerator in the ZORI growth ratio feeding the
+        blended rent nowcast).
       - The RENT_ANCHOR_YEAR annual average per county, used as a common
         anchor with BLS rent CPI for the blended nowcast
         (→ result["_anchor_avg"][key])
 
     Returns {countyData_key: askRent_int, "_period": "YYYY-MM",
-             "_anchor_avg": {...}, "_anchor_year": "YYYY", "_yoy_pct": {...}}.
+             "_anchor_avg": {...}, "_anchor_year": "YYYY", "_yoy_pct": {...},
+             "_smoothing_window": int}.
     State-level askRent is derived as a population-weighted average
-    (Honolulu ~72%, Hawaii ~14%, Maui ~10%, Kauai ~4%).
+    (Honolulu ~72%, Hawaii ~14%, Maui ~10%, Kauai ~4%) of the smoothed
+    county values.
+
+    Why smooth: ZORI is already a "smoothed mean" (the _sm_ in the URL) but
+    its sample size on thin markets — Kauaʻi especially — is small enough
+    that a single luxury batch entering the listings pool can swing the
+    headline number by 15-20% in one month (e.g. the 2026-04 print of
+    $5,255 vs. a 12-month band of $4.3k–$4.5k). Averaging the latest 3
+    monthly prints dampens these sampling artifacts without materially
+    changing the trend signal Zillow already publishes.
 
     The anchor-year average MUST track RENT_ANCHOR_YEAR — the BLS rent CPI
     ratio is computed against the same year, and the blended nowcast assumes
     both series share the anchor. A drifted anchor here would silently shift
-    the ZORI growth factor relative to BLS.
+    the ZORI growth factor relative to BLS. (Anchor stays a full-year mean —
+    only the *current* read is windowed.)
     """
     print(f"  Downloading {ZORI_URL.split('/')[-1]}...")
     raw = fetch_text(ZORI_URL)
@@ -254,7 +270,27 @@ def fetch_zori_asking_rents() -> dict:
             continue
 
         key = ZORI_COUNTY_MAP[region_name]
-        result[key] = round(float(row[last_idx]))
+
+        # Walk backward from the latest non-empty cell collecting up to
+        # ZORI_SMOOTHING_WINDOW numeric values, then take the mean. Skips
+        # blank or unparseable cells. Falls back to whatever fewer values
+        # are available (handles Zillow's late-arriving small-market
+        # coverage — e.g. Kauaʻi has only had data since Feb 2025).
+        window_vals = []
+        for i in range(last_idx, 8, -1):
+            cell = row[i].strip() if i < len(row) else ""
+            if not cell:
+                continue
+            try:
+                window_vals.append(float(cell))
+            except ValueError:
+                continue
+            if len(window_vals) >= ZORI_SMOOTHING_WINDOW:
+                break
+        if not window_vals:
+            continue
+        result[key] = round(sum(window_vals) / len(window_vals))
+
         # Capture the column header (date) once; should be identical across counties
         if latest_date_header is None and last_idx < len(headers):
             latest_date_header = headers[last_idx]
@@ -307,6 +343,7 @@ def fetch_zori_asking_rents() -> dict:
     result["_anchor_avg"] = anchor_avg
     result["_anchor_year"] = RENT_ANCHOR_YEAR
     result["_yoy_pct"] = yoy_pct  # per-county YoY % — used by NTR/ATR audit
+    result["_smoothing_window"] = ZORI_SMOOTHING_WINDOW
     return result
 
 
@@ -881,6 +918,7 @@ def _fetch_rents(all_prices: dict) -> tuple[
         zori_anchor_avg  = zori_rents.pop("_anchor_avg",  {}) or {}
         zori_anchor_year = zori_rents.pop("_anchor_year", RENT_ANCHOR_YEAR)
         zori_yoy_map     = zori_rents.pop("_yoy_pct",     {}) or {}
+        zori_rents.pop("_smoothing_window", None)   # metadata only — not a county
         for key, ask_rent in zori_rents.items():
             all_prices.setdefault(key, {})["askRent"] = ask_rent
         print(f"  Got askRent ({zori_period or '?'}) for: {', '.join(zori_rents.keys())}")

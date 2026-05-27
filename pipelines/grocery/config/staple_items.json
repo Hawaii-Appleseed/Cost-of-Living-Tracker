@@ -1,0 +1,17 @@
+{
+  "_comment": "Curated supplementary cards shown above the 'More' toggle in the Food Prices grid. Hand-collected from member/loyalty pricing — not derived from the pipeline. Update prices monthly if desired; grocery-price-updater.py reads this file and re-emits the stapleItems field on every run, so values here are never overwritten by CI. Keys must match STAPLE_ICONS in index.html so each card picks up its Lucide SVG.",
+  "schemaVersion": 1,
+  "items": [
+    { "key": "bread",   "name": "Bread",   "unit": "20 oz loaf" },
+    { "key": "bananas", "name": "Bananas", "unit": "per lb" },
+    { "key": "beef",    "name": "Beef",    "unit": "1 lb, 80/20" },
+    { "key": "spinach", "name": "Spinach", "unit": "5 oz bag" }
+  ],
+  "prices": {
+    "State":    { "bread": 5.23, "bananas": 0.71, "beef": 6.99, "spinach": 4.39 },
+    "Honolulu": { "bread": 5.19, "bananas": 0.69, "beef": 6.99, "spinach": 4.29 },
+    "Maui":     { "bread": 5.49, "bananas": 0.79, "beef": 7.49, "spinach": 4.79 },
+    "Hawaii":   { "bread": 5.29, "bananas": 0.69, "beef": 6.49, "spinach": 4.49 },
+    "Kauai":    { "bread": 4.99, "bananas": 0.79, "beef": 7.19, "spinach": 4.19 }
+  }
+}
