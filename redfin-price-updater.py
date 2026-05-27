@@ -30,6 +30,7 @@ Sources:
 import csv
 import gzip
 import io
+import os
 import re
 import sys
 from pathlib import Path
@@ -93,6 +94,46 @@ CENSUS_NAME_MAP = {
     "Maui County, Hawaii":     "Maui",
     "Kauai County, Hawaii":    "Kauai",
 }
+
+# Census API key (env var). Required for ACS5 calls — Census tightened
+# the anonymous policy in 2025; the previous unauthenticated path now
+# returns "Missing Key" HTML. Sign up free at
+# https://api.census.gov/data/key_signup.html and set as CENSUS_API_KEY
+# in GitHub Actions + local env.
+CENSUS_API_KEY = os.environ.get("CENSUS_API_KEY", "")
+
+# Realized-burden anchor: ACS B25071 (median GRAPI for renters) +
+# B25092 (median SMOCAPI for owners with mortgage) + B25070/B25091
+# cost-burden distributions. Pulled from the same 5-year vintage as
+# the contract-rent anchor (RENT_ANCHOR_YEAR) so the dashboard's
+# "rent" and "burden" numbers describe the same population window.
+CENSUS_BURDEN_VARS = [
+    "B25071_001E",   # Median GRAPI (renter households, %)
+    "B25092_002E",   # Median SMOCAPI for owner-occupied with mortgage (%)
+    # B25070 — Gross rent as % of household income (renter distribution)
+    "B25070_001E",   # Total renters
+    "B25070_007E",   # 30.0 – 34.9 %
+    "B25070_008E",   # 35.0 – 39.9 %
+    "B25070_009E",   # 40.0 – 49.9 %
+    "B25070_010E",   # 50.0 %+
+    "B25070_011E",   # Not computed
+    # B25091 — Mortgage status × SMOCAPI (owner distribution, with-mortgage rows)
+    "B25091_002E",   # With mortgage (total)
+    "B25091_006E",   # With mortgage, 30.0 – 34.9 %
+    "B25091_007E",   # With mortgage, 35.0 – 39.9 %
+    "B25091_008E",   # With mortgage, 40.0 – 49.9 %
+    "B25091_009E",   # With mortgage, 50.0 %+
+    "B25091_010E",   # With mortgage, not computed
+]
+
+# BLS series for nowcasting from the ACS 5-year mid-point to the
+# current period. Rent uses Honolulu rent CPI (already fetched
+# elsewhere — re-fetched here so the burden pipeline is self-contained).
+# Owner SMOCAPI is dominated by sticky locked-in P&I + slow-growing
+# tax/ins/util → tracks Honolulu all-items CPI as a stand-in. Income
+# uses Hawaii state private avg weekly earnings (CES).
+BLS_CPI_ALL_ITEMS_HNL = "CUURS49ASA0"           # Honolulu, all items
+BLS_WAGES_HI_PRIVATE  = "SMU15000000500000011"  # Hawaii state private avg weekly earnings (NSA)
 
 # BLS CPI: Honolulu MSA — "Rent of primary residence" (existing tenants, not new leases)
 # Series CUURS49ASEHA, not seasonally adjusted, base 1982-84=100.
@@ -359,8 +400,9 @@ def fetch_census_rent() -> dict:
     def _get(url):
         return json.loads(fetch_bytes(url))
 
-    state_url  = f"{CENSUS_BASE_URL}?get={CENSUS_RENT_VAR}&for=state:15"
-    county_url = f"{CENSUS_BASE_URL}?get={CENSUS_RENT_VAR},NAME&for=county:*&in=state:15"
+    key_qs = f"&key={CENSUS_API_KEY}" if CENSUS_API_KEY else ""
+    state_url  = f"{CENSUS_BASE_URL}?get={CENSUS_RENT_VAR}&for=state:15{key_qs}"
+    county_url = f"{CENSUS_BASE_URL}?get={CENSUS_RENT_VAR},NAME&for=county:*&in=state:15{key_qs}"
 
     print(f"  Fetching Census ACS {CENSUS_ACS_YEAR} contract rent (B25058_001E)...")
     state_data  = _get(state_url)
@@ -382,6 +424,188 @@ def fetch_census_rent() -> dict:
             result[key] = {"rent": int(row[rent_idx])}
 
     return result
+
+
+def fetch_census_burden_anchor() -> dict:
+    """
+    Fetch the ACS 5-year realized-burden anchor for Hawaiʻi state + 4 counties.
+
+    Pulls B25071 (median GRAPI for renters), B25092 (median SMOCAPI for
+    owners with a mortgage), and the cost-burden distributions B25070
+    (renters) and B25091 (owners-with-mortgage). Returns a flat dict
+    keyed by countyKey with per-county derived metrics. Cost-burden
+    shares are computed by collapsing the 30-34.9/35-39.9/40-49.9/≥50
+    buckets into "≥30 %" and the ≥50 bucket into "severely burdened",
+    excluding the "not computed" pool from the denominator.
+
+    Returns {countyKey: {tenantGRAPI, ownerSMOCAPI,
+                         rentBurdenedPct, rentSeverelyBurdenedPct,
+                         ownerBurdenedPct, ownerSeverelyBurdenedPct}}
+    plus "_year" metadata. Percentages are decimals (0.0–1.0).
+
+    The Census API requires a key as of mid-2025 — silently returns {}
+    if CENSUS_API_KEY isn't set so the rest of the pipeline doesn't fail.
+    """
+    import json
+    if not CENSUS_API_KEY:
+        print(f"  WARNING: CENSUS_API_KEY not set; skipping realized-burden anchor fetch.")
+        return {}
+
+    vars_csv = ",".join(CENSUS_BURDEN_VARS)
+    state_url  = f"{CENSUS_BASE_URL}?get=NAME,{vars_csv}&for=state:15&key={CENSUS_API_KEY}"
+    county_url = f"{CENSUS_BASE_URL}?get=NAME,{vars_csv}&for=county:*&in=state:15&key={CENSUS_API_KEY}"
+
+    print(f"  Fetching Census ACS {CENSUS_ACS_YEAR} realized-burden anchor (B25071, B25092, B25070, B25091)...")
+    try:
+        state_data  = json.loads(fetch_bytes(state_url))
+        county_data = json.loads(fetch_bytes(county_url))
+    except (OSError, json.JSONDecodeError) as e:
+        print(f"  WARNING: realized-burden anchor fetch failed ({e}); skipping.")
+        return {}
+
+    def _build_row(hdr, row):
+        """Compute the 6 dashboard fields from a single census API row."""
+        def fv(name, scale=1.0):
+            raw = row[hdr.index(name)]
+            v = float(raw)
+            # ACS sentinel for "estimate not displayed" (Kalawao, etc.)
+            return None if v <= -666666666 else v * scale
+        graphi   = fv("B25071_001E", 0.01)   # already a %, store as decimal
+        smocapi  = fv("B25092_002E", 0.01)
+        r_total  = fv("B25070_001E") or 0
+        r_notc   = fv("B25070_011E") or 0
+        r_b30_34 = fv("B25070_007E") or 0
+        r_b35_39 = fv("B25070_008E") or 0
+        r_b40_49 = fv("B25070_009E") or 0
+        r_b50p   = fv("B25070_010E") or 0
+        r_denom  = max(0, r_total - r_notc)
+        rent_burdened     = (r_b30_34 + r_b35_39 + r_b40_49 + r_b50p) / r_denom if r_denom else None
+        rent_severe       = r_b50p / r_denom if r_denom else None
+        o_total  = fv("B25091_002E") or 0
+        o_notc   = fv("B25091_010E") or 0
+        o_b30_34 = fv("B25091_006E") or 0
+        o_b35_39 = fv("B25091_007E") or 0
+        o_b40_49 = fv("B25091_008E") or 0
+        o_b50p   = fv("B25091_009E") or 0
+        o_denom  = max(0, o_total - o_notc)
+        owner_burdened    = (o_b30_34 + o_b35_39 + o_b40_49 + o_b50p) / o_denom if o_denom else None
+        owner_severe      = o_b50p / o_denom if o_denom else None
+        return {
+            "tenantGRAPI":             graphi,
+            "ownerSMOCAPI":            smocapi,
+            "rentBurdenedPct":         rent_burdened,
+            "rentSeverelyBurdenedPct": rent_severe,
+            "ownerBurdenedPct":        owner_burdened,
+            "ownerSeverelyBurdenedPct":owner_severe,
+        }
+
+    result = {"_year": CENSUS_ACS_YEAR}
+    s_hdr, s_row = state_data[0], state_data[1]
+    result["State"] = _build_row(s_hdr, s_row)
+
+    c_hdr, *c_rows = county_data
+    for row in c_rows:
+        key = CENSUS_NAME_MAP.get(row[c_hdr.index("NAME")])
+        if key:
+            result[key] = _build_row(c_hdr, row)
+    return result
+
+
+def fetch_bls_series_ratio(series_id: str, anchor_year: str) -> tuple[float, str] | tuple[None, None]:
+    """
+    Generic BLS series ratio fetcher. Returns (latest / anchor_year_avg, latest_period).
+    Anchor avg is the mean of all monthly observations in `anchor_year`.
+    Used to drive realized-burden nowcasts from the ACS 5-year mid-point
+    to the current period for both CPI All Items (owner side) and the
+    Hawaiʻi private wages series (income denominator on both sides).
+    """
+    import json
+    api_key = os.environ.get("BLS_API_KEY", "")
+    end_year = str(int(anchor_year) + 5)  # cover anchor + ~5 years of nowcast room
+    payload = json.dumps({
+        "seriesid":  [series_id],
+        "startyear": anchor_year,
+        "endyear":   end_year,
+        **({"registrationkey": api_key} if api_key else {}),
+    }).encode()
+    try:
+        resp = json.loads(fetch_bytes(BLS_API_URL, data=payload, headers={"Content-Type": "application/json"}))
+    except (OSError, json.JSONDecodeError) as e:
+        print(f"  WARNING: BLS fetch for {series_id} failed ({e})")
+        return None, None
+    if resp.get("status") != "REQUEST_SUCCEEDED":
+        print(f"  WARNING: BLS {series_id} returned {resp.get('status')}: {resp.get('message')}")
+        return None, None
+    rows = resp["Results"]["series"][0]["data"]
+    if not rows:
+        return None, None
+    # Filter to numeric monthly observations. BLS uses "-" for missing
+    # values; skip those rather than crashing the entire nowcast.
+    def _parse(r):
+        try:
+            return float(r["value"])
+        except (ValueError, TypeError):
+            return None
+    monthly = [(r["year"], r["period"], _parse(r))
+               for r in rows
+               if r["period"].startswith("M") and r["period"] != "M13"]
+    monthly = [(y, p, v) for (y, p, v) in monthly if v is not None]
+    if not monthly:
+        return None, None
+    monthly.sort()
+    anchor_vals = [v for (y, p, v) in monthly if y == anchor_year]
+    if not anchor_vals:
+        return None, None
+    anchor_avg = sum(anchor_vals) / len(anchor_vals)
+    y_last, p_last, v_last = monthly[-1]
+    latest_period = f"{y_last}-{p_last[1:]}"   # M04 → 04
+    return v_last / anchor_avg, latest_period
+
+
+def nowcast_burden_anchors(anchor: dict, anchor_year: str) -> dict:
+    """
+    Apply BLS-driven nowcast factors to the ACS realized-burden anchor.
+
+    Math (per METHODOLOGY.md §2.4):
+        rent_factor   = CPI_rent_HNL(latest)  / CPI_rent_HNL(anchor_avg)
+        cost_factor   = CPI_all_HNL(latest)   / CPI_all_HNL(anchor_avg)
+        income_factor = wage_HI(latest)       / wage_HI(anchor_avg)
+
+        tenantRentPTI    = tenantGRAPI  × rent_factor / income_factor
+        mortgageOwnerPTI = ownerSMOCAPI × cost_factor / income_factor
+
+    Factors apply uniformly across counties (BLS doesn't publish
+    county-level CPI or wages for Hawaiʻi; statewide is the finest
+    Hawaiʻi-specific series available). Cost-burden shares are not
+    nowcasted — they're tagged as ACS 5-yr in the UI.
+
+    Returns anchor extended with nowcasted fields per county.
+    """
+    if not anchor:
+        return {}
+    rent_ratio,  _ = fetch_bls_series_ratio(BLS_RENT_SERIES,       anchor_year)
+    cost_ratio,  _ = fetch_bls_series_ratio(BLS_CPI_ALL_ITEMS_HNL, anchor_year)
+    wage_ratio,  nowcast_period = fetch_bls_series_ratio(BLS_WAGES_HI_PRIVATE, anchor_year)
+    if None in (rent_ratio, cost_ratio, wage_ratio):
+        print(f"  WARNING: realized-burden nowcast skipped (missing BLS factor: "
+              f"rent={rent_ratio}, cost={cost_ratio}, wage={wage_ratio})")
+        return anchor
+    print(f"  Nowcast factors ({anchor_year} → {nowcast_period}): "
+          f"rent={rent_ratio:.3f}, cost={cost_ratio:.3f}, wage={wage_ratio:.3f}")
+    for key in ("State", "Honolulu", "Maui", "Hawaii", "Kauai"):
+        if key not in anchor:
+            continue
+        a = anchor[key]
+        if a.get("tenantGRAPI") is not None:
+            a["tenantRentPTI"] = round(a["tenantGRAPI"] * (rent_ratio / wage_ratio), 4)
+        if a.get("ownerSMOCAPI") is not None:
+            a["mortgageOwnerPTI"] = round(a["ownerSMOCAPI"] * (cost_ratio / wage_ratio), 4)
+        # Round shares to 4 decimals (basis-point precision)
+        for k in ("rentBurdenedPct", "rentSeverelyBurdenedPct", "ownerBurdenedPct", "ownerSeverelyBurdenedPct"):
+            if a.get(k) is not None:
+                a[k] = round(a[k], 4)
+    anchor["_nowcastPeriod"] = nowcast_period
+    return anchor
 
 
 def fetch_bls_rent_ratio() -> tuple[float, str, float | None]:
@@ -790,21 +1014,37 @@ def patch_periods(html: str, zori_period: str | None, bls_rent_period: str | Non
 
 def patch_html(html: str, prices: dict) -> str:
     """
-    Replace sfhPrice, condoPrice, rent, askRent, and income values in
-    the countyData object by simple find-and-replace on the lines.
+    Replace sfhPrice, condoPrice, rent, askRent, income, and the
+    realized-burden fields in the countyData object by simple
+    find-and-replace on the lines.
+
+    Integer fields use a `\\d+` matcher; float fields use a
+    `\\d+(?:\\.\\d+)?` matcher so values like 0.303 / 33.7 are
+    handled correctly.
     """
+    int_fields   = ("sfhPrice", "condoPrice", "rent", "askRent", "income")
+    float_fields = ("tenantRentPTI", "mortgageOwnerPTI",
+                    "rentBurdenedPct", "rentSeverelyBurdenedPct",
+                    "ownerBurdenedPct", "ownerSeverelyBurdenedPct")
     for county_key, vals in prices.items():
         # Find the line with this county
         pattern = rf'^(\s*{re.escape(county_key)}:\s*{{[^}}]*)'
 
         def replacer(match):
             line_text = match.group(1)
-            # Replace each field value in this line
-            for field in ("sfhPrice", "condoPrice", "rent", "askRent", "income"):
+            # Integer fields
+            for field in int_fields:
                 if field in vals:
-                    # Find old value and replace with new
                     line_text = re.sub(
                         rf'{field}:\d+',
+                        f'{field}:{vals[field]}',
+                        line_text
+                    )
+            # Float fields (decimal with optional ".d+")
+            for field in float_fields:
+                if field in vals:
+                    line_text = re.sub(
+                        rf'{field}:[\d.]+',
                         f'{field}:{vals[field]}',
                         line_text
                     )
@@ -813,7 +1053,7 @@ def patch_html(html: str, prices: dict) -> str:
         new_html = re.sub(pattern, replacer, html, flags=re.MULTILINE)
 
         # Check if anything changed by testing each field individually
-        for field in ("sfhPrice", "condoPrice", "rent", "askRent", "income"):
+        for field in int_fields + float_fields:
             if field in vals and f'{field}:{vals[field]}' not in new_html:
                 print(f"  WARNING: could not set {county_key}.{field}")
 
@@ -1062,6 +1302,28 @@ def main():
     all_prices = _fetch_sale_prices()
 
     _, bls_rent_period, bls_rent_yoy, zori_period, zori_yoy_map = _fetch_rents(all_prices)
+
+    # ── Realized-burden anchor + nowcast (renter GRAPI, owner SMOCAPI,
+    #    cost-burden share). Pulls ACS 5-year anchor, nowcasts to current
+    #    period using BLS rent / all-items / Hawaiʻi wages, then merges
+    #    into all_prices so patch_html() writes the new fields. Failure
+    #    is non-fatal — fields stay at whatever values are currently in
+    #    the HTML (last good nowcast).
+    print("\nFetching realized-burden anchor (ACS B25071 / B25092 / B25070 / B25091)...")
+    burden = fetch_census_burden_anchor()
+    if burden:
+        burden = nowcast_burden_anchors(burden, str(CENSUS_ACS_YEAR))
+        for key in ("State", "Honolulu", "Maui", "Hawaii", "Kauai"):
+            row = burden.get(key) or {}
+            target = all_prices.setdefault(key, {})
+            for field in ("tenantRentPTI", "mortgageOwnerPTI",
+                          "rentBurdenedPct", "rentSeverelyBurdenedPct",
+                          "ownerBurdenedPct", "ownerSeverelyBurdenedPct"):
+                if row.get(field) is not None:
+                    target[field] = row[field]
+        nowcast_period = burden.get("_nowcastPeriod")
+        if nowcast_period:
+            print(f"  Realized-burden nowcast period: {nowcast_period}")
 
     # Dev-facing NTR/ATR sanity check (prints table, warns on large divergence).
     audit_rent_nowcast_vs_ntr(

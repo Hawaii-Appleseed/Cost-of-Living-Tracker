@@ -1772,6 +1772,29 @@
   }
   .pti-panel-header--sfh   { color: var(--ocean-700); border-color: var(--ocean-700); }
   .pti-panel-header--condo { color: var(--coral-300); border-color: var(--coral-300); }
+  /* Lowercase italic provenance line tucked into the panel header
+     (e.g. "median gross rent as % of income (ACS B25071)") — makes the
+     source legible without breaking the visual rhythm of the header. */
+  .pti-panel-sub {
+    font-size: 13px;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--text-lt);
+    margin-left: 2px;
+  }
+  /* Single-panel layout used by the realized-burden views (rent OR
+     mortgage). Keeps the bar geometry identical to the split grid so
+     row widths and animations stay consistent — just one column. */
+  .pti-single-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .pti-single-grid .pti-panel {
+    max-width: 720px;
+    margin: 0 auto;
+  }
 
   /* Zone-tinted bar track: three background bands (seafoam / amber / coral)
      reflect the 0-30% / 30-60% / 60%+ severity zones. The tick marks exactly
@@ -3029,10 +3052,10 @@
   </div>
 
   <div class="card" style="margin-bottom:1.25rem;">
-    <div class="card-title">How much of income goes to <button type="button" id="pti-mode-btn" class="pti-mode-btn" aria-haspopup="listbox" aria-expanded="false" onclick="togglePtiModePopover(event)" title="Switch between mortgage and rent">a <span id="pti-mode-name">mortgage</span><span class="caret" aria-hidden="true"></span></button>? <span class="afford-assumptions-info" tabindex="0" role="button" aria-label="About this chart" id="pti-mode-tip" data-tip="All counties · monthly P&amp;I as % of gross income · 20% down, current rate">ⓘ</span>
+    <div class="card-title">How much of income goes to <button type="button" id="pti-mode-btn" class="pti-mode-btn" aria-haspopup="listbox" aria-expanded="false" onclick="togglePtiModePopover(event)" title="Switch between mortgage and rent">a <span id="pti-mode-name">mortgage</span><span class="caret" aria-hidden="true"></span></button>? <span class="afford-assumptions-info" tabindex="0" role="button" aria-label="About this chart" id="pti-mode-tip" data-tip="Median owner’s monthly housing cost as % of their own income, for owners with a mortgage (ACS B25092, 5-yr 2020-2024 nowcast via Honolulu CPI / Hawaiʻi wages)">ⓘ</span>
       <div class="pti-mode-popover" id="pti-mode-popover" role="listbox">
-        <button class="pti-mode-popover-item is-active" data-mode="mortgage" onclick="setPtiMode('mortgage')">Mortgage <span class="pti-mode-popover-item-sub">P&amp;I, 20% down</span></button>
-        <button class="pti-mode-popover-item"           data-mode="rent"     onclick="setPtiMode('rent')">Rent <span class="pti-mode-popover-item-sub">tenant + asking</span></button>
+        <button class="pti-mode-popover-item is-active" data-mode="mortgage" onclick="setPtiMode('mortgage')">Mortgage <span class="pti-mode-popover-item-sub">owners w/ mortgage · ACS B25092</span></button>
+        <button class="pti-mode-popover-item"           data-mode="rent"     onclick="setPtiMode('rent')">Rent <span class="pti-mode-popover-item-sub">renter households · ACS B25071</span></button>
       </div>
     </div>
     <div id="pti-bars"></div>
@@ -3225,11 +3248,11 @@
 
 <script>
 const countyData = {
-  State:    { income:123000,  sfhPrice:1024900,  condoPrice:555200,  sfhPTI:0.5790, condoPTI:0.3657, sfhIdx:51.8, condoIdx:82.0, sfhGap:91439,  condoGap:21529, rent:1920, askRent:2990, sfhMortgage:4744, condoMortgage:2996, buildAuth:4404 },
-  Honolulu: { income:129300, sfhPrice:1155000, condoPrice:515000,  sfhPTI:0.6278, condoPTI:0.3218, sfhIdx:47.8, condoIdx:93.2, sfhGap:113935, condoGap:7592,  rent:2025, askRent:2881, sfhMortgage:5455, condoMortgage:2796, buildAuth:2736 },
-  Maui:     { income:110900,  sfhPrice:1206500, condoPrice:675000,  sfhPTI:0.7532, condoPTI:0.5752, sfhIdx:39.8, condoIdx:52.2, sfhGap:143626, condoGap:87199, rent:1788, askRent:3507, sfhMortgage:5967, condoMortgage:4557, buildAuth:651 },
-  Hawaii:   { income:98800,  sfhPrice:641000,  condoPrice:672500,  sfhPTI:0.3366, condoPTI:0.4268, sfhIdx:89.1, condoIdx:70.3, sfhGap:9424,   condoGap:32644, rent:1357, askRent:2698, sfhMortgage:2166, condoMortgage:2746, buildAuth:911 },
-  Kauai:    { income:132900,  sfhPrice:1542500, condoPrice:757500,  sfhPTI:0.6913, condoPTI:0.6081, sfhIdx:43.4, condoIdx:49.3, sfhGap:122110, condoGap:96144, rent:1775, askRent:4689, sfhMortgage:5393, condoMortgage:4744, buildAuth:106 },
+  State:    { income:123000,  sfhPrice:1024900,  condoPrice:555200,  sfhPTI:0.5790, condoPTI:0.3657, sfhIdx:51.8, condoIdx:82.0, sfhGap:91439,  condoGap:21529, rent:1920, askRent:2990, sfhMortgage:4744, condoMortgage:2996, buildAuth:4404, tenantRentPTI:0.330, mortgageOwnerPTI:0.256, rentBurdenedPct:0.567, rentSeverelyBurdenedPct:0.286, ownerBurdenedPct:0.431, ownerSeverelyBurdenedPct:0.065 },
+  Honolulu: { income:129300, sfhPrice:1155000, condoPrice:515000,  sfhPTI:0.6278, condoPTI:0.3218, sfhIdx:47.8, condoIdx:93.2, sfhGap:113935, condoGap:7592,  rent:2025, askRent:2881, sfhMortgage:5455, condoMortgage:2796, buildAuth:2736, tenantRentPTI:0.335, mortgageOwnerPTI:0.257, rentBurdenedPct:0.577, rentSeverelyBurdenedPct:0.289, ownerBurdenedPct:0.451, ownerSeverelyBurdenedPct:0.066 },
+  Maui:     { income:110900,  sfhPrice:1206500, condoPrice:675000,  sfhPTI:0.7532, condoPTI:0.5752, sfhIdx:39.8, condoIdx:52.2, sfhGap:143626, condoGap:87199, rent:1788, askRent:3507, sfhMortgage:5967, condoMortgage:4557, buildAuth:651, tenantRentPTI:0.327, mortgageOwnerPTI:0.266, rentBurdenedPct:0.559, rentSeverelyBurdenedPct:0.300, ownerBurdenedPct:0.398, ownerSeverelyBurdenedPct:0.071 },
+  Hawaii:   { income:98800,  sfhPrice:641000,  condoPrice:672500,  sfhPTI:0.3366, condoPTI:0.4268, sfhIdx:89.1, condoIdx:70.3, sfhGap:9424,   condoGap:32644, rent:1357, askRent:2698, sfhMortgage:2166, condoMortgage:2746, buildAuth:911, tenantRentPTI:0.305, mortgageOwnerPTI:0.243, rentBurdenedPct:0.516, rentSeverelyBurdenedPct:0.272, ownerBurdenedPct:0.392, ownerSeverelyBurdenedPct:0.057 },
+  Kauai:    { income:132900,  sfhPrice:1542500, condoPrice:757500,  sfhPTI:0.6913, condoPTI:0.6081, sfhIdx:43.4, condoIdx:49.3, sfhGap:122110, condoGap:96144, rent:1775, askRent:4689, sfhMortgage:5393, condoMortgage:4744, buildAuth:106, tenantRentPTI:0.308, mortgageOwnerPTI:0.260, rentBurdenedPct:0.520, rentSeverelyBurdenedPct:0.221, ownerBurdenedPct:0.355, ownerSeverelyBurdenedPct:0.053 },
 };
 const counties = ['State','Honolulu','Maui','Hawaii','Kauai'];
 const shortLbl = { State:'State', Honolulu:'Honolulu', Maui:'Maui', Hawaii:'Hawaiʻi', Kauai:'Kauaʻi' };
@@ -3522,12 +3545,14 @@ function selectCounty(county) {
           <span class="pti-zone-label pti-zone-label--ok"   style="left:0%;width:35.29%">Affordable</span>
           <span class="pti-zone-label pti-zone-label--mid"  style="left:35.29%;width:35.30%">Burdened</span>
           <span class="pti-zone-label pti-zone-label--high" style="left:70.59%;width:29.41%">Severe</span>` : '';
-    const tipMetric = mode === 'rent' ? 'to rent' : 'to mortgage P&amp;I';
+    const tipMetric = mode === 'rent'
+      ? "median renter's rent / income (ACS B25071)"
+      : "median owner's housing costs / income (ACS B25092)";
     return `
       <div class="pti-row is-clickable${isCurrent ? ' is-current' : ''}${isState ? ' is-state' : ''}" role="button" tabindex="0" data-county="${c}" title="View ${fullLbl[c]}">
         <div class="pti-row-lbl${isState ? ' pti-row-lbl--state' : ''}">${shortLbl[c]}</div>
         <div class="pti-bar-track">${zoneLabels}
-          <div class="pti-bar-fill" style="width:${w}%;background:${clr};" data-tip="${pct(v)} of income ${tipMetric}"></div>
+          <div class="pti-bar-fill" style="width:${w}%;background:${clr};" data-tip="${pct(v)} · ${tipMetric}"></div>
           <div class="pti-bar-tick" style="left:${threshPct}%;" title="30% cost-burden threshold"></div>
         </div>
         <div class="pti-row-val" style="color:${clr}">${pct(v)}</div>
@@ -3536,59 +3561,46 @@ function selectCounty(county) {
     `;
   };
 
-  // Build PTI panels for the active mode. Mortgage view shows the two
-  // homeownership PTI series (SFH P&I, condo P&I); rent view recomputes
-  // PTI from rent / askRent against each county's median income so users
-  // can compare ownership burden vs renter burden in the same chart.
+  // Build realized-burden panel for the active mode.
+  // Sources (per METHODOLOGY.md §2.4):
+  //   Rent     → ACS B25071 median GRAPI for renters, nowcast to current
+  //              period via BLS Honolulu rent CPI / Hawaiʻi wages.
+  //   Mortgage → ACS B25092 median SMOCAPI for owners with a mortgage,
+  //              nowcast via BLS Honolulu all-items CPI / Hawaiʻi wages.
+  // Cost-burden shares (B25070 / B25091) drive the lede; they're not
+  // nowcasted (slow-moving distributional shares, ACS 5-year only).
   const mode = (typeof currentPtiMode !== 'undefined') ? currentPtiMode : 'mortgage';
-  let leftLabel, rightLabel, leftPTI, rightPTI, ledeMetricName, ledeMetricKey;
-  if (mode === 'rent') {
-    leftLabel  = 'Tenant rent';
-    rightLabel = 'Asking rent';
-    leftPTI    = c => (countyData[c].rent    * 12) / countyData[c].income;
-    rightPTI   = c => (countyData[c].askRent * 12) / countyData[c].income;
-    ledeMetricName = 'rent';
-    ledeMetricKey  = 'tenant rent';
-  } else {
-    leftLabel  = 'Single-family home';
-    rightLabel = 'Condo / Townhome';
-    leftPTI    = c => countyData[c].sfhPTI;
-    rightPTI   = c => countyData[c].condoPTI;
-    ledeMetricName = 'mortgage';
-    ledeMetricKey  = 'single-family mortgage';
-  }
-  // Lede: count counties (excluding statewide) whose left-panel metric exceeds 30%.
-  const ledeCountyKeys = counties.filter(c => c !== 'State');
-  const leftOver = ledeCountyKeys.filter(c => leftPTI(c) > 0.30).length;
-  const ledeTotal = ledeCountyKeys.length;
-  const ledeBadgeCls = leftOver === 0 ? 'num-badge--green'
-                     : leftOver < ledeTotal ? 'num-badge--amber'
-                     : 'num-badge--coral';
-  // When 0 counties exceed → frame positively ("all N stay under"); when
-  // all exceed → frame negatively ("all N exceed"); when some → "X of N exceed".
-  let ledeFrag, ledeVerb;
-  if (leftOver === 0) {
-    ledeFrag = `<span class="num-badge ${ledeBadgeCls}">all ${ledeTotal} counties</span>`;
-    ledeVerb = 'stays under';
-  } else if (leftOver === ledeTotal) {
-    ledeFrag = `<span class="num-badge ${ledeBadgeCls}">all ${ledeTotal} counties</span>`;
-    ledeVerb = 'exceeds';
-  } else {
-    ledeFrag = `<span class="num-badge ${ledeBadgeCls}">${leftOver} of ${ledeTotal} counties</span>`;
-    ledeVerb = 'exceeds';
-  }
-  const ledeText = `In ${ledeFrag}, a typical ${ledeMetricKey} ${ledeVerb} the 30% cost-burden line.`;
+  const isRent = (mode === 'rent');
+  const burdenPTI   = c => isRent ? countyData[c].tenantRentPTI    : countyData[c].mortgageOwnerPTI;
+  const burdenShare = c => isRent ? countyData[c].rentBurdenedPct  : countyData[c].ownerBurdenedPct;
+  const severeShare = c => isRent ? countyData[c].rentSeverelyBurdenedPct
+                                  : countyData[c].ownerSeverelyBurdenedPct;
+  const panelLabel    = isRent ? 'Renters' : 'Owners with mortgage';
+  const panelSubLabel = isRent ? 'median gross rent as % of income (ACS B25071)'
+                               : 'median monthly owner costs as % of income (ACS B25092)';
+  const householdType = isRent ? 'renter' : 'owner';
+  const householdTypePl = isRent ? 'renter households' : 'owner households with a mortgage';
+
+  // Statewide cost-burden shares drive the lede sentence — answers
+  // "what share of {household type} pay too much for housing" in plain
+  // language, which is more interpretable than a median ratio.
+  const stateBurdened  = burdenShare('State') || 0;
+  const stateSevere    = severeShare('State') || 0;
+  const fmtPct = v => (v * 100).toFixed(0) + '%';
+  const burdenBadgeCls = stateBurdened >= 0.50 ? 'num-badge--coral'
+                       : stateBurdened >= 0.30 ? 'num-badge--amber'
+                       : 'num-badge--green';
+  const severeBadgeCls = stateSevere   >= 0.25 ? 'num-badge--coral'
+                       : stateSevere   >= 0.15 ? 'num-badge--amber'
+                       : 'num-badge--green';
+  const ledeText = `In Hawaiʻi, <span class="num-badge ${burdenBadgeCls}">${fmtPct(stateBurdened)}</span> of ${householdTypePl} are cost-burdened (pay ≥30% of income to housing) — and <span class="num-badge ${severeBadgeCls}">${fmtPct(stateSevere)}</span> are severely cost-burdened (pay ≥50%).`;
 
   document.getElementById('pti-bars').innerHTML = `
     <div class="pti-lede">${ledeText}</div>
-    <div class="pti-split-grid">
+    <div class="pti-single-grid">
       <div class="pti-panel">
-        <div class="pti-panel-header pti-panel-header--sfh">${leftLabel}</div>
-        ${counties.map(c => ptiRow(c, leftPTI(c), c === 'State', mode)).join('')}
-      </div>
-      <div class="pti-panel">
-        <div class="pti-panel-header pti-panel-header--condo">${rightLabel}</div>
-        ${counties.map(c => ptiRow(c, rightPTI(c), c === 'State', mode)).join('')}
+        <div class="pti-panel-header pti-panel-header--${isRent ? 'sfh' : 'condo'}">${panelLabel} <span class="pti-panel-sub">· ${panelSubLabel}</span></div>
+        ${counties.map(c => ptiRow(c, burdenPTI(c), c === 'State', mode)).join('')}
       </div>
     </div>
   `;
@@ -4698,8 +4710,8 @@ function setPtiMode(mode) {
   const tipEl = document.getElementById('pti-mode-tip');
   if (tipEl) {
     tipEl.setAttribute('data-tip', mode === 'rent'
-      ? 'All counties · monthly rent as % of gross income · tenant rent (existing leases) vs asking rent (new listings)'
-      : 'All counties · monthly P&I as % of gross income · 20% down, current rate');
+      ? 'Median renter’s rent as % of their own income (ACS B25071, 5-yr 2020-2024 nowcast to current via Honolulu rent CPI / Hawaiʻi wages)'
+      : 'Median owner’s monthly housing cost as % of their own income, for owners with a mortgage (ACS B25092, 5-yr 2020-2024 nowcast via Honolulu CPI / Hawaiʻi wages)');
   }
   closePtiModePopover();
   // Re-render the housing pane (which contains the PTI section) by

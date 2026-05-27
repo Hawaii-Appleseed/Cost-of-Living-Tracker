@@ -20,7 +20,8 @@ jobs:
     permissions:
       contents: write   # needed to commit and push updated files
     env:
-      BLS_API_KEY: ${{ secrets.BLS_API_KEY }}
+      BLS_API_KEY:    ${{ secrets.BLS_API_KEY }}
+      CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
 
     steps:
       - name: Check out repo

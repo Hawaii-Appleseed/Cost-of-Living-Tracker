@@ -219,6 +219,80 @@ state as "not projected" — graceful degradation.
 
 ---
 
+## Realized housing burden (ACS B25071 / B25092 + BLS nowcast)
+
+The "How much of income goes to {mortgage|rent}?" chart uses *realized*
+burden metrics — what current renters and owners actually pay as a
+share of *their own* income — rather than synthetic ratios built from
+aggregate price ÷ aggregate income (which mismatch the household whose
+rent is in the numerator with the household whose income is in the
+denominator).
+
+### Source tables (anchor)
+
+| ACS table | What it measures | Used for |
+|---|---|---|
+| **B25071_001E** | Median Gross Rent As Percentage of Income (GRAPI) | Renter-side `tenantRentPTI` |
+| **B25092_002E** | Median Selected Monthly Owner Costs As Percentage of Income (SMOCAPI), owners with mortgage | Owner-side `mortgageOwnerPTI` |
+| **B25070** | Gross rent / income distribution, renters | `rentBurdenedPct` (≥30%), `rentSeverelyBurdenedPct` (≥50%) |
+| **B25091** | Mortgage status × SMOCAPI distribution, owners-with-mortgage rows | `ownerBurdenedPct`, `ownerSeverelyBurdenedPct` |
+
+Both medians (B25071 / B25092) are computed by Census directly from the
+underlying microdata — each household's rent (or owner cost) is paired
+with that same household's income, then the median is taken of the
+resulting ratios. Computing this externally as
+`median(rent) / median(income)` produces a different number because
+renters and owners differ in income distribution; we use the Census-published medians.
+
+Cost-burden shares are derived by collapsing the 30-34.9 / 35-39.9 /
+40-49.9 / ≥50 buckets into "≥30%" and the ≥50 bucket into "severely
+burdened", excluding the "not computed" pool from the denominator.
+
+### Nowcasting the anchor to the current period
+
+The ACS 5-year vintage is centered roughly 2.5 years behind today. To
+bring the realized burden up to the current dashboard period we apply
+a BLS-driven nowcast factor on the numerator and denominator:
+
+```
+rent_factor   = CPI_rent_HNL(latest)  / CPI_rent_HNL(anchor_year_avg)
+cost_factor   = CPI_all_HNL(latest)   / CPI_all_HNL(anchor_year_avg)
+income_factor = wage_HI(latest)       / wage_HI(anchor_year_avg)
+
+tenantRentPTI    = B25071 × (rent_factor / income_factor)
+mortgageOwnerPTI = B25092 × (cost_factor / income_factor)
+```
+
+| Series | Code | Role |
+|---|---|---|
+| Honolulu CPI, rent of primary residence | `CUURS49ASEHA` | Rent-burden numerator |
+| Honolulu CPI, all items | `CUURS49ASA0` | Owner-burden numerator proxy — locked-in mortgage P&I + slow-growing tax / insurance / utilities ≈ general CPI |
+| Hawaiʻi state private avg weekly earnings (NSA) | `SMU15000000500000011` | Income denominator (both sides) |
+
+Factors are statewide and applied uniformly across all five geographies —
+BLS does not publish county-level CPI or wages for Hawaiʻi, and statewide
+is the finest Hawaiʻi-specific series available.
+
+Cost-burden shares (B25070 / B25091) are **not** nowcasted — they're
+distributional and move slowly. The UI tags them with the ACS 5-year
+period so users know they're anchor-vintage figures.
+
+Damping convention (per the project-wide rule): monthly damping
+φ = 0.92 (half-life ~8.3 months) applies only when extrapolating past
+the latest BLS print. As long as BLS publishes through the current
+month, the multiplier is used live with no damping.
+
+### Failure modes
+
+- `CENSUS_API_KEY` missing → entire burden anchor fetch silently skipped;
+  the dashboard renders last-known values from the prior monthly commit.
+  CI must set the secret for monthly refreshes (free key, no approval).
+- BLS series unavailable for the required anchor year → nowcast skipped;
+  raw ACS anchor values are written without forward correction.
+- Single county returns Census sentinel (-666666666) → that county's
+  field stays at the prior value rather than overwriting with a
+  meaningless number.
+
 ## Rent nowcast blend (70% BLS CPI + 30% ZORI)
 
 The BLS Honolulu rent CPI lags market asking rent by roughly 12 months — it
