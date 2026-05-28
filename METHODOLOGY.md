@@ -293,6 +293,58 @@ month, the multiplier is used live with no damping.
   field stays at the prior value rather than overwriting with a
   meaningless number.
 
+## Home sale prices: trailing-median smoothing + derived affordability
+
+### 3-month trailing median (sale prices)
+
+Redfin reports the **median sale price of whatever closed that month**, and the
+neighbor-island submarkets transact in tiny volumes — roughly 27 single-family
+sales/month on Kauaʻi and ~33 condo sales/month on Hawaiʻi Island. At those
+counts a single luxury batch closing in one month moves the headline median
+±15–20%. The April Kauaʻi SFH print, for example, sat ~19% above its own
+3-month mean.
+
+`extract_hawaii_prices()` therefore reports the **median of the most recent
+three monthly prints** per (county, property type) rather than the single latest
+month. Median (not mean) so one $5M outlier sale cannot drag the figure; a
+3-month window so the signal still moves within a quarter. This mirrors the
+trailing-mean treatment ZORI already gets in `fetch_zori_asking_rents()`. Deep
+markets are barely affected (Honolulu SFH/condo moved 0.0%); the thin ones are
+where it matters (latest live run: Kauaʻi SFH −12.5%, Hawaiʻi SFH −8.7%).
+
+Redfin market-tracker files are monthly (`PERIOD_DURATION == 30`), so each
+(region, type, month) is one row; the smoother still pins to the latest row's
+cadence defensively in case Redfin ever mixes durations into one export.
+
+### Derived affordability metrics (recomputed each run)
+
+The per-county `sfhIdx` / `sfhGap` / `sfhMortgage` / `sfhPTI` fields (and condo
+equivalents) are **recomputed every run** by `compute_derived_affordability()`
+so they track the freshly smoothed price + current income. They were previously
+frozen literals that drifted out of sync — e.g. Kauaʻi's stored monthly P&I read
+$5,393 against a $1.5M home (true P&I ≈ $6,700) and its condo "gap" implied
+$96k of extra income was needed for a $757k condo at a $133k income, both
+artifacts of stale numbers no longer matching the price beside them.
+
+All four reproduce the dashboard JS exactly (`calcAffordPrice()` / `mcardV2()`),
+at the **same rate the rate-slider defaults to** so the static card values agree
+with the live calculator on first paint:
+
+- **Assumptions:** 30-yr fixed, 20% down (LTV 0.80), 30% of gross income to
+  P&I, mortgage rate = `MORTGAGE_RATE_PCT` (current Freddie Mac PMMS, 6.38%).
+  `MORTGAGE_RATE_PCT` **must stay in sync with the HTML `rate-slider` default**
+  — bump both together when the PMMS rate is refreshed.
+- **`{type}Idx`** = affordPrice ÷ price × 100 (100 = exactly affordable at
+  median income; UI buckets <55 cost-burdened / <80 stretched / ≥80 ok).
+- **`{type}Gap`** = income-dollar shortfall — extra annual income needed so the
+  household could afford the median price (clamped at 0 once affordable). The JS
+  reads `incomeNeeded = income + gap`.
+- **`{type}Mortgage`** = monthly P&I at the median price.
+- **`{type}PTI`** = monthly P&I as a share of gross monthly income. This is a
+  price-card diagnostic and is **not currently surfaced in the UI** (the visible
+  PTI bars use the ACS-derived `tenantRentPTI` / `mortgageOwnerPTI`); it is
+  recomputed for internal consistency rather than display.
+
 ## Rent nowcast blend (per-county BLS CPI / ZORI weights)
 
 The BLS Honolulu rent CPI lags market asking rent by roughly 12 months — it
@@ -661,7 +713,7 @@ one of three native cadences:
 
 | Domain | Native cadence | Where to convert |
 |---|---|---|
-| Sale prices (Redfin) | monthly | n/a — already monthly |
+| Sale prices (Redfin) | monthly | reported as a 3-month trailing **median** (thin-market noise damping — see "Home sale prices") |
 | Asking rent (ZORI) | monthly | n/a |
 | Existing-tenant rent (BLS) | bimonthly (odd months) | always reported as nowcast for the latest odd month |
 | Headline / shelter / food / energy / transport CPI | bimonthly (odd months) | YoY only; no resampling |

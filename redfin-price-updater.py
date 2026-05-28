@@ -32,6 +32,7 @@ import gzip
 import io
 import os
 import re
+import statistics
 import sys
 from pathlib import Path
 
@@ -70,6 +71,21 @@ HUD_FY             = "FY 2025"
 # DBEDT E-8 column header → countyData key (columns in order: State, Honolulu, Hawaii, Kauai, Maui)
 # The header row in the sheet uses newlines inside cell values
 DBEDT_COL_KEYS = ["State", "Honolulu", "Hawaii", "Kauai", "Maui"]  # columns 1–5 in E-8
+
+# ─── Affordability assumptions (mirror the dashboard JS) ─────────
+# These reproduce calcAffordPrice()/mcardV2() in index.html so the price-
+# derived metrics (sfhIdx/sfhGap/sfhMortgage/sfhPTI + condo equivalents)
+# are recomputed each run instead of drifting as stale literals.
+#
+# MORTGAGE_RATE_PCT MUST stay in sync with the rate-slider DEFAULT in the
+# HTML (id="rate-slider" value=…). At the default slider position the live
+# banner's affordPrice and the stored idx/gap agree; if they diverge the
+# stored metrics would contradict the calculator on first paint. Bump both
+# together when refreshing the Freddie Mac PMMS rate.
+MORTGAGE_RATE_PCT   = 6.38   # 30-yr fixed, Freddie Mac PMMS (matches slider default)
+DOWN_PAYMENT_FRAC   = 0.20   # 20% down → LTV 0.80
+DTI_FRONT_FRAC      = 0.30   # 30% of gross income to P&I
+MORTGAGE_TERM_MONTHS = 360   # 30-year amortization
 
 # ─── Rent anchor year (SINGLE SOURCE OF TRUTH) ──────────────────
 # Both the ACS contract-rent dollar anchor and the BLS rent-CPI base-year
@@ -250,11 +266,27 @@ def download_tsv(url: str) -> list[dict]:
     return list(reader)
 
 
+SALE_PRICE_SMOOTHING_WINDOW = 3   # months for trailing median — see comment below
+
+
 def extract_hawaii_prices(rows: list[dict], region_col: str, region_values: dict) -> dict:
     """
-    Filter rows to Hawaii regions + target property types,
-    find the most recent month for each (region, property_type),
-    return {countyData_key: {sfhPrice: int, condoPrice: int}}.
+    Filter rows to Hawaii regions + target property types and return the
+    SALE_PRICE_SMOOTHING_WINDOW-month trailing **median** sale price for each
+    (region, property_type): {countyData_key: {sfhPrice: int, condoPrice: int}}.
+
+    Why median, not the single latest month: Redfin reports the median sale
+    price of whatever closed that month, and thin Hawaiʻi submarkets transact
+    in tiny volumes (Kauaʻi SFH ≈ 27 sales/mo, Hawaiʻi condos ≈ 33). A single
+    luxury batch swings the headline ±20% — e.g. the latest Kauaʻi SFH print
+    sat ~19% above its own 3-month mean. Taking the median of the last three
+    monthly prints damps that sampling noise while staying robust to a single
+    outlier month (a mean would let one $5M sale drag the figure). This mirrors
+    the ZORI trailing-mean treatment in fetch_zori_asking_rents().
+
+    Redfin market-tracker files are monthly (PERIOD_DURATION == 30), so each
+    (region, type, month) is one row; we still pin to the latest row's duration
+    defensively in case Redfin ever mixes cadences into the same export.
     """
     # Filter to Hawaii + relevant property types
     filtered = []
@@ -263,6 +295,7 @@ def extract_hawaii_prices(rows: list[dict], region_col: str, region_values: dict
         prop   = row.get("PROPERTY_TYPE", "").strip('"')
         price  = row.get("MEDIAN_SALE_PRICE", "").strip('"')
         period = row.get("PERIOD_BEGIN", "").strip('"')
+        dur    = row.get("PERIOD_DURATION", "").strip('"')
 
         if region not in region_values or prop not in PROP_TYPE_MAP:
             continue
@@ -274,24 +307,38 @@ def extract_hawaii_prices(rows: list[dict], region_col: str, region_values: dict
             "field":  PROP_TYPE_MAP[prop],
             "price":  int(float(price)),
             "period": period,
+            "dur":    dur,
         })
 
-    # Keep only the most recent period per (key, field)
-    latest = {}
+    # Group every observation per (key, field), then take the trailing-median
+    # of the most recent N monthly prints (restricted to the latest row's
+    # cadence, deduped to one price per month).
+    series: dict[tuple[str, str], list[dict]] = {}
     for row in filtered:
-        k = (row["key"], row["field"])
-        if k not in latest or row["period"] > latest[k]["period"]:
-            latest[k] = row
+        series.setdefault((row["key"], row["field"]), []).append(row)
 
-    # Restructure as {key: {sfhPrice: X, condoPrice: Y, period: ...}}
-    result = {}
-    for (key, field), row in latest.items():
+    result: dict[str, dict] = {}
+    for (key, field), obs in series.items():
+        obs.sort(key=lambda r: r["period"])
+        latest_dur = obs[-1]["dur"]
+        by_period = {r["period"]: r["price"] for r in obs if r["dur"] == latest_dur}
+        window_periods = sorted(by_period)[-SALE_PRICE_SMOOTHING_WINDOW:]
+        window_prices  = [by_period[p] for p in window_periods]
+        smoothed       = int(round(statistics.median(window_prices)))
+        latest_period  = window_periods[-1]
+
+        raw_latest = by_period[latest_period]
+        delta = (smoothed - raw_latest) / raw_latest * 100 if raw_latest else 0.0
+        print(f"  {key:<9} {field:<10} {SALE_PRICE_SMOOTHING_WINDOW}-mo median "
+              f"${smoothed:>9,}  (latest ${raw_latest:>9,}, {delta:+.1f}%, "
+              f"n={len(window_prices)})")
+
         if key not in result:
-            result[key] = {"period": row["period"]}
-        result[key][field] = row["price"]
+            result[key] = {"period": latest_period}
+        result[key][field] = smoothed
         # Keep the most recent period across both property types
-        if row["period"] > result[key]["period"]:
-            result[key]["period"] = row["period"]
+        if latest_period > result[key]["period"]:
+            result[key]["period"] = latest_period
 
     return result
 
@@ -1414,11 +1461,13 @@ def patch_html(html: str, prices: dict) -> str:
         sub-keys we control; missing sub-keys render as `null` so the JS
         renderer can fall back gracefully.
     """
-    int_fields   = ("sfhPrice", "condoPrice", "rent", "askRent", "income")
+    int_fields   = ("sfhPrice", "condoPrice", "rent", "askRent", "income",
+                    "sfhGap", "condoGap", "sfhMortgage", "condoMortgage")
     float_fields = ("tenantRentPTI", "mortgageOwnerPTI",
                     "rentBurdenedPct", "rentSeverelyBurdenedPct",
                     "ownerBurdenedPct", "ownerSeverelyBurdenedPct",
-                    "zoriYoY", "cpiRentYoY")
+                    "zoriYoY", "cpiRentYoY",
+                    "sfhIdx", "condoIdx", "sfhPTI", "condoPTI")
     # Each nested_field maps to its ordered sub-keys for deterministic output.
     nested_fields = {
         "bedroomRent": ("br0", "br1", "br2", "br3plus"),
@@ -1730,6 +1779,82 @@ def _fetch_income_and_construction(all_prices: dict) -> str:
     return build_period
 
 
+def _monthly_pi(price: float, rate_pct: float) -> float:
+    """Monthly principal+interest on a 30-yr fixed loan at *rate_pct*, 20% down."""
+    loan = price * (1.0 - DOWN_PAYMENT_FRAC)
+    r    = rate_pct / 100.0 / 12.0
+    n    = MORTGAGE_TERM_MONTHS
+    if r == 0:
+        return loan / n
+    return loan * r * (1 + r) ** n / ((1 + r) ** n - 1)
+
+
+def _afford_price(income: float, rate_pct: float) -> float:
+    """Max purchase price a household at *income* can afford — mirrors the
+    dashboard's calcAffordPrice(): 30% of gross income to P&I, 30-yr fixed,
+    20% down."""
+    monthly_max = income / 12.0 * DTI_FRONT_FRAC
+    r = rate_pct / 100.0 / 12.0
+    n = MORTGAGE_TERM_MONTHS
+    loan_amt = monthly_max * n if r == 0 else monthly_max * (1 - (1 + r) ** -n) / r
+    ltv = max(0.001, 1.0 - DOWN_PAYMENT_FRAC)
+    return loan_amt / ltv
+
+
+def compute_derived_affordability(all_prices: dict, rate_pct: float = MORTGAGE_RATE_PCT) -> None:
+    """Recompute the price-derived affordability metrics in place so they track
+    the (smoothed) Redfin price instead of remaining frozen literals.
+
+    For each county and home type (sfh/condo) writes:
+      • {type}Idx      — affordability index, affordPrice / price × 100
+                         (100 = exactly affordable at median income; the UI
+                         buckets <55 cost-burdened / <80 stretched / ≥80 ok)
+      • {type}Gap      — income-dollar gap: extra annual income needed so the
+                         household could afford the median price (0 if already
+                         affordable). JS reads incomeNeeded = income + gap.
+      • {type}Mortgage — monthly P&I at this price (20% down, 30-yr, rate_pct)
+      • {type}PTI      — monthly P&I as a share of gross monthly income
+                         (price-card diagnostic; not currently surfaced in UI)
+
+    All four use the SAME rate the slider defaults to (MORTGAGE_RATE_PCT) so the
+    static card values agree with the live calculator at first paint. Counties
+    missing income or a price are skipped (their literals stay put + a warning).
+    """
+    print(f"\nRecomputing price-derived affordability metrics @ {rate_pct:.2f}% "
+          f"(20% down, 30-yr P&I)…")
+    pairs = (
+        ("sfhPrice",   "sfhIdx",   "sfhGap",   "sfhMortgage",   "sfhPTI"),
+        ("condoPrice", "condoIdx", "condoGap", "condoMortgage", "condoPTI"),
+    )
+    for key in ("State", "Honolulu", "Maui", "Hawaii", "Kauai"):
+        v = all_prices.get(key)
+        if not v:
+            continue
+        income = v.get("income")
+        if not income:
+            print(f"  {key:<9} skipped — no income")
+            continue
+        afford = _afford_price(income, rate_pct)
+        for price_f, idx_f, gap_f, mort_f, pti_f in pairs:
+            price = v.get(price_f)
+            if not price:
+                continue
+            idx      = afford / price * 100.0
+            mortgage = _monthly_pi(price, rate_pct)
+            # incomeNeeded scales linearly with affordPrice, so the income that
+            # would make `afford == price` is income × price/afford; the gap is
+            # the shortfall (clamped at 0 once the home is affordable).
+            income_needed = income * price / afford
+            gap = max(0, int(round(income_needed - income)))
+            v[idx_f]  = round(idx, 1)
+            v[gap_f]  = gap
+            v[mort_f] = int(round(mortgage))
+            v[pti_f]  = round(mortgage / (income / 12.0), 4)
+        print(f"  {key:<9} SFH idx {v.get('sfhIdx'):>5}  gap ${v.get('sfhGap'):>7,}  "
+              f"P&I ${v.get('sfhMortgage'):>6,}   |  Condo idx {v.get('condoIdx'):>5}  "
+              f"gap ${v.get('condoGap'):>7,}  P&I ${v.get('condoMortgage'):>6,}")
+
+
 def _print_summary(all_prices: dict, build_period: str) -> None:
     """Print a formatted table of the latest fetched values."""
     print("\nLatest data:\n")
@@ -1823,6 +1948,11 @@ def main():
     )
 
     build_period = _fetch_income_and_construction(all_prices)
+
+    # Recompute price-derived affordability metrics (idx/gap/mortgage/PTI) so
+    # they track the freshly smoothed prices + incomes instead of drifting.
+    compute_derived_affordability(all_prices, MORTGAGE_RATE_PCT)
+
     _print_summary(all_prices, build_period)
 
     if dry_run:
