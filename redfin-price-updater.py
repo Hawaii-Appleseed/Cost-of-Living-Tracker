@@ -171,6 +171,32 @@ BLENDED_RENT_CPI_WEIGHTS = {
 # Backward-compat fallback for any caller still passing through the old name
 BLENDED_RENT_CPI_WEIGHT = BLENDED_RENT_CPI_WEIGHTS["Honolulu"]
 
+# Per-county 3-leg blend weights — ONLY the two counties where adding a
+# genuinely county-specific HUD Fair Market Rent (FMR) leg is justified
+# (M4 backtest + 3-leg addendum, docs/rent_nowcast_backtest.md):
+#
+#   • Hawaiʻi — realized ACS rent +27% (2021→24) outran BOTH Honolulu CPI
+#     (+15%) and ZORI (+16%); only HUD FMR (+37%) captured the divergence,
+#     cutting the Hawaiʻi backtest MAPE 9.21% → ~4.8%. The CPI leg is
+#     Honolulu-only, so without FMR the Big Island has no signal that can
+#     diverge from Honolulu — in either direction (surge OR plateau).
+#   • Kauaʻi — has NO ZORI history (its ZORI leg is the statewide proxy), so
+#     FMR is its first genuinely county-specific signal. CAVEAT: FMR slightly
+#     *worsens* Kauaʻi's measured MAPE (status-quo CPI/proxy-ZORI 4.00% vs
+#     CPI/FMR 5.74%) because Kauaʻi's realized growth was modest (+14%) while
+#     FMR overshot (+25%) over the test window. FMR is therefore added at a
+#     MODEST 0.20 weight here — for robustness (a real local leg), not measured
+#     accuracy. Keep its weight small and re-validate annually.
+#
+# Maui (CPI/ZORI 50/50 — ZORI is the better county signal there) and
+# Honolulu/State (CPI-led 0.70) are intentionally NOT given an FMR leg.
+# Counties absent from this dict fall back to the 2-leg BLENDED_RENT_CPI_WEIGHTS.
+# Weights are explicit (cpi/zori/fmr) and must sum to 1.0.
+BLENDED_RENT_3LEG_WEIGHTS = {
+    "Hawaii": {"cpi": 0.34, "zori": 0.33, "fmr": 0.33},
+    "Kauai":  {"cpi": 0.40, "zori": 0.40, "fmr": 0.20},
+}
+
 # Number of trailing monthly periods to average when computing the BLS
 # rent-CPI ratio that feeds the blended nowcast (Q1 of the rent-nowcast
 # improvement plan). ZORI input is already smoothed at the same window;
@@ -930,36 +956,67 @@ def blend_rent_nowcast(
     acs_anchor: float,
     bls_ratio: float,
     zori_ratio: float,
-    cpi_weight: float,
+    cpi_weight: float = BLENDED_RENT_CPI_WEIGHT,
+    *,
+    fmr_ratio:   float | None = None,
+    fmr_weight:  float = 0.0,
+    zori_weight: float | None = None,
 ) -> dict:
     """
-    Blend BLS-CPI-scaled rent (lagging ~12 mo) with ZORI-implied rent (leading)
-    to nowcast current tenant rent. Both components use the same ACS dollar
-    anchor (RENT_ANCHOR_YEAR); only the anchor→present growth factor differs.
+    Blend BLS-CPI-scaled rent (lagging ~12 mo) with ZORI-implied rent (leading),
+    plus an optional HUD-FMR third leg, to nowcast current tenant rent. Every
+    component uses the same ACS dollar anchor (RENT_ANCHOR_YEAR); only the
+    anchor→present growth factor differs.
 
       bls_ratio    = CUURS49ASEHA(latest 3-mo trailing mean) / anchor annual avg
                      [smoothed via BLS_RENT_SMOOTHING_WINDOW — see fetch_bls_rent_ratio]
       zori_ratio   = ZORI(latest 3-mo trailing mean) / ZORI(anchor annual avg)
                      [per county; state ratio used as proxy when a county's
                       anchor avg is missing]
-      cpi_weight   = per-county weight from BLENDED_RENT_CPI_WEIGHTS — Honolulu
-                     and State use 0.70 (CPI is regionally representative);
-                     outer islands use 0.50 (ZORI is the only county-specific
-                     source).
-      blended_rent = acs_anchor × ( cpi_weight·bls_ratio + (1−cpi_weight)·zori_ratio )
+      fmr_ratio    = HUD 2-BR FMR(latest FY) / FMR(anchor FY) — a genuinely
+                     county-specific (and Kauaʻi-available) growth signal. Only
+                     supplied for the counties in BLENDED_RENT_3LEG_WEIGHTS
+                     (Hawaiʻi, Kauaʻi); None elsewhere → 2-leg blend.
+      cpi_weight   = per-county CPI weight (see BLENDED_RENT_CPI_WEIGHTS /
+                     BLENDED_RENT_3LEG_WEIGHTS).
 
-    Returns a dict with the blended value plus the two single-source components
-    so callers can log all three (useful for audit and the methodology tooltip).
+    Weight handling:
+      • 2-leg (default): fmr_weight=0, zori_weight=None → zori_weight = 1−cpi_weight.
+      • 3-leg: caller passes explicit cpi/zori/fmr weights (summing to 1).
+      blended_factor = cpi_w·bls_ratio + zori_w·zori_ratio + fmr_w·fmr_ratio
+
+    If fmr_ratio is None or fmr_weight is 0 the FMR leg is dropped and its
+    weight is folded back onto ZORI so the blend never silently under-sums.
+
+    Returns a dict with the blended value plus each single-source component so
+    callers can log them all (useful for audit and the methodology tooltip).
     """
-    w = cpi_weight
-    blended_factor = w * bls_ratio + (1 - w) * zori_ratio
+    cpi_w = cpi_weight
+    use_fmr = fmr_ratio is not None and fmr_weight > 0
+    fmr_w   = fmr_weight if use_fmr else 0.0
+    # Default ZORI weight makes the 2-leg case behave exactly as before; in the
+    # 3-leg case the caller passes an explicit zori_weight. If the FMR leg is
+    # requested but unavailable, its weight is reassigned to ZORI.
+    if zori_weight is None:
+        zori_w = 1.0 - cpi_w
+    else:
+        zori_w = zori_weight + (fmr_weight if not use_fmr else 0.0)
+
+    blended_factor = cpi_w * bls_ratio + zori_w * zori_ratio
+    if use_fmr:
+        blended_factor += fmr_w * fmr_ratio
+
     return {
         "blended":      round(acs_anchor * blended_factor),
         "cpi_scaled":   round(acs_anchor * bls_ratio),
         "zori_implied": round(acs_anchor * zori_ratio),
+        "fmr_implied":  round(acs_anchor * fmr_ratio) if use_fmr else None,
         "bls_ratio":    bls_ratio,
         "zori_ratio":   zori_ratio,
-        "cpi_weight":   w,
+        "fmr_ratio":    fmr_ratio if use_fmr else None,
+        "cpi_weight":   cpi_w,
+        "zori_weight":  zori_w,
+        "fmr_weight":   fmr_w,
     }
 
 
@@ -1181,6 +1238,126 @@ def fetch_hud_state_mfi() -> dict:
         raise ValueError("Could not parse Hawaii MFI from HUD state PDF")
 
     return {"_period": HUD_FY, "State": {"income": int(m.group(1))}}
+
+
+# ─── HUD Fair Market Rent (FMR) — county-specific 3rd blend leg ──────────────
+# HUD publishes a single combined historical workbook ("FMR_2Bed_YYYY_YYYY.xlsx")
+# with ONE column per fiscal year ("fmrNN_2" = that FY's 2-BR FMR). Using it
+# avoids the per-year filename + header drift that plagues the individual FMR
+# releases — we only have to resolve one link (its end-year bumps each fall).
+# The HUD portal bot-blocks default User-Agents, so we send a browser UA, and
+# HUD workbooks ship a malformed dcterms date that openpyxl rejects, so we
+# strip it first. See BLENDED_RENT_3LEG_WEIGHTS for the why/which-counties.
+HUD_FMR_DATASETS_PAGE     = "https://www.huduser.gov/portal/datasets/fmr.html"
+HUD_FMR_PAGE_BASE         = "https://www.huduser.gov/portal/datasets/"
+HUD_FMR_COMBINED_RE       = re.compile(r'href="([^"]*FMR_2Bed_\d{4}_\d{4}\.xlsx)"', re.I)
+# Last-known-good combined file, used only if the page scrape finds no link.
+HUD_FMR_COMBINED_FALLBACK = "https://www.huduser.gov/portal/datasets/FMR/FMR_2Bed_1983_2026.xlsx"
+HUD_FMR_BROWSER_UA        = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+HUD_FMR_STATE_FIPS        = "15"   # Hawaii
+HUD_FMR_COUNTY_FIPS       = {"001": "Hawaii", "003": "Honolulu", "007": "Kauai", "009": "Maui"}
+
+
+def _sanitize_hud_xlsx(data: bytes) -> bytes:
+    """HUD workbooks ship a malformed <dcterms:created/modified> that openpyxl
+    rejects; strip those two elements from docProps/core.xml and re-zip."""
+    import zipfile
+    bin_in, out = io.BytesIO(data), io.BytesIO()
+    with zipfile.ZipFile(bin_in) as zin, zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as zout:
+        for n in zin.namelist():
+            d = zin.read(n)
+            if n == "docProps/core.xml":
+                t = d.decode("utf-8", "ignore")
+                t = re.sub(r"<dcterms:(created|modified)[^>]*>.*?</dcterms:\1>", "", t)
+                d = t.encode("utf-8")
+            zout.writestr(n, d)
+    return out.getvalue()
+
+
+def _hud_fmr_combined_url() -> str:
+    """Resolve the current 'FMR_2Bed_YYYY_YYYY.xlsx' combined-history link from
+    the HUD FMR datasets page. Falls back to the last-known-good URL on any
+    scrape failure (the filename's end-year bumps each fiscal year)."""
+    try:
+        html = fetch_bytes(HUD_FMR_DATASETS_PAGE,
+                           headers={"User-Agent": HUD_FMR_BROWSER_UA}).decode("utf-8", "ignore")
+        m = HUD_FMR_COMBINED_RE.search(html)
+        if m:
+            href = m.group(1)
+            if href.startswith("http"):
+                return href
+            if href.startswith("/"):
+                return "https://www.huduser.gov" + href
+            return HUD_FMR_PAGE_BASE + href
+    except Exception as e:
+        print(f"  WARNING: HUD FMR page scrape failed ({e}) — using last-known URL")
+    return HUD_FMR_COMBINED_FALLBACK
+
+
+def _fmr_col_year(col: str | None) -> int | None:
+    """'fmr24_2' → 2024, 'fmr99_2' → 1999. Returns None for non-2BR columns.
+    Two-digit year: 00-50 → 20xx, 51-99 → 19xx (file spans 1983→present)."""
+    m = re.fullmatch(r"fmr(\d{2})_2", col or "")
+    if not m:
+        return None
+    yy = int(m.group(1))
+    return (2000 + yy) if yy <= 50 else (1900 + yy)
+
+
+def fetch_hud_fmr_ratios(anchor_year: str = RENT_ANCHOR_YEAR) -> dict:
+    """Return {countyKey: fmr_growth_ratio} where ratio = 2-BR FMR(latest FY) /
+    2-BR FMR(anchor FY), for the Hawaii counties. Plus metadata keys
+    '_anchor_fy' and '_latest_fy' (e.g. "FY2024", "FY2026").
+
+    Used as the optional 3rd blend leg for the counties in
+    BLENDED_RENT_3LEG_WEIGHTS. Returns {} on ANY failure so the blend
+    gracefully degrades to the 2-leg CPI/ZORI nowcast for those counties.
+    """
+    if not _OPENPYXL_AVAILABLE:
+        print("  WARNING: openpyxl unavailable — skipping HUD FMR leg")
+        return {}
+    try:
+        url = _hud_fmr_combined_url()
+        raw = _sanitize_hud_xlsx(
+            fetch_bytes(url, headers={"User-Agent": HUD_FMR_BROWSER_UA}, timeout=120)
+        )
+        wb = openpyxl.load_workbook(io.BytesIO(raw), read_only=True)
+        ws = wb.active
+        it = ws.iter_rows(values_only=True)
+        hdr = list(next(it))
+        idx = {c: i for i, c in enumerate(hdr)}
+        i_state, i_county = idx.get("state"), idx.get("county")
+        if i_state is None or i_county is None:
+            raise ValueError("FMR workbook missing 'state'/'county' columns")
+
+        # Map every "fmrNN_2" column to its 4-digit year.
+        year_cols = {y: i for c, i in idx.items()
+                     if (y := _fmr_col_year(c)) is not None}
+        anchor_y = int(anchor_year)
+        if anchor_y not in year_cols:
+            raise ValueError(f"FMR workbook has no fmr{anchor_y % 100:02d}_2 column "
+                             f"(anchor {anchor_y})")
+        latest_y = max(year_cols)
+        ia, il = year_cols[anchor_y], year_cols[latest_y]
+
+        ratios: dict = {}
+        for r in it:
+            if str(r[i_state]) != HUD_FMR_STATE_FIPS:
+                continue
+            ckey = HUD_FMR_COUNTY_FIPS.get(str(r[i_county]).zfill(3))
+            if not ckey:
+                continue
+            base, cur = r[ia], r[il]
+            if base and cur:
+                ratios[ckey] = float(cur) / float(base)
+        if not ratios:
+            raise ValueError("no Hawaii county rows matched in FMR workbook")
+        ratios["_anchor_fy"] = f"FY{anchor_y}"
+        ratios["_latest_fy"] = f"FY{latest_y}"
+        return ratios
+    except Exception as e:
+        print(f"  WARNING: HUD FMR fetch failed ({e}) — FMR leg disabled (2-leg fallback)")
+        return {}
 
 
 ZORI_PERIOD_RE = re.compile(
@@ -1414,10 +1591,24 @@ def _fetch_rents(all_prices: dict) -> tuple[
         print(f"  WARNING: Zillow ZORI fetch failed ({e}) — askRent will not be updated")
         zori_anchor_year = RENT_ANCHOR_YEAR
 
+    # ── 3.5 HUD Fair Market Rent (county-specific 3rd leg, targeted) ──────────
+    # Only Hawaiʻi & Kauaʻi get an FMR leg (see BLENDED_RENT_3LEG_WEIGHTS). The
+    # fetch is fully soft-failing: an empty dict here just means those two
+    # counties fall back to their 2-leg CPI/ZORI blend below.
+    print("\nFetching HUD Fair Market Rent (county-specific blend leg)...")
+    fmr_ratios = fetch_hud_fmr_ratios(RENT_ANCHOR_YEAR)
+    fmr_window = ""
+    if fmr_ratios:
+        fmr_window = f"{fmr_ratios.pop('_anchor_fy', '?')}→{fmr_ratios.pop('_latest_fy', '?')}"
+        print(f"  HUD FMR 2-BR growth ({fmr_window}): "
+              + ", ".join(f"{k} {v:.3f}" for k, v in fmr_ratios.items()))
+
     # ── 4. Blended rent nowcast ───────────────────────────────────────────────
-    # Per-county weights (Honolulu/State 70/30; outer islands 50/50) + a 3-mo
-    # trailing-mean BLS ratio so a single bumpy CPI print doesn't whipsaw
-    # the headline. Falls back to CPI-only rent when either input is missing.
+    # Per-county weights: Honolulu/State 70/30 CPI/ZORI; Maui 50/50 CPI/ZORI;
+    # Hawaiʻi & Kauaʻi use a 3-leg CPI/ZORI/FMR blend (BLENDED_RENT_3LEG_WEIGHTS)
+    # when their FMR ratio is available, else fall back to 2-leg. Plus a 3-mo
+    # trailing-mean BLS ratio so a single bumpy CPI print doesn't whipsaw the
+    # headline. Falls back to CPI-only rent when ZORI/BLS inputs are missing.
     blend_bls_ratio = bls_ratio_smooth if bls_ratio_smooth is not None else bls_ratio
     if blend_bls_ratio and zori_anchor_avg:
         zori_ratios: dict[str, float] = {}
@@ -1442,21 +1633,45 @@ def _fetch_rents(all_prices: dict) -> tuple[
             v = all_prices.get(key)
             if not v or key not in acs_rent_anchor or key not in zori_ratios:
                 continue
-            cpi_w = BLENDED_RENT_CPI_WEIGHTS.get(key, 0.7)
-            b = blend_rent_nowcast(
-                acs_anchor = acs_rent_anchor[key],
-                bls_ratio  = blend_bls_ratio,
-                zori_ratio = zori_ratios[key],
-                cpi_weight = cpi_w,
-            )
-            v["rent"] = b["blended"]
-            zw = int(round((1 - cpi_w) * 100))
-            cw = int(round(cpi_w * 100))
-            print(f"  {key:<9}  {cw}/{zw} CPI/ZORI  "
-                  f"CPI-scaled ${b['cpi_scaled']:>5,}  "
-                  f"ZORI-implied ${b['zori_implied']:>5,}  "
-                  f"→ blended ${b['blended']:>5,}  "
-                  f"(bls_ratio={b['bls_ratio']:.3f}, zori_ratio={b['zori_ratio']:.3f})")
+            w3    = BLENDED_RENT_3LEG_WEIGHTS.get(key)
+            fmr_r = fmr_ratios.get(key)
+            if w3 and fmr_r is not None:
+                # 3-leg CPI/ZORI/FMR (Hawaiʻi, Kauaʻi)
+                b = blend_rent_nowcast(
+                    acs_anchor  = acs_rent_anchor[key],
+                    bls_ratio   = blend_bls_ratio,
+                    zori_ratio  = zori_ratios[key],
+                    cpi_weight  = w3["cpi"],
+                    zori_weight = w3["zori"],
+                    fmr_ratio   = fmr_r,
+                    fmr_weight  = w3["fmr"],
+                )
+                v["rent"] = b["blended"]
+                print(f"  {key:<9}  {int(round(w3['cpi']*100))}/{int(round(w3['zori']*100))}/"
+                      f"{int(round(w3['fmr']*100))} CPI/ZORI/FMR  "
+                      f"CPI ${b['cpi_scaled']:>5,}  ZORI ${b['zori_implied']:>5,}  "
+                      f"FMR ${b['fmr_implied']:>5,}  → blended ${b['blended']:>5,}  "
+                      f"(bls={b['bls_ratio']:.3f}, zori={b['zori_ratio']:.3f}, "
+                      f"fmr={b['fmr_ratio']:.3f})")
+            else:
+                # 2-leg CPI/ZORI (Honolulu, State, Maui — and Hawaiʻi/Kauaʻi
+                # if the FMR fetch failed this run)
+                cpi_w = BLENDED_RENT_CPI_WEIGHTS.get(key, 0.7)
+                b = blend_rent_nowcast(
+                    acs_anchor = acs_rent_anchor[key],
+                    bls_ratio  = blend_bls_ratio,
+                    zori_ratio = zori_ratios[key],
+                    cpi_weight = cpi_w,
+                )
+                v["rent"] = b["blended"]
+                zw = int(round((1 - cpi_w) * 100))
+                cw = int(round(cpi_w * 100))
+                fb = "  [FMR unavailable → 2-leg fallback]" if (w3 and fmr_r is None) else ""
+                print(f"  {key:<9}  {cw}/{zw} CPI/ZORI  "
+                      f"CPI-scaled ${b['cpi_scaled']:>5,}  "
+                      f"ZORI-implied ${b['zori_implied']:>5,}  "
+                      f"→ blended ${b['blended']:>5,}  "
+                      f"(bls_ratio={b['bls_ratio']:.3f}, zori_ratio={b['zori_ratio']:.3f}){fb}")
     else:
         print("  Skipping blended nowcast (missing BLS ratio or ZORI 2024 baseline)")
 

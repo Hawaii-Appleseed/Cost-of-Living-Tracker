@@ -302,22 +302,27 @@ overreacts to turnover. There is only **one** BLS rent series for Hawaiʻi
 (Honolulu MSA, `CUURS49ASEHA`), so the CPI growth leg is identical for every
 county — the ZORI leg is the only county-specific growth signal.
 
-We blend the two, anchored to the same ACS dollar base:
+We blend the legs, anchored to the same ACS dollar base. Most counties use a
+2-leg CPI/ZORI blend; Hawaiʻi and Kauaʻi add a third county-specific HUD Fair
+Market Rent (FMR) leg (see below):
 
 ```
-blended_rent = ACS_anchor × ( w · BLS_ratio  +  (1 − w) · ZORI_ratio )
+2-leg:  blended_rent = ACS_anchor × ( w_cpi · BLS_ratio + w_zori · ZORI_ratio )
+3-leg:  blended_rent = ACS_anchor × ( w_cpi · BLS_ratio + w_zori · ZORI_ratio + w_fmr · FMR_ratio )
 ```
 
-where each ratio is `latest 3-month trailing mean / anchor_year_average` and
-`w` is **per-county** (`BLENDED_RENT_CPI_WEIGHTS` in `redfin-price-updater.py`):
+where each ratio is `latest value / anchor_year_average` (BLS & ZORI use a
+3-month trailing mean; FMR is the annual 2-BR fiscal-year value) and the weights
+are **per-county** (`BLENDED_RENT_CPI_WEIGHTS` and, for the 3-leg counties,
+`BLENDED_RENT_3LEG_WEIGHTS` in `redfin-price-updater.py`):
 
-| County | w (CPI weight) | Rationale |
-|---|---|---|
-| Honolulu | 0.70 | CPI is the literal Honolulu series — regionally representative |
-| State | 0.70 | Honolulu-dominated population |
-| Maui | 0.50 | ZORI is the only county-specific source; validated (see backtest) |
-| Hawaiʻi | 0.50 | same |
-| Kauaʻi | 0.50 | **provisional — unvalidated** (see below) |
+| County | CPI | ZORI | FMR | Rationale |
+|---|---|---|---|---|
+| Honolulu | 0.70 | 0.30 | — | CPI is the literal Honolulu series — regionally representative |
+| State | 0.70 | 0.30 | — | Honolulu-dominated population |
+| Maui | 0.50 | 0.50 | — | ZORI is the only county-specific source; best-validated outer island |
+| Hawaiʻi | 0.34 | 0.33 | 0.33 | CPI/ZORI both undershot the Big-Island divergence; FMR captures it (see below) |
+| Kauaʻi | 0.40 | 0.40 | 0.20 | ZORI is statewide-proxy only; FMR is Kauaʻi's first real local leg (modest weight — see below) |
 
 **Smoothing (Q1).** Both legs use a 3-month trailing mean of their latest
 prints (`BLS_RENT_SMOOTHING_WINDOW = ZORI_SMOOTHING_WINDOW = 3`) so a single
@@ -336,14 +341,53 @@ See Cleveland Fed WP 22-38r ("New-Tenant Repeat Rent Inflation") for the
 academic basis of blending a lagging stock-rent index with a leading
 asking-rent index.
 
+### County-specific HUD FMR leg — Hawaiʻi & Kauaʻi only (targeted)
+
+The 2-leg blend has only **one** county-specific signal (ZORI); the CPI leg is
+Honolulu-only and applied identically to every island. That fails wherever a
+neighbor island's rent path diverges from Honolulu. The M4 backtest exposed two
+such cases, so each gets a third leg drawn from **HUD Fair Market Rent** (the
+40th-percentile 2-bedroom gross rent, published annually per county). We use
+only its fiscal-year **growth ratio** (`FMR(latest FY) / FMR(anchor FY)`), never
+its dollar level. The leg is **targeted** — added only where the backtest shows
+it helps, to keep surface area minimal:
+
+- **Hawaiʻi (CPI 0.34 / ZORI 0.33 / FMR 0.33).** Realized Big-Island rent rose
+  +27% (ACS 2021→24), outrunning *both* Honolulu CPI (+15%) and ZORI (+16%);
+  only HUD FMR (+37%) captured it, cutting Hawaiʻi's backtest MAPE 9.21% → ~4.8%.
+  Because the CPI leg cannot diverge from Honolulu, FMR is the Big Island's only
+  means of tracking its own trajectory — in *either* direction. (Going forward,
+  FY2024→FY2026 FMR is roughly flat, so the leg now gently restrains the nowcast
+  rather than boosting it — the post-surge plateau Honolulu CPI would miss.)
+- **Kauaʻi (CPI 0.40 / ZORI 0.40 / FMR 0.20).** Kauaʻi has no ZORI history (its
+  ZORI leg is the statewide proxy), so FMR is its **first genuinely
+  county-specific signal**. CAVEAT: FMR slightly *worsens* Kauaʻi's measured
+  MAPE in the backtest (status-quo CPI/proxy-ZORI 4.00% vs CPI/FMR 5.74%),
+  because Kauaʻi's realized growth was modest (+14%) while FMR overshot (+25%).
+  FMR is therefore added at a deliberately **modest 0.20 weight** — for
+  robustness (a real local leg instead of an all-proxy blend), not measured
+  accuracy. Keep its weight small and re-validate annually.
+
+Maui (ZORI is the better county signal there) and Honolulu/State keep their
+2-leg blend. **Caveats:** FMR is ACS-derived and lags the market ~2 years, so
+its FY label trails the period it actually describes; it is a slow,
+partly-ACS-correlated check, weighted accordingly and never as the majority leg.
+Engineering notes: HUD bot-blocks default User-Agents (we send a browser UA) and
+ships a malformed `dcterms` date that breaks openpyxl (we strip it). We read the
+single combined-history workbook (`FMR_2Bed_YYYY_YYYY.xlsx`, one `fmrNN_2` column
+per fiscal year), whose link is resolved dynamically from the HUD FMR datasets
+page so the annual filename bump doesn't break the pipeline. Any FMR fetch
+failure silently reverts Hawaiʻi & Kauaʻi to their 2-leg blend.
+
 ### Kauaʻi is provisional
 
-Kauaʻi's 0.50 weight is an **assumption, not a measured result**. Zillow only
+Kauaʻi's weights remain an **assumption, not a measured result**. Zillow only
 began publishing Kauaʻi ZORI in 2025, so (a) the live pipeline falls back to the
-*statewide* ZORI ratio as Kauaʻi's leg — meaning *neither* leg is Kauaʻi-specific
-(CPI is Honolulu, ZORI is statewide) — and (b) there is no historical ZORI to
-backtest the weight against (zero usable cases). Re-validate once Kauaʻi has ≥2
-years of ZORI (≈2027).
+*statewide* ZORI ratio as Kauaʻi's ZORI leg, and (b) there is no historical ZORI
+to backtest the weight against (zero usable cases). The new FMR leg (above) gives
+Kauaʻi its first county-specific input, but at a modest 0.20 weight and with a
+known backtest tradeoff — so the overall Kauaʻi blend is still provisional.
+Re-validate once Kauaʻi has ≥2 years of ZORI (≈2027).
 
 Fallback chain:
 - BLS fetch fails → ACS raw values stay (no monthly currency)
@@ -351,6 +395,8 @@ Fallback chain:
 - County missing anchor-year ZORI baseline (Kauaʻi today) → use state ZORI
   ratio as proxy, analogous to how Honolulu BLS rent CPI is already applied
   statewide
+- HUD FMR fetch fails (Hawaiʻi, Kauaʻi) → drop the FMR leg and revert to the
+  2-leg CPI/ZORI blend for those counties
 
 ### Backtests
 
@@ -374,6 +420,14 @@ Two harnesses validate the weights, with complementary ground truths:
 
 Both harnesses agree directionally: the **outer islands want more ZORI weight
 than Honolulu's 0.70**, which is what motivated the 0.50 outer-island split.
+
+A third harness, **`scripts/backtest_rent_3leg.py`** (addendum in
+`docs/rent_nowcast_backtest.md`), motivated the targeted HUD FMR leg: on the
+ACS-truth outer cases a 3-leg CPI/ZORI/FMR blend beats the 2-leg 5.93% (≈5.35%
+pooled), with the gain concentrated in Hawaiʻi (9.21% → ~4.8%) and Kauaʻi
+gaining its first county-specific validation. The win is *not* uniform — Maui
+and Honolulu are better without FMR — which is why the leg is applied only to
+Hawaiʻi and Kauaʻi rather than blanket-added.
 
 ### Regression budget
 
