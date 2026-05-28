@@ -293,60 +293,100 @@ month, the multiplier is used live with no damping.
   field stays at the prior value rather than overwriting with a
   meaningless number.
 
-## Rent nowcast blend (70% BLS CPI + 30% ZORI)
+## Rent nowcast blend (per-county BLS CPI / ZORI weights)
 
 The BLS Honolulu rent CPI lags market asking rent by roughly 12 months — it
 samples each unit once every six months and averages continuing leases
 alongside new ones. Zillow ZORI is an asking-rent index that leads CPI but
-overreacts to turnover.
+overreacts to turnover. There is only **one** BLS rent series for Hawaiʻi
+(Honolulu MSA, `CUURS49ASEHA`), so the CPI growth leg is identical for every
+county — the ZORI leg is the only county-specific growth signal.
 
-We blend the two, anchored to the same ACS 2024 dollar base:
+We blend the two, anchored to the same ACS dollar base:
 
 ```
-blended_rent = ACS_anchor × ( 0.7 × BLS_ratio  +  0.3 × ZORI_ratio )
+blended_rent = ACS_anchor × ( w · BLS_ratio  +  (1 − w) · ZORI_ratio )
 ```
 
-where each ratio is `latest / anchor_year_average`. The 70/30 split
-captures most of the CPI lag without letting asking-rent swings dominate
-the reported number. See Cleveland Fed WP 22-38r ("New-Tenant Repeat Rent
-Inflation") for the academic basis.
+where each ratio is `latest 3-month trailing mean / anchor_year_average` and
+`w` is **per-county** (`BLENDED_RENT_CPI_WEIGHTS` in `redfin-price-updater.py`):
+
+| County | w (CPI weight) | Rationale |
+|---|---|---|
+| Honolulu | 0.70 | CPI is the literal Honolulu series — regionally representative |
+| State | 0.70 | Honolulu-dominated population |
+| Maui | 0.50 | ZORI is the only county-specific source; validated (see backtest) |
+| Hawaiʻi | 0.50 | same |
+| Kauaʻi | 0.50 | **provisional — unvalidated** (see below) |
+
+**Smoothing (Q1).** Both legs use a 3-month trailing mean of their latest
+prints (`BLS_RENT_SMOOTHING_WINDOW = ZORI_SMOOTHING_WINDOW = 3`) so a single
+bumpy CPI or ZORI print doesn't swing the headline rent. The ACS anchor and
+both anchor-year averages stay full-year means.
+
+**Maui post-fire re-anchor (M2).** Maui's ACS anchor uses the **ACS 1-year**
+2024 vintage (`COUNTY_ANCHOR_OVERRIDE = {"Maui": "acs1"}`) instead of the 5-year.
+The 2023 Lahaina fire produced a single-year rent shock that the 5-year vintage
+dilutes by averaging it with pre-fire years (1-yr $1,802 vs 5-yr $1,717). ACS
+1-yr publishes only for ≥65k-population areas; all four counties qualify, but
+only Maui is overridden today. A suppressed or failed 1-yr fetch reverts to the
+5-yr value with a logged warning.
+
+See Cleveland Fed WP 22-38r ("New-Tenant Repeat Rent Inflation") for the
+academic basis of blending a lagging stock-rent index with a leading
+asking-rent index.
+
+### Kauaʻi is provisional
+
+Kauaʻi's 0.50 weight is an **assumption, not a measured result**. Zillow only
+began publishing Kauaʻi ZORI in 2025, so (a) the live pipeline falls back to the
+*statewide* ZORI ratio as Kauaʻi's leg — meaning *neither* leg is Kauaʻi-specific
+(CPI is Honolulu, ZORI is statewide) — and (b) there is no historical ZORI to
+backtest the weight against (zero usable cases). Re-validate once Kauaʻi has ≥2
+years of ZORI (≈2027).
 
 Fallback chain:
 - BLS fetch fails → ACS raw values stay (no monthly currency)
 - ZORI fetch fails → CPI-only scaling (lagging but consistent)
-- County missing 2024 ZORI baseline (Kauai often) → use state ZORI ratio
-  as proxy, analogous to how Honolulu BLS rent CPI is already applied
+- County missing anchor-year ZORI baseline (Kauaʻi today) → use state ZORI
+  ratio as proxy, analogous to how Honolulu BLS rent CPI is already applied
   statewide
 
-### Walk-forward backtest
+### Backtests
 
-`backtests/rent_blend_walkforward.py` runs a Cleveland-Fed-style
-pseudo-out-of-sample evaluation of the 70/30 weight. For each anchor
-T ∈ {2022-04, 2022-10, 2023-04, 2023-10, 2024-04} the harness:
+Two harnesses validate the weights, with complementary ground truths:
 
-1. Pulls BLS rent CPI, ZORI, and the ACS 5-year vintage that was actually
-   live at T (vintage_year+1 December release rule).
-2. Runs `blend_rent_nowcast()` to project T+12 rent.
-3. Compares the projection against realized rent at T+12 under two
-   ground-truth views:
-   - **Blend-truth** = `(BLS_T+12 + ZORI_T+12) / 2` (symmetric)
-   - **BLS-only-truth** = `BLS_T+12` (anchored to the slow-moving series
-     that already lags ~12 months, so BLS_T+12 ≈ true rent at T)
+1. **Independent ground truth — `scripts/backtest_rent_nowcast.py` (M4).**
+   Compares the blended *growth factor* against realized **ACS 1-yr contract
+   rent** (B25058), 2021→2024, per county. ACS is not one of the blend inputs,
+   so this view is free of the circularity in (2). Result: outer-island pooled
+   MAPE at the live w=0.50 is **5.93%**, with a shallow MAPE-vs-weight curve
+   (optimum w≈0.4 at 5.64% — 0.29 pp better, inside the ACS noise floor). Full
+   report + the ACS-MoE noise-floor analysis in `docs/rent_nowcast_backtest.md`.
 
-5 anchors × 5 regions = 25 cells per scheme. Five schemes evaluated:
-BLS-only, 70/30, 60/40, 50/50, ZORI-only. Results in
-`backtests/results/rent_blend_2026-04.md`.
+2. **Self-consistency — `backtests/rent_blend_walkforward.py`.**
+   Pseudo-out-of-sample over anchors {2022-04 … 2024-04}, scoring the 12-month
+   nowcast against (BLS+ZORI)/2 and BLS-only proxies. These proxies are *built
+   from the blend inputs*, so each is mechanically biased toward the weight that
+   favors its dominant series — the two views bracket the truth rather than
+   pinpoint it. Live weights sit at 3.28% (BLS-truth) / 5.75% (blend-truth).
+   Results in `backtests/results/`.
 
-The current results (April 2026 run): under blend-truth ZORI-only "wins"
-on MAPE but the metric is mechanically biased toward whichever input
-dominates the ground truth; under BLS-only-truth the live 70/30 weight
-sits at ~3.3% MAPE versus 2.9% for 50/50 — a small enough gap that the
-existing 70/30 weight remains defensible. No auto-tuning of the live
-constant; weight changes go through a separate review.
+Both harnesses agree directionally: the **outer islands want more ZORI weight
+than Honolulu's 0.70**, which is what motivated the 0.50 outer-island split.
 
-Refresh cadence: rerun annually after a new ACS vintage drops, then
-again any time the blend logic changes. Cached BLS/ACS responses live in
-`backtests/cache/` so reruns are deterministic.
+### Regression budget
+
+- **Primary gate: outer-island pooled blended-rent MAPE ≤ 8%** (independent ACS
+  ground truth). Current **5.93%** ✓. Re-run `scripts/backtest_rent_nowcast.py`.
+- A flat **per-county** 8% gate is intentionally *not* adopted — Maui's ACS 1-yr
+  MoE alone is ±10.5% (Kauaʻi ±14.8% at 90% CI), so the ground truth is blurrier
+  than an 8% target. Track per-county MAPE for *direction* (flag a >3 pp jump
+  between annual re-runs), not as a hard pass/fail.
+
+Refresh cadence: rerun both harnesses annually after a new ACS vintage drops,
+and any time the blend logic or weights change. Cached BLS/ACS responses for
+the walk-forward live in `backtests/cache/`.
 
 ---
 
