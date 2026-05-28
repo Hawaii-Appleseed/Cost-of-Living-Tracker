@@ -131,3 +131,71 @@ Adopt as a CI/methodology gate, mirroring the 6.76% census MAPE precedent:
    ≥2 years of ZORI.
 4. **Re-run this backtest annually** when each new ACS 1-yr vintage lands
    (≈ each September), and record the new pooled MAPE here.
+
+---
+
+## Addendum — 3-leg prototype: adding a HUD FMR county leg
+
+`scripts/backtest_rent_3leg.py` tests the audit's #1 recommendation: add a
+genuinely per-county growth signal — HUD Fair Market Rent (2BR, FY2021–2024) —
+as a third leg alongside Honolulu CPI and county ZORI. FMR is free, truly
+per-county, and has full history for all four counties (including Kauaʻi, which
+ZORI lacks). Ground truth is the same ACS 1-yr contract rent.
+
+### HUD FMR caught the divergence CPI/ZORI missed
+
+| County | ACS truth 2021→24 | Honolulu CPI | ZORI | HUD FMR |
+|---|---|---|---|---|
+| Hawaiʻi | **+27%** | +15% | +16% (from '22) | **+37%** |
+| Maui | +27% | +15% | +33% | +21% |
+| Kauaʻi | +14% | +15% | — (no history) | +25% |
+| Honolulu | +5% | +15% | +15% | +15% |
+
+FMR rose +37% for Hawaiʻi County — it *captured* the surge that Honolulu CPI
+(+15%) and ZORI (+16%) both undershot, with a +24% jump in its FY2023 print.
+
+### Pooled outer-island MAPE (ACS truth)
+
+On the original 9 ZORI-available outer cases (apples-to-apples vs the 5.93%):
+
+| Scheme | MAPE |
+|---|---|
+| 2-leg CPI .5 / ZORI .5 (**production**) | 5.93% |
+| 3-leg CPI .33 / ZORI .33 / FMR .33 | **5.35%** |
+| 3-leg grid optimum (CPI 0 / ZORI .5 / FMR .5) | 4.22% |
+
+A 3-leg equal blend beats production by 0.58 pp; the grid wants to drop CPI
+entirely (ZORI+FMR → 4.22%) — but that is almost certainly overfitting 9 noisy
+cases and would discard the only timely (monthly) leg. **Verdict: yes, a 3-leg
+blend beats 5.93%, but the win is concentrated, not uniform.**
+
+### Where FMR helps — and where it doesn't (per county, CPI/FMR 2-leg vs production)
+
+| County | production CPI/ZORI | CPI/FMR | takeaway |
+|---|---|---|---|
+| Hawaiʻi | 9.21% | **4.83%** | FMR fixes the divergent county — the headline win |
+| Maui | 4.29% | 6.33% | ZORI is better here; don't displace it |
+| Kauaʻi | n/a (no ZORI) | 5.74% | **first-ever validation**; status-quo CPI-proxy is 4.00% |
+| Honolulu | 5.20% | 5.51% | CPI already near-optimal; FMR slightly worse |
+
+### Recommendation
+
+Adopt a **3-leg blend on the outer islands** (≈ CPI 0.34 / ZORI 0.33 / FMR 0.33),
+which (a) cuts pooled outer MAPE 5.93% → 5.35%, (b) specifically repairs
+Hawaiʻi County (9.21% → ~4.8%), and (c) finally gives Kauaʻi a real
+county-specific leg instead of the statewide-ZORI proxy. Keep a CPI share for
+monthly timeliness rather than chasing the grid's CPI=0. Honolulu/State stay on
+CPI-led 0.70.
+
+**Caveats before wiring to production:**
+- HUD FMR is the 40th-percentile *gross* rent, is derived from ACS 5-yr lagged
+  ~3 years, and is annual — it is a laggy, partly-ACS-correlated signal. Use its
+  growth ratio only, and don't over-weight it.
+- **HUD changes the workbook filename every fiscal year** (`FY21_4050_FMRs_rev.xlsx`
+  → `FY22_FMRs_revised.xlsx` → `FY23_FMRs_revised.xlsx` → `FMR2024_final_revised.xlsx`),
+  and the column headers drift (`state_alpha`→`stusps`, `county`→`fips`). A
+  monthly pipeline integration needs a resilient resolver (scrape the FMR
+  landing page for the year's `*FMR*.xlsx` link) + the docProps date sanitiser
+  used in the prototype. The HUD portal also bot-blocks default User-Agents.
+- Still only 9–18 noisy cases; treat the weight as directional, re-validate
+  annually.
