@@ -1730,16 +1730,17 @@
   .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
   .bar-lbl { font-size: 20px; color: var(--text-mid); width: 90px; flex-shrink: 0; }
   .bar-bg { flex: 1; height: 22px; background: var(--bar-track); border-radius: 4px; overflow: visible; position: relative; }
-  /* Right-side value stack for #build-auth-bars rows: desktop shows total
-     and per-resident inline; mobile stacks them vertically and drops the
-     160px min-width so the row fits in a 375px viewport. */
-  .bar-val-stack { flex-shrink: 0; text-align: right; min-width: 160px; }
-  .bar-val-total { font-size: 18px; color: var(--ocean); font-weight: 500; }
-  .bar-val-per   { font-size: 16px; color: var(--text-lt); margin-left: 8px; }
+  /* Right-side value stack for #build-auth-bars rows. FIXED width (not
+     min-width) + vertical stacking so every row's track is identical length —
+     a min-width grew for large totals like "$2,736M", shrinking that row's
+     track and leaving the bars visibly ragged. Tabular figures keep the
+     stacked numbers right-aligned to the same decimal column. */
+  .bar-val-stack { flex-shrink: 0; width: 140px; text-align: right; display: flex; flex-direction: column; line-height: 1.25; }
+  .bar-val-total { font-size: 16px; color: var(--ocean); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .bar-val-per   { font-size: 13px; color: var(--text-lt); margin-left: 0; font-variant-numeric: tabular-nums; }
   @media (max-width: 520px) {
     .bar-lbl { width: 72px; font-size: 17px; }
-    .bar-val-stack { min-width: 0; display: flex; flex-direction: column; gap: 0; line-height: 1.2; }
-    .bar-val-per { margin-left: 0; }
+    .bar-val-stack { width: 110px; }
   }
   .bar-fill { height: 100%; border-radius: 4px; }
   .bar-val { font-size: 20px; font-weight: 500; width: 50px; text-align: right; flex-shrink: 0; }
@@ -2040,43 +2041,118 @@
     color: var(--text-mid);
     margin-bottom: 8px;
   }
-  .rent-bedroom-sub {
-    font-size: 12px;
+  /* Small ⓘ affordance carrying the gross-rent + vintage caveat as a hover
+     tooltip (same [data-tip] pattern as the Groceries / PTI info icons), so
+     the heading stays uncluttered. */
+  .rent-bedroom-info {
+    font-size: 13px;
     color: var(--text-lt);
-    font-style: italic;
-    letter-spacing: 0;
-    text-transform: none;
-    margin-left: 4px;
+    opacity: 0.7;
+    cursor: pointer;
+    margin-left: 2px;
+    vertical-align: baseline;
   }
+  .rent-bedroom-info:hover,
+  .rent-bedroom-info:focus-visible { opacity: 1; color: var(--ocean); outline: none; }
+  /* Inline geography picker in the bedroom-rents heading — styled to read as
+     part of the title (not a chunky form control): inherits the heading font,
+     ocean accent, dashed underline + chevron to signal it's selectable. */
+  .rent-bedroom-geo {
+    font: inherit;
+    font-weight: 600;
+    color: var(--ocean);
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed rgba(26,122,154,0.55);
+    padding: 0 19px 1px 3px;
+    margin: 0 1px;
+    cursor: pointer;
+    vertical-align: baseline;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%231a7a9a' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 1px center;
+    background-size: 11px;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .rent-bedroom-geo:hover { border-bottom-color: var(--ocean); color: var(--ocean-mid, #0f5a73); }
+  .rent-bedroom-geo:focus-visible { outline: 2px solid var(--ocean); outline-offset: 2px; border-radius: 3px; }
   .rent-bedroom-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 10px;
+    gap: 12px;
   }
+  /* Bedroom tiles carry their size identity through a faint full-card accent
+     wash + an accent-tinted border (each unit size gets its own hue) — no left
+     stripe. A hover-lift deepens the wash, and a proportional fill bar lets the
+     eye read the rent gradient across unit sizes at a glance. --brm-accent is
+     set per tile in renderBedroomTiles() to ramp seafoam → deep-ocean. */
   .rent-bedroom-tile {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 12px;
+    position: relative;
+    background: color-mix(in srgb, var(--brm-accent, #1a7a9a) 6%, #fff);
+    border: 1px solid color-mix(in srgb, var(--brm-accent, #1a7a9a) 30%, var(--border));
+    border-radius: 12px;
+    padding: 14px 15px;
     text-align: left;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s, border-color 0.2s;
+    overflow: hidden;
+  }
+  .rent-bedroom-tile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    background: color-mix(in srgb, var(--brm-accent, #1a7a9a) 11%, #fff);
+    border-color: color-mix(in srgb, var(--brm-accent, #1a7a9a) 45%, var(--border));
+  }
+  .rent-bedroom-head {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 1;
+  }
+  .rent-bedroom-icon {
+    height: 18px; width: auto;
+    color: var(--brm-accent, #1a7a9a);
+    flex-shrink: 0;
   }
   .rent-bedroom-label {
     font-size: 12px;
     color: var(--text-lt);
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    margin-bottom: 4px;
-    font-weight: 500;
+    font-weight: 600;
   }
   .rent-bedroom-val {
-    font-size: 19px;
+    position: relative;
+    z-index: 1;
+    font-size: 22px;
     font-weight: 600;
     color: var(--text);
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.01em;
+    line-height: 1.1;
   }
+  .rent-bedroom-permo { font-size: 12px; color: var(--text-lt); font-weight: 500; margin-left: 2px; letter-spacing: 0; }
   .rent-bedroom-val--na { color: var(--text-lt); font-weight: 400; }
+  .rent-bedroom-track {
+    position: relative;
+    z-index: 1;
+    margin-top: 9px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--bar-track);
+    overflow: hidden;
+  }
+  .rent-bedroom-track-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--brm-accent, #1a7a9a);
+    opacity: 0.82;
+  }
   @media (max-width: 580px) {
     .rent-bedroom-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
@@ -3286,7 +3362,7 @@
          currently-selected county. Gracefully shows "—" when ACS suppresses
          a cell (4-BR / 5+-BR in smaller counties). -->
     <div class="rent-bedroom-section" id="rent-bedroom-section" style="margin-top:18px;display:none;">
-      <div class="rent-bedroom-title">Median rent by bedroom &middot; <span id="rent-bedroom-county-label">Statewide</span> <span class="rent-bedroom-sub">gross rent (incl. utilities) · ACS 5-yr</span></div>
+      <div class="rent-bedroom-title">Median rent by bedroom &middot; <select id="rent-bedroom-geo" class="rent-bedroom-geo" aria-label="Select geography for bedroom rents" onchange="renderBedroomTiles(this.value)"><option value="State">Statewide</option><option value="Honolulu">Honolulu</option><option value="Maui">Maui</option><option value="Hawaii">Hawaiʻi</option><option value="Kauai">Kauaʻi</option></select> <span class="rent-bedroom-info" tabindex="0" role="button" aria-label="About these figures" data-tip="Gross rent (incl. utilities) · ACS 5-yr · Census B25031">ⓘ</span></div>
       <div class="rent-bedroom-grid" id="rent-bedroom-tiles"></div>
     </div>
   </div>
@@ -3911,26 +3987,58 @@ function selectCounty(county) {
 /* ---------------- Per-bedroom rent tiles (ACS B25031) ----------------
    Renders 4 tiles (0BR / 1BR / 2BR / 3+BR) for the active county.
    Gracefully handles ACS cell suppression — missing values show "—". */
+// Accent ramp: seafoam → deep-ocean as bedroom count climbs, so the eye
+// reads the rent gradient across unit sizes at a glance.
+const BEDROOM_ACCENTS = ['#5ab59a', '#3a9f93', '#1a7a9a', '#0f5a73'];
+// Per-size icons (Lucide-style strokes, tinted with the card accent). The bed
+// COUNT encodes the bedroom count — identical top-down bed glyphs (frame +
+// pillow + blanket fold), one per bedroom, repeated on a 13-unit pitch with a
+// clear gap. Each icon is height-locked (CSS height:18px, width:auto) so every
+// bed renders the SAME size and you literally count beds: 1 / 2 / 3. The
+// viewBox width grows with the count. Studio = sofa (no bedroom).
+const BEDROOM_ICONS = [
+  // Studio → sofa
+  '<svg class="rent-bedroom-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3"/><rect x="3" y="11" width="18" height="6" rx="2"/><path d="M5 17v2"/><path d="M19 17v2"/><path d="M12 11v6"/></svg>',
+  // 1 BR → one bed
+  '<svg class="rent-bedroom-icon" viewBox="0 0 13 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="1.5" width="10" height="19" rx="2.2"/><rect x="3" y="3" width="7" height="3" rx="1"/><line x1="1.5" y1="12" x2="11.5" y2="12"/></svg>',
+  // 2 BR → two beds
+  '<svg class="rent-bedroom-icon" viewBox="0 0 26 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="1.5" width="10" height="19" rx="2.2"/><rect x="3" y="3" width="7" height="3" rx="1"/><line x1="1.5" y1="12" x2="11.5" y2="12"/><rect x="14.5" y="1.5" width="10" height="19" rx="2.2"/><rect x="16" y="3" width="7" height="3" rx="1"/><line x1="14.5" y1="12" x2="24.5" y2="12"/></svg>',
+  // 3+ BR → three beds
+  '<svg class="rent-bedroom-icon" viewBox="0 0 39 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="1.5" width="10" height="19" rx="2.2"/><rect x="3" y="3" width="7" height="3" rx="1"/><line x1="1.5" y1="12" x2="11.5" y2="12"/><rect x="14.5" y="1.5" width="10" height="19" rx="2.2"/><rect x="16" y="3" width="7" height="3" rx="1"/><line x1="14.5" y1="12" x2="24.5" y2="12"/><rect x="27.5" y="1.5" width="10" height="19" rx="2.2"/><rect x="29" y="3" width="7" height="3" rx="1"/><line x1="27.5" y1="12" x2="37.5" y2="12"/></svg>',
+];
 function renderBedroomTiles(county) {
   const section = document.getElementById('rent-bedroom-section');
   const tiles   = document.getElementById('rent-bedroom-tiles');
-  const label   = document.getElementById('rent-bedroom-county-label');
+  const select  = document.getElementById('rent-bedroom-geo');
   if (!section || !tiles) return;
+  // Default to the dropdown's current value when called without an explicit
+  // county (lets the picker drive the section independently of the main map).
+  if (!county) county = (select && select.value) || 'State';
   const data = (countyData[county] && countyData[county].bedroomRent) || null;
   if (!data) { section.style.display = 'none'; return; }
   section.style.display = '';
-  if (label) label.textContent = (county === 'State') ? 'Statewide' : fullLbl[county];
-  const tile = (lbl, v) => {
-    const cls = v ? '' : ' rent-bedroom-val--na';
-    const val = v ? `$${Math.round(v).toLocaleString()}` : '—';
-    return `<div class="rent-bedroom-tile"><div class="rent-bedroom-label">${lbl}</div><div class="rent-bedroom-val${cls}">${val}</div></div>`;
-  };
-  tiles.innerHTML = [
-    tile('Studio', data.br0),
-    tile('1 BR',   data.br1),
-    tile('2 BR',   data.br2),
-    tile('3+ BR',  data.br3plus),
-  ].join('');
+  if (select) select.value = county;
+  const rows = [
+    ['Studio', data.br0],
+    ['1 BR',   data.br1],
+    ['2 BR',   data.br2],
+    ['3+ BR',  data.br3plus],
+  ];
+  const maxV = Math.max(...rows.map(([, v]) => v || 0), 1);
+  tiles.innerHTML = rows.map(([lbl, v], i) => {
+    const accent = BEDROOM_ACCENTS[i];
+    const cls    = v ? '' : ' rent-bedroom-val--na';
+    const val    = v
+      ? `$${Math.round(v).toLocaleString()}<span class="rent-bedroom-permo">/mo</span>`
+      : '—';
+    const pct    = v ? Math.max(6, (v / maxV) * 100) : 0;
+    const track  = v
+      ? `<div class="rent-bedroom-track"><div class="rent-bedroom-track-fill" style="width:${pct.toFixed(1)}%"></div></div>`
+      : '';
+    return `<div class="rent-bedroom-tile" style="--brm-accent:${accent}">`
+      + `<div class="rent-bedroom-head">${BEDROOM_ICONS[i]}<span class="rent-bedroom-label">${lbl}</span></div>`
+      + `<div class="rent-bedroom-val${cls}">${val}</div>${track}</div>`;
+  }).join('');
 }
 
 /* ---------------- Inflation (BLS Honolulu CPI) ---------------- */
