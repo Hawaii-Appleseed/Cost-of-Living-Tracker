@@ -1972,6 +1972,50 @@
     font-variant-numeric: tabular-nums;
     flex-shrink: 0;
   }
+  /* YoY chip in the rent-grid right column. */
+  .rent-yoy {
+    display: inline-flex; align-items: center; gap: 2px;
+    font-size: 13px; font-weight: 600;
+    padding: 2px 6px; border-radius: 4px; margin-left: 6px;
+    vertical-align: middle; font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em; white-space: nowrap;
+  }
+  .rent-yoy--hot   { background: #fbe2da; color: #a8442f; }
+  .rent-yoy--warm  { background: #fbedd1; color: #8a6028; }
+  .rent-yoy--cool  { background: #def0e8; color: #2a6b5a; }
+  .rent-yoy--flat  { background: #e8edf1; color: #475c6b; }
+  .rent-spread {
+    display: block; font-size: 12px; font-style: italic;
+    color: var(--text-lt); margin-top: 1px; text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .rent-freshness-pill {
+    display: inline-block; margin-left: 8px; padding: 1px 8px;
+    font-size: 13px; font-style: italic; color: var(--text-lt);
+    background: rgba(0,0,0,0.04); border-radius: 999px;
+    vertical-align: baseline; white-space: nowrap;
+  }
+  .rent-freshness-pill:empty { display: none; }
+  .rent-bedroom-title { font-size: 16px; font-weight: 500; color: var(--text-mid); margin-bottom: 8px; }
+  .rent-bedroom-sub { font-size: 12px; color: var(--text-lt); font-style: italic; letter-spacing: 0; text-transform: none; margin-left: 4px; }
+  .rent-bedroom-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .rent-bedroom-tile {
+    background: white; border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 12px; text-align: left;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .rent-bedroom-label {
+    font-size: 12px; color: var(--text-lt);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 4px; font-weight: 500;
+  }
+  .rent-bedroom-val {
+    font-size: 19px; font-weight: 600; color: var(--text);
+    font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+  }
+  .rent-bedroom-val--na { color: var(--text-lt); font-weight: 400; }
+  @media (max-width: 580px) { .rent-bedroom-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 520px) { .rent-freshness-pill { display: block; margin-left: 0; margin-top: 4px; } }
 
   .legend-row { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 19px; color: var(--text-lt); margin-bottom: 10px; }
   .swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; margin-right: 3px; vertical-align: middle; }
@@ -3119,12 +3163,16 @@
 
   <div class="card">
     <div class="card-title">Rental market</div>
-    <div class="card-sub"><span class="gloss" data-gloss="contractRent">Tenant rent</span> on existing leases vs. <span class="gloss" data-gloss="askingRent">asking rent</span> on new listings &nbsp;·&nbsp; both exclude utilities</div>
+    <div class="card-sub rent-card-sub"><span class="gloss" data-gloss="contractRent">Tenant rent</span> on existing leases vs. <span class="gloss" data-gloss="askingRent">asking rent</span> on new listings &nbsp;·&nbsp; both exclude utilities <span class="rent-freshness-pill" id="rent-freshness-pill"></span></div>
     <div class="legend-row">
       <span><span class="swatch" style="background:var(--ocean-300);"></span><span class="gloss" data-gloss="rentNowcast">Tenant rent</span></span>
       <span><span class="swatch" style="background:var(--coral-500);"></span><span class="gloss" data-gloss="askingRent">Asking rent</span></span>
     </div>
     <div id="rent-grid"></div>
+    <div class="rent-bedroom-section" id="rent-bedroom-section" style="margin-top:18px;display:none;">
+      <div class="rent-bedroom-title">Median rent by bedroom &middot; <span id="rent-bedroom-county-label">Statewide</span> <span class="rent-bedroom-sub">gross rent (incl. utilities) · ACS 5-yr</span></div>
+      <div class="rent-bedroom-grid" id="rent-bedroom-tiles"></div>
+    </div>
   </div>
 
   <div class="card" id="construction-card">
@@ -3294,11 +3342,11 @@
 
 <script>
 const countyData = {
-  State:    { income:123000,  sfhPrice:1024900,  condoPrice:555200,  sfhPTI:0.5790, condoPTI:0.3657, sfhIdx:51.8, condoIdx:82.0, sfhGap:91439,  condoGap:21529, rent:1937, askRent:2990, sfhMortgage:4744, condoMortgage:2996, buildAuth:4404, tenantRentPTI:0.3302, mortgageOwnerPTI:0.2564, rentBurdenedPct:0.5667, rentSeverelyBurdenedPct:0.2859, ownerBurdenedPct:0.4307, ownerSeverelyBurdenedPct:0.0646 },
-  Honolulu: { income:129300, sfhPrice:1155000, condoPrice:515000,  sfhPTI:0.6278, condoPTI:0.3218, sfhIdx:47.8, condoIdx:93.2, sfhGap:113935, condoGap:7592,  rent:2032, askRent:2881, sfhMortgage:5455, condoMortgage:2796, buildAuth:2736, tenantRentPTI:0.3352, mortgageOwnerPTI:0.2574, rentBurdenedPct:0.5768, rentSeverelyBurdenedPct:0.2892, ownerBurdenedPct:0.4513, ownerSeverelyBurdenedPct:0.066 },
-  Maui:     { income:110900,  sfhPrice:1206500, condoPrice:675000,  sfhPTI:0.7532, condoPTI:0.5752, sfhIdx:39.8, condoIdx:52.2, sfhGap:143626, condoGap:87199, rent:1797, askRent:3507, sfhMortgage:5967, condoMortgage:4557, buildAuth:651, tenantRentPTI:0.3272, mortgageOwnerPTI:0.2664, rentBurdenedPct:0.5589, rentSeverelyBurdenedPct:0.3, ownerBurdenedPct:0.3977, ownerSeverelyBurdenedPct:0.0711 },
-  Hawaii:   { income:98800,  sfhPrice:641000,  condoPrice:672500,  sfhPTI:0.3366, condoPTI:0.4268, sfhIdx:89.1, condoIdx:70.3, sfhGap:9424,   condoGap:32644, rent:1368, askRent:2698, sfhMortgage:2166, condoMortgage:2746, buildAuth:911, tenantRentPTI:0.3053, mortgageOwnerPTI:0.2435, rentBurdenedPct:0.5162, rentSeverelyBurdenedPct:0.2723, ownerBurdenedPct:0.3919, ownerSeverelyBurdenedPct:0.0573 },
-  Kauai:    { income:132900,  sfhPrice:1542500, condoPrice:757500,  sfhPTI:0.6913, condoPTI:0.6081, sfhIdx:43.4, condoIdx:49.3, sfhGap:122110, condoGap:96144, rent:1791, askRent:4689, sfhMortgage:5393, condoMortgage:4744, buildAuth:106, tenantRentPTI:0.3083, mortgageOwnerPTI:0.2604, rentBurdenedPct:0.5196, rentSeverelyBurdenedPct:0.221, ownerBurdenedPct:0.3548, ownerSeverelyBurdenedPct:0.0534 },
+  State:    { income:123000,  sfhPrice:1024900,  condoPrice:555200,  sfhPTI:0.5790, condoPTI:0.3657, sfhIdx:51.8, condoIdx:82.0, sfhGap:91439,  condoGap:21529, rent:1934, askRent:2990, sfhMortgage:4744, condoMortgage:2996, buildAuth:4404, tenantRentPTI:0.3302, mortgageOwnerPTI:0.2564, rentBurdenedPct:0.5667, rentSeverelyBurdenedPct:0.2859, ownerBurdenedPct:0.4307, ownerSeverelyBurdenedPct:0.0646, zoriYoY:0.0583, cpiRentYoY:0.0291, bedroomRent:{br0:1436,br1:1533,br2:1996,br3plus:2964} },
+  Honolulu: { income:129300, sfhPrice:1155000, condoPrice:515000,  sfhPTI:0.6278, condoPTI:0.3218, sfhIdx:47.8, condoIdx:93.2, sfhGap:113935, condoGap:7592,  rent:2029, askRent:2881, sfhMortgage:5455, condoMortgage:2796, buildAuth:2736, tenantRentPTI:0.3352, mortgageOwnerPTI:0.2574, rentBurdenedPct:0.5768, rentSeverelyBurdenedPct:0.2892, ownerBurdenedPct:0.4513, ownerSeverelyBurdenedPct:0.066, zoriYoY:0.0587, cpiRentYoY:0.0291, bedroomRent:{br0:1458,br1:1605,br2:2086,br3plus:3149} },
+  Maui:     { income:110900,  sfhPrice:1206500, condoPrice:675000,  sfhPTI:0.7532, condoPTI:0.5752, sfhIdx:39.8, condoIdx:52.2, sfhGap:143626, condoGap:87199, rent:1861, askRent:3507, sfhMortgage:5967, condoMortgage:4557, buildAuth:651, tenantRentPTI:0.3272, mortgageOwnerPTI:0.2664, rentBurdenedPct:0.5589, rentSeverelyBurdenedPct:0.3, ownerBurdenedPct:0.3977, ownerSeverelyBurdenedPct:0.0711, zoriYoY:0.0344, bedroomRent:{br0:1365,br1:1330,br2:2020,br3plus:2755} },
+  Hawaii:   { income:98800,  sfhPrice:641000,  condoPrice:672500,  sfhPTI:0.3366, condoPTI:0.4268, sfhIdx:89.1, condoIdx:70.3, sfhGap:9424,   condoGap:32644, rent:1373, askRent:2698, sfhMortgage:2166, condoMortgage:2746, buildAuth:911, tenantRentPTI:0.3053, mortgageOwnerPTI:0.2435, rentBurdenedPct:0.5162, rentSeverelyBurdenedPct:0.2723, ownerBurdenedPct:0.3919, ownerSeverelyBurdenedPct:0.0573, zoriYoY:0.0375, bedroomRent:{br0:1138,br1:1127,br2:1500,br3plus:1958} },
+  Kauai:    { income:132900,  sfhPrice:1542500, condoPrice:757500,  sfhPTI:0.6913, condoPTI:0.6081, sfhIdx:43.4, condoIdx:49.3, sfhGap:122110, condoGap:96144, rent:1800, askRent:4689, sfhMortgage:5393, condoMortgage:4744, buildAuth:106, tenantRentPTI:0.3083, mortgageOwnerPTI:0.2604, rentBurdenedPct:0.5196, rentSeverelyBurdenedPct:0.221, ownerBurdenedPct:0.3548, ownerSeverelyBurdenedPct:0.0534, zoriYoY:0.1824, bedroomRent:{br0:1660,br1:1436,br2:1825,br3plus:2745} },
 };
 const counties = ['State','Honolulu','Maui','Hawaii','Kauai'];
 const shortLbl = { State:'State', Honolulu:'Honolulu', Maui:'Maui', Hawaii:'Hawaiʻi', Kauai:'Kauaʻi' };
@@ -3653,6 +3701,14 @@ function selectCounty(county) {
     </div>
   `;
 
+  const rentYoyChip = (yoyDecimal) => {
+    if (yoyDecimal === undefined || yoyDecimal === null || yoyDecimal === 0) return '';
+    const pct = yoyDecimal * 100;
+    const tier = pct >= 5 ? 'hot' : pct >= 2 ? 'warm' : pct <= -2 ? 'cool' : 'flat';
+    const arrow = pct > 0.5 ? '▲' : pct < -0.5 ? '▼' : '';
+    const sign = pct >= 0 ? '+' : '';
+    return `<span class="rent-yoy rent-yoy--${tier}">${arrow ? arrow + ' ' : ''}${sign}${pct.toFixed(1)}%</span>`;
+  };
   const maxRentH = Math.max(...counties.map(c => countyData[c].askRent));
   document.getElementById('rent-grid').innerHTML = counties.map(c => {
     const rd = countyData[c];
@@ -3660,6 +3716,10 @@ function selectCounty(county) {
     const w2 = (rd.askRent / maxRentH * 100).toFixed(1);
     const isState = c === 'State';
     const isCurrent = c === currentCounty;
+    const cpiChip = (isState || c === 'Honolulu') ? rentYoyChip(rd.cpiRentYoY) : '';
+    const zoriChip = rentYoyChip(rd.zoriYoY);
+    const spread = (rd.rent > 0) ? rd.askRent / rd.rent : 0;
+    const spreadBadge = spread >= 1.25 ? `<span class="rent-spread">${spread.toFixed(1)}× contract</span>` : '';
     return `<div class="rent-row is-clickable${isCurrent ? ' is-current' : ''}${isState ? ' rent-row--state' : ''}" role="button" tabindex="0" data-county="${c}" title="View ${fullLbl[c]}">
       <div class="rent-row-lbl">${shortLbl[c]}${isState ? '<span class="rent-row-eyebrow">Statewide</span>' : ''}</div>
       <div class="rent-bar-group">
@@ -3667,22 +3727,57 @@ function selectCounty(county) {
           <div class="rent-hbar-track">
             <div class="rent-hbar" style="width:${w1}%;background:var(--ocean-300);" data-tip="Tenant rent · ${fmt(rd.rent)}/mo"></div>
           </div>
-          <div class="rent-hbar-val">${fmt(rd.rent)}</div>
+          <div class="rent-hbar-val">${fmt(rd.rent)}${cpiChip}</div>
         </div>
         <div class="rent-hbar-wrap">
           <div class="rent-hbar-track">
             <div class="rent-hbar" style="width:${w2}%;background:var(--coral-500);" data-tip="Asking rent · ${fmt(rd.askRent)}/mo"></div>
           </div>
-          <div class="rent-hbar-val">${fmt(rd.askRent)}</div>
+          <div class="rent-hbar-val">${fmt(rd.askRent)}${zoriChip}${spreadBadge}</div>
         </div>
       </div>
     </div>`;
   }).join('');
 
+  if (typeof renderBedroomTiles === 'function') renderBedroomTiles(currentCounty);
+
+  const pill = document.getElementById('rent-freshness-pill');
+  if (pill) {
+    const fmtMonth = (p) => {
+      if (!p) return null;
+      try {
+        const [y, m] = p.split('-');
+        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        return `${months[parseInt(m,10)-1]} ${y}`;
+      } catch (_) { return p; }
+    };
+    const cpi = (typeof blsRentLatestPeriod !== 'undefined') ? fmtMonth(blsRentLatestPeriod) : null;
+    const zori = (typeof zoriLatestPeriod !== 'undefined') ? fmtMonth(zoriLatestPeriod) : null;
+    pill.textContent = (cpi && zori) ? `CPI as of ${cpi} · ZORI as of ${zori}`
+                      : (cpi ? `CPI as of ${cpi}` : (zori ? `ZORI as of ${zori}` : ''));
+  }
+
   // Re-render goods pane so it's ready when user switches tabs
   if (typeof renderGoodsPane === 'function') renderGoodsPane();
   if (typeof renderInflation === 'function') renderInflation();
   if (typeof renderDataFreshness === 'function') renderDataFreshness();
+}
+
+function renderBedroomTiles(county) {
+  const section = document.getElementById('rent-bedroom-section');
+  const tiles = document.getElementById('rent-bedroom-tiles');
+  const label = document.getElementById('rent-bedroom-county-label');
+  if (!section || !tiles) return;
+  const data = (countyData[county] && countyData[county].bedroomRent) || null;
+  if (!data) { section.style.display = 'none'; return; }
+  section.style.display = '';
+  if (label) label.textContent = (county === 'State') ? 'Statewide' : fullLbl[county];
+  const tile = (lbl, v) => {
+    const cls = v ? '' : ' rent-bedroom-val--na';
+    const val = v ? `$${Math.round(v).toLocaleString()}` : '—';
+    return `<div class="rent-bedroom-tile"><div class="rent-bedroom-label">${lbl}</div><div class="rent-bedroom-val${cls}">${val}</div></div>`;
+  };
+  tiles.innerHTML = [tile('Studio', data.br0), tile('1 BR', data.br1), tile('2 BR', data.br2), tile('3+ BR', data.br3plus)].join('');
 }
 
 /* ---------------- Inflation (BLS Honolulu CPI) ---------------- */
