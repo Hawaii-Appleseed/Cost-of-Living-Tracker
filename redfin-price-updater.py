@@ -117,6 +117,17 @@ CENSUS_RENT_VAR = "B25058_001E"   # median contract rent (no utilities) — comp
 # household afford this?" framing; MFI is retained separately as familyIncome4 for
 # the 4-person USDA grocery basket. See METHODOLOGY.md "Income denominator".
 CENSUS_HH_INCOME_VAR = "B19013_001E"
+# Median household income BY TENURE (B25119). Owner income is the buy-side
+# affordability denominator (sfh/condo idx/gap/PTI); renter income is the
+# rent-burden denominator. Splitting tenure is more rigorous than one blended
+# household figure: owners skew higher-income, renters lower, so a single median
+# understates buyer capacity and overstates renter slack. B25119_001E (all
+# households) ≈ B19013_001E and is fetched only as a sanity cross-check.
+#   B25119_001E — all occupied households
+#   B25119_002E — owner-occupied
+#   B25119_003E — renter-occupied
+CENSUS_OWNER_INCOME_VAR  = "B25119_002E"
+CENSUS_RENTER_INCOME_VAR = "B25119_003E"
 CENSUS_NAME_MAP = {
     "Honolulu County, Hawaii": "Honolulu",
     "Hawaii County, Hawaii":   "Hawaii",
@@ -657,6 +668,80 @@ def fetch_census_household_income() -> dict:
             result[key] = {"income": val}
         else:
             print(f"  WARNING: {key} median household income suppressed — leaving literal")
+
+    return result
+
+
+def fetch_census_tenure_income() -> dict:
+    """
+    Download median household income BY TENURE (B25119) for Hawaii state + 4
+    counties from the ACS 5-year vintage.
+
+    Owner income (B25119_002E) is the buy-side affordability denominator —
+    sfh/condo idx/gap/PTI — because would-be buyers are drawn from the
+    owner-income distribution, not the blended household median that the
+    lower-income renter half drags down. Renter income (B25119_003E) is the
+    rent-burden denominator for the same reason in reverse. Tenure-splitting the
+    denominator is more defensible than applying one B19013 figure to both.
+
+    Returns {countyKey: {"ownerIncome": int, "renterIncome": int}} plus a
+    "_year" key. Each tenure cell is cleaned independently: a suppressed owner
+    cell does not discard a valid renter cell. Missing cells are skipped with a
+    warning so the stale literal stays in the HTML.
+    """
+    import json
+
+    def _get(url):
+        return json.loads(fetch_bytes(url))
+
+    def _clean(raw):
+        try:
+            v = int(raw)
+        except (TypeError, ValueError):
+            return None
+        return v if v > 0 else None
+
+    key_qs   = f"&key={CENSUS_API_KEY}" if CENSUS_API_KEY else ""
+    base_5yr = _census_base_url("acs5")
+    vars_csv = f"{CENSUS_OWNER_INCOME_VAR},{CENSUS_RENTER_INCOME_VAR}"
+    state_url  = f"{base_5yr}?get={vars_csv}&for=state:15{key_qs}"
+    county_url = f"{base_5yr}?get={vars_csv},NAME&for=county:*&in=state:15{key_qs}"
+
+    print(f"  Fetching Census ACS 5-yr {CENSUS_ACS_YEAR} median income by tenure "
+          f"(B25119 owner/renter)...")
+    state_data  = _get(state_url)
+    county_data = _get(county_url)
+
+    def _row_to_vals(hdr, row, label):
+        own = _clean(row[hdr.index(CENSUS_OWNER_INCOME_VAR)])
+        rnt = _clean(row[hdr.index(CENSUS_RENTER_INCOME_VAR)])
+        out = {}
+        if own is not None:
+            out["ownerIncome"] = own
+        else:
+            print(f"  WARNING: {label} owner-occupied income suppressed — leaving literal")
+        if rnt is not None:
+            out["renterIncome"] = rnt
+        else:
+            print(f"  WARNING: {label} renter-occupied income suppressed — leaving literal")
+        return out
+
+    result = {"_year": CENSUS_ACS_YEAR}
+
+    s_hdr, s_row = state_data[0], state_data[1]
+    s_vals = _row_to_vals(s_hdr, s_row, "State")
+    if s_vals:
+        result["State"] = s_vals
+
+    c_hdr, *c_rows = county_data
+    name_idx = c_hdr.index("NAME")
+    for row in c_rows:
+        key = CENSUS_NAME_MAP.get(row[name_idx])
+        if not key:
+            continue
+        vals = _row_to_vals(c_hdr, row, key)
+        if vals:
+            result[key] = vals
 
     return result
 
@@ -1558,7 +1643,7 @@ def patch_html(html: str, prices: dict) -> str:
         renderer can fall back gracefully.
     """
     int_fields   = ("sfhPrice", "condoPrice", "rent", "askRent", "income",
-                    "familyIncome4",
+                    "ownerIncome", "renterIncome", "familyIncome4",
                     "sfhGap", "condoGap", "sfhMortgage", "condoMortgage")
     float_fields = ("tenantRentPTI", "mortgageOwnerPTI",
                     "rentBurdenedPct", "rentSeverelyBurdenedPct",
@@ -1840,9 +1925,13 @@ def _fetch_income_and_construction(all_prices: dict) -> str:
     """Fetch the affordability income denominator, the 4-person family MFI, and
     DBEDT build auth; merge into *all_prices*.
 
-    Two distinct income series are written:
+    Four income series are written:
       • `income`         — ACS B19013 median HOUSEHOLD income (all households).
-                           The housing-affordability denominator (idx/gap/PTI).
+                           The KPI tile + calculator default denominator.
+      • `ownerIncome`    — ACS B25119 owner-occupied median income. The buy-side
+                           affordability denominator (sfh/condo idx/gap/PTI).
+      • `renterIncome`   — ACS B25119 renter-occupied median income. The
+                           rent-burden denominator.
       • `familyIncome4`  — HUD 4-person Median Family Income (HHFDC county PDFs
                            + HUD state PDF). Retained only for the 4-person USDA
                            grocery basket in renderGoodsPane().
@@ -1859,6 +1948,17 @@ def _fetch_income_and_construction(all_prices: dict) -> str:
         print(f"  Got household income for: {', '.join(hh_income.keys())}")
     except Exception as e:
         print(f"  WARNING: ACS household income fetch failed ({e}) — income will not be updated")
+
+    print("\nFetching ACS median income by tenure (B25119) → ownerIncome / renterIncome...")
+    try:
+        tenure_income = fetch_census_tenure_income()
+        tenure_income.pop("_year", None)
+        for key, vals in tenure_income.items():
+            all_prices.setdefault(key, {}).update(vals)
+        print(f"  Got tenure income for: {', '.join(tenure_income.keys())}")
+    except Exception as e:
+        print(f"  WARNING: ACS tenure income fetch failed ({e}) — "
+              f"ownerIncome/renterIncome will not be updated")
 
     print("\nFetching HHFDC county median family incomes (HUD FY 2025) → familyIncome4...")
     try:
@@ -1958,15 +2058,20 @@ def compute_derived_affordability(all_prices: dict, rate_pct: float = MORTGAGE_R
     """Recompute the price-derived affordability metrics in place so they track
     the (smoothed) Redfin price instead of remaining frozen literals.
 
+    The buy-side denominator is OWNER-occupied median income (ACS B25119,
+    `ownerIncome`) — would-be buyers are drawn from the owner-income distribution,
+    so blending in lower renter incomes would understate buyer capacity. Falls
+    back to the all-household `income` (B19013) where ownerIncome is missing.
+
     For each county and home type (sfh/condo) writes:
       • {type}Idx      — affordability index, affordPrice / price × 100
-                         (100 = exactly affordable at median income; the UI
+                         (100 = exactly affordable at owner income; the UI
                          buckets <55 cost-burdened / <80 stretched / ≥80 ok)
-      • {type}Gap      — income-dollar gap: extra annual income needed so the
-                         household could afford the median price (0 if already
-                         affordable). JS reads incomeNeeded = income + gap.
+      • {type}Gap      — income-dollar gap: extra annual income needed so an
+                         owner-income household could afford the median price
+                         (0 if already affordable). JS reads incomeNeeded.
       • {type}Mortgage — monthly P&I at this price (20% down, 30-yr, rate_pct)
-      • {type}PTI      — monthly P&I as a share of gross monthly income
+      • {type}PTI      — monthly P&I as a share of gross monthly owner income
                          (price-card diagnostic; not currently surfaced in UI)
 
     All four use the SAME rate the slider defaults to (MORTGAGE_RATE_PCT) so the
@@ -1983,11 +2088,13 @@ def compute_derived_affordability(all_prices: dict, rate_pct: float = MORTGAGE_R
         v = all_prices.get(key)
         if not v:
             continue
-        income = v.get("income")
-        if not income:
+        # Buy-side denominator: owner income (B25119), fall back to all-household
+        # income (B19013) where the owner cell is suppressed.
+        buy_income = v.get("ownerIncome") or v.get("income")
+        if not buy_income:
             print(f"  {key:<9} skipped — no income")
             continue
-        afford = _afford_price(income, rate_pct)
+        afford = _afford_price(buy_income, rate_pct)
         for price_f, idx_f, gap_f, mort_f, pti_f in pairs:
             price = v.get(price_f)
             if not price:
@@ -1997,12 +2104,12 @@ def compute_derived_affordability(all_prices: dict, rate_pct: float = MORTGAGE_R
             # incomeNeeded scales linearly with affordPrice, so the income that
             # would make `afford == price` is income × price/afford; the gap is
             # the shortfall (clamped at 0 once the home is affordable).
-            income_needed = income * price / afford
-            gap = max(0, int(round(income_needed - income)))
+            income_needed = buy_income * price / afford
+            gap = max(0, int(round(income_needed - buy_income)))
             v[idx_f]  = round(idx, 1)
             v[gap_f]  = gap
             v[mort_f] = int(round(mortgage))
-            v[pti_f]  = round(mortgage / (income / 12.0), 4)
+            v[pti_f]  = round(mortgage / (buy_income / 12.0), 4)
         print(f"  {key:<9} SFH idx {v.get('sfhIdx'):>5}  gap ${v.get('sfhGap'):>7,}  "
               f"P&I ${v.get('sfhMortgage'):>6,}   |  Condo idx {v.get('condoIdx'):>5}  "
               f"gap ${v.get('condoGap'):>7,}  P&I ${v.get('condoMortgage'):>6,}")

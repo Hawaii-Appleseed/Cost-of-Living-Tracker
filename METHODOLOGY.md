@@ -13,7 +13,8 @@ fresh ACS vintage drops, this is the file to read before touching numbers.
 | Contract rent (existing leases) | Census ACS 5-yr | `B25058_001E` | annual, December release | `redfin-price-updater.py` |
 | Rent CPI (existing tenants) | BLS Honolulu MSA | `CUURS49ASEHA` | bimonthly (even months), NSA | `redfin-price-updater.py` |
 | Asking rent | Zillow ZORI | `County_zori_uc_sfrcondomfr_sm_month.csv` | monthly | `redfin-price-updater.py` |
-| Median household income (affordability denominator) | Census ACS 5-yr | `B19013_001E` | annual, December release | `redfin-price-updater.py` |
+| Median household income (all households — headline KPI tile + calculator default) | Census ACS 5-yr | `B19013_001E` → `income` | annual, December release | `redfin-price-updater.py` |
+| Median income by tenure (buy & rent-side denominators) | Census ACS 5-yr | `B25119_002E` owner → `ownerIncome`, `B25119_003E` renter → `renterIncome` | annual, December release | `redfin-price-updater.py` |
 | 4-person family income (grocery basis only) | HHFDC county PDFs + HUD state PDF | FY 2025 MFI → `familyIncome4` | annual | `redfin-price-updater.py` |
 | 30-yr fixed mortgage rate | Freddie Mac PMMS via FRED | `MORTGAGE30US` | weekly | `redfin-price-updater.py` |
 | Construction authorizations | DBEDT QSER | Table E-8 | annual (from quarterly data) | `redfin-price-updater.py` |
@@ -351,19 +352,43 @@ with the live calculator on first paint:
   PTI bars use the ACS-derived `tenantRentPTI` / `mortgageOwnerPTI`); it is
   recomputed for internal consistency rather than display.
 
-### Income denominator: household income vs. 4-person family income
+### Income denominator: tenure-split household income
 
-Housing affordability is now measured against **ACS median household income**
-(`B19013_001E`, the `income` field) — *all* households, regardless of size or
-family structure. This is the right denominator for "can a typical household
-afford the median home?": it counts the singles, roommates, and elderly couples
-who actually compete in the same for-sale market, not just married-couple
-families of four. The earlier denominator was HUD's **4-person Median Family
-Income** (MFI), which a peer reviewer would flag as systematically high — it
-excludes smaller and non-family households, overstating the typical buyer's
-income and thereby *understating* the affordability gap. Switching to B19013
-lowers each county's income, so `sfhIdx`/`condoIdx` fall, and `sfhGap`/`condoGap`
-and the PTI ratios rise — a more honest read of the market.
+The income denominator evolved in two steps.
+
+**Step 1 — household, not 4-person family.** The earlier basis was HUD's
+**4-person Median Family Income** (MFI), which a peer reviewer would flag as
+systematically high: it excludes smaller and non-family households, overstating
+the typical resident's income and thereby *understating* the affordability gap.
+We moved to **ACS median household income** (`B19013_001E`, the `income` field)
+— *all* households, counting the singles, roommates, and elderly couples who
+compete in the same markets, not just married-couple families of four. This
+all-household median is what the headline "Median income" KPI tile and the
+affordability calculator's default slider display, both labeled "all households."
+
+**Step 2 — split the denominator by tenure (ACS B25119).** Reporting one
+all-household income against *both* for-sale prices and rents blurs two very
+different populations, so the affordability metrics now use tenure-specific
+medians from ACS table **B25119** (median household income by owner/renter
+status):
+
+- **Buy-side affordability** — `sfhIdx`, `condoIdx`, `sfhGap`, `condoGap`,
+  `sfhPTI`, `condoPTI`, and the banner "can afford up to" figure — is measured
+  against **owner-occupied** median income (`B25119_002E` → `ownerIncome`).
+  Owner households skew higher-income than the all-household median, so this
+  reflects who actually transacts in the for-sale market. It modestly *improves*
+  the affordability read versus the all-household basis (income up ⇒ index up,
+  gap and PTI down) — intentional, not a regression: owners, not the median
+  household, are the buyers.
+- **Rent-side** — the rent-affordability ratio (rent × 12 ÷ income) is measured
+  against **renter-occupied** median income (`B25119_003E` → `renterIncome`),
+  which skews lower; the all-household median would understate the income share
+  renters actually spend on housing. (The headline realized cost-burden shares
+  in the rent panel — `tenantRentPTI`, `rentBurdenedPct` — come *directly* from
+  ACS B25070/B25091 tabulations and are independent of this denominator.)
+
+As a vintage cross-check, B25119's all-tenure line (`_001E`) reproduces the
+B19013 `income` value for every county to within rounding.
 
 The HUD 4-person MFI is **not discarded**: it is still fetched
 (`fetch_hhfdc_county_mfi()` + `fetch_hud_state_mfi()`) and stored separately as
@@ -371,8 +396,10 @@ The HUD 4-person MFI is **not discarded**: it is still fetched
 Plan basket is defined for a **4-person reference family** — dividing a
 family-of-four food cost by an all-households income (which includes one- and
 two-person households) would understate the true food burden on the family the
-basket actually describes. So the two panes intentionally use two different
-income bases: housing → household income, groceries → 4-person family income.
+basket actually describes. So the dashboard intentionally uses several income
+bases: buy metrics → owner-occupied median, rent ratio → renter-occupied median,
+the headline income tile + calculator → all-household median, and groceries →
+4-person family MFI.
 
 ## Rent nowcast blend (per-county BLS CPI / ZORI weights)
 

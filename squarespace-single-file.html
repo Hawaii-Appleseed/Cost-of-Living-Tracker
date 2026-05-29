@@ -3273,7 +3273,7 @@
   <div class="metrics-container">
     <div class="metrics-container-title">Housing market &amp; affordability</div>
     <div class="housing-pair-grid" id="housing-pair-grid"></div>
-    <div class="affordability-note"><span class="gloss" data-gloss="affordabilityIndex">Affordability index</span>: 100 = typical Hawaiʻi household can afford the median home at current mortgage rates.</div>
+    <div class="affordability-note"><span class="gloss" data-gloss="affordabilityIndex">Affordability index</span>: 100 = a typical home-owning household can afford the median home at current mortgage rates.</div>
   </div>
 
   <div class="card" style="margin-bottom:1.25rem;">
@@ -3333,7 +3333,7 @@
       <div id="construction-notes" style="display:none;margin-top:8px;">
         <div class="note-box" style="margin-bottom:0;">
           <strong style="color:var(--text);">Note on condos &amp; construction costs</strong><br>
-          Condo <span class="gloss" data-gloss="mortgagePayment">mortgage payments</span> exclude HOA fees, which average ~$762/month statewide — among the highest in the nation. At $310–$520/sf for multifamily hard costs alone, up ~30% since 2020, building to price points accessible to median-income households requires substantial public subsidy. <span class="gloss" data-gloss="affordabilityIndex">Affordability index</span>: 100 = perfectly affordable at median income; below 100 = median income falls short.
+          Condo <span class="gloss" data-gloss="mortgagePayment">mortgage payments</span> exclude HOA fees, which average ~$762/month statewide — among the highest in the nation. At $310–$520/sf for multifamily hard costs alone, up ~30% since 2020, building to price points accessible to median-income households requires substantial public subsidy. <span class="gloss" data-gloss="affordabilityIndex">Affordability index</span>: 100 = perfectly affordable at the median owner income; below 100 = median owner income falls short.
           <br><br>
           <strong style="color:var(--text);">Note on construction cost indices</strong><br>
           The cost indices track the <em>low end</em> of each published <span class="gloss" data-gloss="RLB">RLB</span> cost range (e.g., $310/sf for multifamily, not $520/sf), rebased to Q1 2020 = 100. Using the low end understates actual cost growth for higher-complexity projects, so the increases shown — +51% multifamily, +19% single-family, +81% ground parking — should be read as a floor, not a ceiling.
@@ -3466,11 +3466,11 @@
 
 <script>
 const countyData = {
-  State:    { income:100389, familyIncome4:123000, sfhPrice:1014900,  condoPrice:558500,  sfhPTI:0.6058, condoPTI:0.3334, sfhIdx:49.5, condoIdx:90.0, sfhGap:102330,  condoGap:11167, rent:1934, askRent:2990, sfhMortgage:5068, condoMortgage:2789, buildAuth:4404, tenantRentPTI:0.3302, mortgageOwnerPTI:0.2564, rentBurdenedPct:0.5667, rentSeverelyBurdenedPct:0.2859, ownerBurdenedPct:0.4307, ownerSeverelyBurdenedPct:0.0646, zoriYoY:0.0583, cpiRentYoY:0.0291, bedroomRent:{br0:1436,br1:1533,br2:1996,br3plus:2964} },
-  Honolulu: { income:106195, familyIncome4:129300, sfhPrice:1155000, condoPrice:515000,  sfhPTI:0.6517, condoPTI:0.2906, sfhIdx:46.0, condoIdx:103.2, sfhGap:124508, condoGap:0,  rent:2029, askRent:2881, sfhMortgage:5768, condoMortgage:2572, buildAuth:2736, tenantRentPTI:0.3352, mortgageOwnerPTI:0.2574, rentBurdenedPct:0.5768, rentSeverelyBurdenedPct:0.2892, ownerBurdenedPct:0.4513, ownerSeverelyBurdenedPct:0.066, zoriYoY:0.0587, cpiRentYoY:0.0291, bedroomRent:{br0:1458,br1:1605,br2:2086,br3plus:3149} },
-  Maui:     { income:97161, familyIncome4:110900, sfhPrice:1250000, condoPrice:675000,  sfhPTI:0.7709, condoPTI:0.4163, sfhIdx:38.9, condoIdx:72.1, sfhGap:152518, condoGap:37666, rent:1861, askRent:3507, sfhMortgage:6242, condoMortgage:3371, buildAuth:651, tenantRentPTI:0.3272, mortgageOwnerPTI:0.2664, rentBurdenedPct:0.5589, rentSeverelyBurdenedPct:0.3, ownerBurdenedPct:0.3977, ownerSeverelyBurdenedPct:0.0711, zoriYoY:0.0344, bedroomRent:{br0:1365,br1:1330,br2:2020,br3plus:2755} },
-  Hawaii:   { income:78639, familyIncome4:98800, sfhPrice:585000,  condoPrice:672500,  sfhPTI:0.4458, condoPTI:0.5124, sfhIdx:67.3, condoIdx:58.5, sfhGap:38211,   condoGap:55688, rent:1355, askRent:2698, sfhMortgage:2921, condoMortgage:3358, buildAuth:911, tenantRentPTI:0.3053, mortgageOwnerPTI:0.2435, rentBurdenedPct:0.5162, rentSeverelyBurdenedPct:0.2723, ownerBurdenedPct:0.3919, ownerSeverelyBurdenedPct:0.0573, zoriYoY:0.0375, bedroomRent:{br0:1138,br1:1127,br2:1500,br3plus:1958} },
-  Kauai:    { income:97668, familyIncome4:132900, sfhPrice:1350000, condoPrice:785000,  sfhPTI:0.8283, condoPTI:0.4816, sfhIdx:36.2, condoIdx:62.3, sfhGap:171985, condoGap:59130, rent:1767, askRent:4689, sfhMortgage:6741, condoMortgage:3920, buildAuth:106, tenantRentPTI:0.3083, mortgageOwnerPTI:0.2604, rentBurdenedPct:0.5196, rentSeverelyBurdenedPct:0.221, ownerBurdenedPct:0.3548, ownerSeverelyBurdenedPct:0.0534, zoriYoY:0.1824, bedroomRent:{br0:1660,br1:1436,br2:1825,br3plus:2745} },
+  State:    { income:100389, ownerIncome:121145, renterIncome:71363, familyIncome4:123000, sfhPrice:1014900,  condoPrice:558500,  sfhPTI:0.502, condoPTI:0.2763, sfhIdx:59.8, condoIdx:108.6, sfhGap:81574,  condoGap:0, rent:1934, askRent:2990, sfhMortgage:5068, condoMortgage:2789, buildAuth:4404, tenantRentPTI:0.3302, mortgageOwnerPTI:0.2564, rentBurdenedPct:0.5667, rentSeverelyBurdenedPct:0.2859, ownerBurdenedPct:0.4307, ownerSeverelyBurdenedPct:0.0646, zoriYoY:0.0583, cpiRentYoY:0.0291, bedroomRent:{br0:1436,br1:1533,br2:1996,br3plus:2964} },
+  Honolulu: { income:106195, ownerIncome:132429, renterIncome:74033, familyIncome4:129300, sfhPrice:1155000, condoPrice:515000,  sfhPTI:0.5226, condoPTI:0.233, sfhIdx:57.4, condoIdx:128.7, sfhGap:98274, condoGap:0,  rent:2029, askRent:2881, sfhMortgage:5768, condoMortgage:2572, buildAuth:2736, tenantRentPTI:0.3352, mortgageOwnerPTI:0.2574, rentBurdenedPct:0.5768, rentSeverelyBurdenedPct:0.2892, ownerBurdenedPct:0.4513, ownerSeverelyBurdenedPct:0.066, zoriYoY:0.0587, cpiRentYoY:0.0291, bedroomRent:{br0:1458,br1:1605,br2:2086,br3plus:3149} },
+  Maui:     { income:97161, ownerIncome:116568, renterIncome:70296, familyIncome4:110900, sfhPrice:1250000, condoPrice:675000,  sfhPTI:0.6426, condoPTI:0.347, sfhIdx:46.7, condoIdx:86.5, sfhGap:133111, condoGap:18259, rent:1861, askRent:3507, sfhMortgage:6242, condoMortgage:3371, buildAuth:651, tenantRentPTI:0.3272, mortgageOwnerPTI:0.2664, rentBurdenedPct:0.5589, rentSeverelyBurdenedPct:0.3, ownerBurdenedPct:0.3977, ownerSeverelyBurdenedPct:0.0711, zoriYoY:0.0344, bedroomRent:{br0:1365,br1:1330,br2:2020,br3plus:2755} },
+  Hawaii:   { income:78639, ownerIncome:90664, renterIncome:54668, familyIncome4:98800, sfhPrice:585000,  condoPrice:672500,  sfhPTI:0.3866, condoPTI:0.4445, sfhIdx:77.6, condoIdx:67.5, sfhGap:26186,   condoGap:43663, rent:1355, askRent:2698, sfhMortgage:2921, condoMortgage:3358, buildAuth:911, tenantRentPTI:0.3053, mortgageOwnerPTI:0.2435, rentBurdenedPct:0.5162, rentSeverelyBurdenedPct:0.2723, ownerBurdenedPct:0.3919, ownerSeverelyBurdenedPct:0.0573, zoriYoY:0.0375, bedroomRent:{br0:1138,br1:1127,br2:1500,br3plus:1958} },
+  Kauai:    { income:97668, ownerIncome:109877, renterIncome:70359, familyIncome4:132900, sfhPrice:1350000, condoPrice:785000,  sfhPTI:0.7362, condoPTI:0.4281, sfhIdx:40.7, condoIdx:70.1, sfhGap:159776, condoGap:46921, rent:1767, askRent:4689, sfhMortgage:6741, condoMortgage:3920, buildAuth:106, tenantRentPTI:0.3083, mortgageOwnerPTI:0.2604, rentBurdenedPct:0.5196, rentSeverelyBurdenedPct:0.221, ownerBurdenedPct:0.3548, ownerSeverelyBurdenedPct:0.0534, zoriYoY:0.1824, bedroomRent:{br0:1660,br1:1436,br2:1825,br3plus:2745} },
 };
 const counties = ['State','Honolulu','Maui','Hawaii','Kauai'];
 const shortLbl = { State:'State', Honolulu:'Honolulu', Maui:'Maui', Hawaii:'Hawaiʻi', Kauai:'Kauaʻi' };
@@ -3561,11 +3561,15 @@ function calcAffordPrice(income, ratePct, downPct = 20) {
 function updateAfford() {
   const rate = parseFloat(document.getElementById('rate-slider').value);
   const d = countyData[currentCounty];
-  const affordPrice = calcAffordPrice(d.income, rate);
+  // Buy-side denominator: owner-occupied median income (ACS B25119), matching
+  // the owner-income basis of the static sfhIdx/sfhGap literals so this banner
+  // agrees with the SFH card. Falls back to all-household income if suppressed.
+  const buyIncome = d.ownerIncome || d.income;
+  const affordPrice = calcAffordPrice(buyIncome, rate);
   const sfhDiff = d.sfhPrice - affordPrice;
   const condoDiff = d.condoPrice - affordPrice;
-  const incomeNeeded = Math.round(d.income + d.sfhGap);
-  const coverage = Math.max(0, Math.min(d.income / incomeNeeded, 1));
+  const incomeNeeded = Math.round(buyIncome + d.sfhGap);
+  const coverage = Math.max(0, Math.min(buyIncome / incomeNeeded, 1));
   const incomePct = Math.round(coverage * 100);
   const gapPct = 100 - incomePct;
   const affordable = d.sfhGap <= 0;
@@ -3624,7 +3628,7 @@ function updateAfford() {
   document.getElementById('afford-banner').innerHTML = `
     <div class="afford-banner-label">${eyebrowLbl}</div>
     <div class="afford-narrative">
-      A typical household can afford a home up to <span class="num-badge num-badge--outline">${fmt(affordPrice)}</span>
+      A typical home-owning household can afford a home up to <span class="num-badge num-badge--outline">${fmt(affordPrice)}</span>
       ${affordable
         ? `&mdash; at or above the <span class="num-badge num-badge--green">✓ ${fmt(d.sfhPrice)}</span> median single-family price.`
         : `&mdash; but the median single-family sells for <span class="num-badge num-badge--coral">▲ ${fmt(d.sfhPrice)}</span>.`}
@@ -3721,7 +3725,7 @@ function selectCounty(county) {
                        : idx >= 80  ? 'num-badge--green'
                        : idx >= 55  ? 'num-badge--amber'
                        :              'num-badge--coral';
-    const incomeTip = `This county's median household income (${fmt(d.income)}) — half of households earn more, half less. It's the benchmark earner used to gauge whether the median home is affordable.`;
+    const incomeTip = `This county's median income among home-owning households (${fmt(d.ownerIncome || d.income)}, ACS B25119) — the buyer-side benchmark for whether the median home is affordable. Owner income is used because it reflects who actually buys.`;
     const typicalIncome = `<span class="tip-term tip-wrap tip-left" tabindex="0" role="button" aria-label="What is typical income?" data-tip="${incomeTip}">Typical income</span>`;
     const coverageLine = idx >= 100
       ? `${typicalIncome} covers <span class="num-badge num-badge--green">the full cost</span> at this price.`
@@ -4651,7 +4655,7 @@ const GLOSSARY = {
     def:  "HUD definition: a household that spends 50% or more of gross income on housing — the deepest tier of housing stress, typically forcing tradeoffs against food, healthcare, or savings." },
   affordabilityIndex: {
     term: "Affordability index",
-    def:  "100 = a typical Hawaiʻi household can just afford the median home at a 30% payment-to-income ratio on the current mortgage rate. Below 100 = unaffordable; above 100 = affordable." },
+    def:  "100 = a household at the median owner-occupied income (ACS B25119) can just afford the median home at a 30% payment-to-income ratio on the current mortgage rate. Below 100 = unaffordable; above 100 = affordable. The buy-side index uses owner income because it reflects who actually buys; the rent-burden gauge uses renter income." },
   contractRent: {
     term: "Contract rent",
     def:  "The rent actually being paid under current leases, excluding utilities. Reflects existing tenants (Census ACS table B25058)." },
@@ -4889,8 +4893,10 @@ function renderSummaryStrip() {
   const txtEl  = document.getElementById('kpi-home-idx-text');
   if (fillEl && gapEl && txtEl) {
     if (currentHomeView === 'rent') {
-      // Rent burden: rent × 12 / income. <25% green, 25–30% amber, ≥30% coral.
-      const burden = (d.rent * 12) / d.income; // 0–1
+      // Rent burden: rent × 12 / renter income (ACS B25119 renter-occupied
+      // median; falls back to all-household income). <25% green, 25–30% amber,
+      // ≥30% coral.
+      const burden = (d.rent * 12) / (d.renterIncome || d.income); // 0–1
       const burdenPct = burden * 100;
       // Bar scale: 0–40% maps to 0–100% fill; cap at 40%.
       const capped = Math.min(burdenPct, 40);
@@ -4907,7 +4913,7 @@ function renderSummaryStrip() {
       gapEl.style.width  = (100 - fillPct).toFixed(1) + '%';
       txtEl.innerHTML = burdenPct.toFixed(0) + '% of income · <span class="kpi-idx-verdict ' + vcls + '">' + vlbl + '</span>';
     } else {
-      // SFH affordability index: 100 = affordable at median income.
+      // SFH affordability index: 100 = affordable at median owner income.
       const idx = d.sfhIdx;
       const incomePct = Math.min(idx, 100);
       const gapPct    = Math.max(0, 100 - incomePct);
