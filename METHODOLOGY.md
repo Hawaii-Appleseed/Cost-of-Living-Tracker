@@ -13,7 +13,9 @@ fresh ACS vintage drops, this is the file to read before touching numbers.
 | Contract rent (existing leases) | Census ACS 5-yr | `B25058_001E` | annual, December release | `redfin-price-updater.py` |
 | Rent CPI (existing tenants) | BLS Honolulu MSA | `CUURS49ASEHA` | bimonthly (even months), NSA | `redfin-price-updater.py` |
 | Asking rent | Zillow ZORI | `County_zori_uc_sfrcondomfr_sm_month.csv` | monthly | `redfin-price-updater.py` |
-| HUD income limits | HHFDC county PDFs + HUD state PDF | FY 2025 MFI | annual | `redfin-price-updater.py` |
+| Median household income (affordability denominator) | Census ACS 5-yr | `B19013_001E` | annual, December release | `redfin-price-updater.py` |
+| 4-person family income (grocery basis only) | HHFDC county PDFs + HUD state PDF | FY 2025 MFI → `familyIncome4` | annual | `redfin-price-updater.py` |
+| 30-yr fixed mortgage rate | Freddie Mac PMMS via FRED | `MORTGAGE30US` | weekly | `redfin-price-updater.py` |
 | Construction authorizations | DBEDT QSER | Table E-8 | annual (from quarterly data) | `redfin-price-updater.py` |
 | All-items CPI (headline chip) | BLS Honolulu | `CUURS49ASA0` | bimonthly | `bls-cpi-updater.py` |
 | Shelter / food / gasoline / transport CPI | BLS Honolulu | `CUURS49ASAH`, `CUURS49ASAF11`, `CUURS49ASETB01`, `CUURS49ASAT` | bimonthly | `bls-cpi-updater.py` |
@@ -331,9 +333,13 @@ at the **same rate the rate-slider defaults to** so the static card values agree
 with the live calculator on first paint:
 
 - **Assumptions:** 30-yr fixed, 20% down (LTV 0.80), 30% of gross income to
-  P&I, mortgage rate = `MORTGAGE_RATE_PCT` (current Freddie Mac PMMS, 6.38%).
-  `MORTGAGE_RATE_PCT` **must stay in sync with the HTML `rate-slider` default**
-  — bump both together when the PMMS rate is refreshed.
+  P&I, and the **live weekly Freddie Mac PMMS 30-yr fixed** fetched from FRED
+  series `MORTGAGE30US` (`fetch_mortgage_rate()`). That single fetched rate now
+  drives *both* these derived metrics *and* the HTML `rate-slider` default
+  (`patch_mortgage_rate()` rewrites the slider's value + bubble + display each
+  run), so the static card values and the live calculator can no longer drift
+  apart. `MORTGAGE_RATE_PCT` (6.38%) is the **fallback only**, used when
+  `FRED_API_KEY` is unset or the fetch fails.
 - **`{type}Idx`** = affordPrice ÷ price × 100 (100 = exactly affordable at
   median income; UI buckets <55 cost-burdened / <80 stretched / ≥80 ok).
 - **`{type}Gap`** = income-dollar shortfall — extra annual income needed so the
@@ -344,6 +350,29 @@ with the live calculator on first paint:
   price-card diagnostic and is **not currently surfaced in the UI** (the visible
   PTI bars use the ACS-derived `tenantRentPTI` / `mortgageOwnerPTI`); it is
   recomputed for internal consistency rather than display.
+
+### Income denominator: household income vs. 4-person family income
+
+Housing affordability is now measured against **ACS median household income**
+(`B19013_001E`, the `income` field) — *all* households, regardless of size or
+family structure. This is the right denominator for "can a typical household
+afford the median home?": it counts the singles, roommates, and elderly couples
+who actually compete in the same for-sale market, not just married-couple
+families of four. The earlier denominator was HUD's **4-person Median Family
+Income** (MFI), which a peer reviewer would flag as systematically high — it
+excludes smaller and non-family households, overstating the typical buyer's
+income and thereby *understating* the affordability gap. Switching to B19013
+lowers each county's income, so `sfhIdx`/`condoIdx` fall, and `sfhGap`/`condoGap`
+and the PTI ratios rise — a more honest read of the market.
+
+The HUD 4-person MFI is **not discarded**: it is still fetched
+(`fetch_hhfdc_county_mfi()` + `fetch_hud_state_mfi()`) and stored separately as
+`familyIncome4`. The grocery pane keeps using it, because the USDA Thrifty Food
+Plan basket is defined for a **4-person reference family** — dividing a
+family-of-four food cost by an all-households income (which includes one- and
+two-person households) would understate the true food burden on the family the
+basket actually describes. So the two panes intentionally use two different
+income bases: housing → household income, groceries → 4-person family income.
 
 ## Rent nowcast blend (per-county BLS CPI / ZORI weights)
 
