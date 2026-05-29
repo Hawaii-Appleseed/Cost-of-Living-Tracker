@@ -1777,18 +1777,19 @@
   }
   .pti-panel-header--sfh   { color: var(--ocean-700); border-color: var(--ocean-700); }
   .pti-panel-header--condo { color: var(--coral-300); border-color: var(--coral-300); }
-  /* Lowercase italic provenance line tucked into the panel header
-     (e.g. "median gross rent as % of income (ACS B25071)") — makes the
-     source legible without breaking the visual rhythm of the header. */
-  .pti-panel-sub {
+  /* Small ⓘ in the panel header that carries the measure's provenance line
+     (e.g. "share of owner households … cost-burdened, by county") as a hover
+     tooltip — keeps the header uncluttered. Inherits the header's themed color. */
+  .pti-panel-info {
     font-size: 13px;
     text-transform: none;
     letter-spacing: 0;
     font-weight: 400;
-    font-style: italic;
-    color: var(--text-lt);
-    margin-left: 2px;
+    opacity: 0.6;
+    cursor: pointer;
   }
+  .pti-panel-info:hover,
+  .pti-panel-info:focus-visible { opacity: 1; outline: none; }
   /* Single-panel layout used by the realized-burden views (rent OR
      mortgage). Keeps the bar geometry identical to the split grid so
      row widths and animations stay consistent — just one column. */
@@ -2007,31 +2008,19 @@
   .rent-yoy--warm  { background: #fbedd1; color: #8a6028; }
   .rent-yoy--cool  { background: #def0e8; color: #2a6b5a; }
   .rent-yoy--flat  { background: #e8edf1; color: #475c6b; }
-  /* Asking-vs-tenant spread badge (e.g. "2.6× contract") on the asking-rent
-     row, tucked under the value as a small italic sublabel. */
-  .rent-spread {
-    display: block;
-    font-size: 12px;
-    font-style: italic;
-    color: var(--text-lt);
-    margin-top: 1px;
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-  }
-  /* CPI / ZORI freshness pill in the Rental market card-sub. */
-  .rent-freshness-pill {
-    display: inline-block;
-    margin-left: 8px;
-    padding: 1px 8px;
+  /* CPI / ZORI freshness — small ⓘ affordance carrying the as-of periods as a
+     hover tooltip so the Rental market card-sub stays uncluttered. */
+  .rent-freshness-info {
     font-size: 13px;
-    font-style: italic;
     color: var(--text-lt);
-    background: rgba(0,0,0,0.04);
-    border-radius: 999px;
+    opacity: 0.7;
+    cursor: pointer;
+    margin-left: 6px;
     vertical-align: baseline;
-    white-space: nowrap;
   }
-  .rent-freshness-pill:empty { display: none; }
+  .rent-freshness-info:hover,
+  .rent-freshness-info:focus-visible { opacity: 1; color: var(--ocean); outline: none; }
+  .rent-freshness-info:empty { display: none; }
   /* Per-bedroom median-rent tiles (ACS B25031) — 4-up grid below the rent
      bars. Reuses the construction-card aesthetic (subtle shadow, accent). */
   .rent-bedroom-title {
@@ -2155,10 +2144,6 @@
   @media (max-width: 580px) {
     .rent-bedroom-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
-  @media (max-width: 520px) {
-    .rent-freshness-pill { display: block; margin-left: 0; margin-top: 4px; }
-  }
-
   .legend-row { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 19px; color: var(--text-lt); margin-bottom: 10px; }
   .swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; margin-right: 3px; vertical-align: middle; }
 
@@ -3123,6 +3108,31 @@
      renders washed-out. Restore full opacity while the host is hovered —
      the tooltip is only visible during hover anyway. */
   [data-tip]:hover { opacity: 1 !important; }
+  /* Wrapping variant for long tooltips (full sentences, not short labels) —
+     normal wrap + bounded width so they don't run off-screen on mobile.
+     max-width is viewport-clamped so the pill never exceeds the screen. */
+  [data-tip].tip-wrap:hover::after {
+    white-space: normal;
+    width: max-content;
+    max-width: min(260px, calc(100vw - 24px));
+    text-align: left;
+    line-height: 1.35;
+  }
+  /* Edge-aware anchoring (mobile): centered tooltips overflow the viewport
+     when their trigger sits near a screen edge. tip-left anchors the pill's
+     LEFT edge to the trigger (extends rightward) for left-side triggers;
+     tip-right anchors the RIGHT edge (extends leftward) for right-side ones.
+     Scoped to ≤520px — on desktop there's room to keep the centered default. */
+  @media (max-width: 520px) {
+    [data-tip].tip-wrap:hover::after { max-width: min(240px, calc(100vw - 28px)); }
+    [data-tip].tip-wrap.tip-left:hover::after  { left: 0; right: auto; transform: none; }
+    [data-tip].tip-wrap.tip-right:hover::after { left: auto; right: 0; transform: none; }
+  }
+  /* Inline dotted-underline term that reveals its [data-tip] tooltip on hover. */
+  .tip-term {
+    border-bottom: 1px dotted var(--text-lt);
+    cursor: help;
+  }
 
   /* When a glossary chip sits inside a data-tip host (e.g. the "proj."
      period-tag inside #goods-groc-date), hovering the chip puts BOTH the
@@ -3310,7 +3320,7 @@
         </div>
       </div>
       <div class="kpi-value" id="kpi-income-value">—</div>
-      <div class="kpi-sub" id="kpi-income-sub"><span class="gloss" data-gloss="HUD">HUD</span> FY 2025</div>
+      <div class="kpi-sub" id="kpi-income-sub"><span class="gloss" data-gloss="ACS">ACS</span> 5-yr 2024</div>
     </div>
   </div>
 </section>
@@ -3337,7 +3347,7 @@
   <div class="metrics-container">
     <div class="metrics-container-title">Housing market &amp; affordability</div>
     <div class="housing-pair-grid" id="housing-pair-grid"></div>
-    <div class="affordability-note"><span class="gloss" data-gloss="affordabilityIndex">Affordability index</span>: 100 = typical Hawaiʻi household can afford the median home at current mortgage rates.</div>
+    <div class="affordability-note"><span class="gloss" data-gloss="affordabilityIndex">Affordability index</span>: 100 = a typical home-owning household can afford the median home at current mortgage rates.</div>
   </div>
 
   <div class="card" style="margin-bottom:1.25rem;">
@@ -3351,7 +3361,7 @@
 
   <div class="card">
     <div class="card-title">Rental market</div>
-    <div class="card-sub rent-card-sub"><span class="gloss" data-gloss="contractRent">Tenant rent</span> on existing leases vs. <span class="gloss" data-gloss="askingRent">asking rent</span> on new listings &nbsp;·&nbsp; both exclude utilities <span class="rent-freshness-pill" id="rent-freshness-pill"></span></div>
+    <div class="card-sub rent-card-sub"><span class="gloss" data-gloss="contractRent">Tenant rent</span> on existing leases vs. <span class="gloss" data-gloss="askingRent">asking rent</span> on new listings &nbsp;·&nbsp; both exclude utilities <span class="rent-freshness-info tip-wrap tip-right" id="rent-freshness-pill" tabindex="0" role="button" aria-label="Data as-of periods"></span></div>
     <div class="legend-row">
       <span><span class="swatch" style="background:var(--ocean-300);"></span><span class="gloss" data-gloss="rentNowcast">Tenant rent</span></span>
       <span><span class="swatch" style="background:var(--coral-500);"></span><span class="gloss" data-gloss="askingRent">Asking rent</span></span>
@@ -3400,7 +3410,7 @@
       <div id="construction-notes" style="display:none;margin-top:8px;">
         <div class="note-box" style="margin-bottom:0;">
           <strong style="color:var(--text);">Note on condos &amp; construction costs</strong><br>
-          Condo <span class="gloss" data-gloss="mortgagePayment">mortgage payments</span> exclude HOA fees, which average ~$762/month statewide — among the highest in the nation. At $310–$520/sf for multifamily hard costs alone, up ~30% since 2020, building to price points accessible to median-income households requires substantial public subsidy. <span class="gloss" data-gloss="affordabilityIndex">Affordability index</span>: 100 = perfectly affordable at median income; below 100 = median income falls short.
+          Condo <span class="gloss" data-gloss="mortgagePayment">mortgage payments</span> exclude HOA fees, which average ~$762/month statewide — among the highest in the nation. At $310–$520/sf for multifamily hard costs alone, up ~30% since 2020, building to price points accessible to median-income households requires substantial public subsidy. <span class="gloss" data-gloss="affordabilityIndex">Affordability index</span>: 100 = perfectly affordable at the median owner income; below 100 = median owner income falls short.
           <br><br>
           <strong style="color:var(--text);">Note on construction cost indices</strong><br>
           The cost indices track the <em>low end</em> of each published <span class="gloss" data-gloss="RLB">RLB</span> cost range (e.g., $310/sf for multifamily, not $520/sf), rebased to Q1 2020 = 100. Using the low end understates actual cost growth for higher-complexity projects, so the increases shown — +51% multifamily, +19% single-family, +81% ground parking — should be read as a floor, not a ceiling.
@@ -3415,9 +3425,9 @@
 
     <div class="slider-row" id="income-slider-row">
       <div class="slider-label">Household income</div>
-      <input type="range" id="income-slider" class="has-progress" min="30000" max="300000" step="1000" value="98317" oninput="updateCalc()">
-      <div class="slider-bubble" id="income-bubble">$98,317</div>
-      <div class="slider-val" id="income-display">$98,317</div>
+      <input type="range" id="income-slider" class="has-progress" min="30000" max="300000" step="1000" value="100389" oninput="updateCalc()">
+      <div class="slider-bubble" id="income-bubble">$100,389</div>
+      <div class="slider-val" id="income-display">$100,389</div>
     </div>
     <div class="slider-row" id="rate-slider-row">
       <div class="slider-label">Mortgage rate</div>
@@ -3533,11 +3543,11 @@
 
 <script>
 const countyData = {
-  State:    { income:123000,  sfhPrice:1014900,  condoPrice:558500,  sfhPTI:0.4944, condoPTI:0.2721, sfhIdx:60.7, condoIdx:110.3, sfhGap:79719,  condoGap:0, rent:1934, askRent:2990, sfhMortgage:5068, condoMortgage:2789, buildAuth:4404, tenantRentPTI:0.3302, mortgageOwnerPTI:0.2564, rentBurdenedPct:0.5667, rentSeverelyBurdenedPct:0.2859, ownerBurdenedPct:0.4307, ownerSeverelyBurdenedPct:0.0646, zoriYoY:0.0583, cpiRentYoY:0.0291, bedroomRent:{br0:1436,br1:1533,br2:1996,br3plus:2964} },
-  Honolulu: { income:129300, sfhPrice:1155000, condoPrice:515000,  sfhPTI:0.5353, condoPTI:0.2387, sfhIdx:56.0, condoIdx:125.7, sfhGap:101403, condoGap:0,  rent:2029, askRent:2881, sfhMortgage:5768, condoMortgage:2572, buildAuth:2736, tenantRentPTI:0.3352, mortgageOwnerPTI:0.2574, rentBurdenedPct:0.5768, rentSeverelyBurdenedPct:0.2892, ownerBurdenedPct:0.4513, ownerSeverelyBurdenedPct:0.066, zoriYoY:0.0587, cpiRentYoY:0.0291, bedroomRent:{br0:1458,br1:1605,br2:2086,br3plus:3149} },
-  Maui:     { income:110900,  sfhPrice:1250000, condoPrice:675000,  sfhPTI:0.6754, condoPTI:0.3647, sfhIdx:44.4, condoIdx:82.3, sfhGap:138779, condoGap:23927, rent:1861, askRent:3507, sfhMortgage:6242, condoMortgage:3371, buildAuth:651, tenantRentPTI:0.3272, mortgageOwnerPTI:0.2664, rentBurdenedPct:0.5589, rentSeverelyBurdenedPct:0.3, ownerBurdenedPct:0.3977, ownerSeverelyBurdenedPct:0.0711, zoriYoY:0.0344, bedroomRent:{br0:1365,br1:1330,br2:2020,br3plus:2755} },
-  Hawaii:   { income:98800,  sfhPrice:585000,  condoPrice:672500,  sfhPTI:0.3548, condoPTI:0.4079, sfhIdx:84.6, condoIdx:73.6, sfhGap:18050,   condoGap:35527, rent:1355, askRent:2698, sfhMortgage:2921, condoMortgage:3358, buildAuth:911, tenantRentPTI:0.3053, mortgageOwnerPTI:0.2435, rentBurdenedPct:0.5162, rentSeverelyBurdenedPct:0.2723, ownerBurdenedPct:0.3919, ownerSeverelyBurdenedPct:0.0573, zoriYoY:0.0375, bedroomRent:{br0:1138,br1:1127,br2:1500,br3plus:1958} },
-  Kauai:    { income:132900,  sfhPrice:1350000, condoPrice:785000,  sfhPTI:0.6087, condoPTI:0.3539, sfhIdx:49.3, condoIdx:84.8, sfhGap:136753, condoGap:23898, rent:1767, askRent:4689, sfhMortgage:6741, condoMortgage:3920, buildAuth:106, tenantRentPTI:0.3083, mortgageOwnerPTI:0.2604, rentBurdenedPct:0.5196, rentSeverelyBurdenedPct:0.221, ownerBurdenedPct:0.3548, ownerSeverelyBurdenedPct:0.0534, zoriYoY:0.1824, bedroomRent:{br0:1660,br1:1436,br2:1825,br3plus:2745} },
+  State:    { income:100389, ownerIncome:121145, renterIncome:71363, familyIncome4:123000, sfhPrice:1014900,  condoPrice:558500,  sfhPTI:0.502, condoPTI:0.2763, sfhIdx:59.8, condoIdx:108.6, sfhGap:81574,  condoGap:0, rent:1934, askRent:2990, sfhMortgage:5068, condoMortgage:2789, buildAuth:4404, tenantRentPTI:0.3302, mortgageOwnerPTI:0.2564, rentBurdenedPct:0.5667, rentSeverelyBurdenedPct:0.2859, ownerBurdenedPct:0.4307, ownerSeverelyBurdenedPct:0.0646, zoriYoY:0.0583, cpiRentYoY:0.0291, bedroomRent:{br0:1436,br1:1533,br2:1996,br3plus:2964} },
+  Honolulu: { income:106195, ownerIncome:132429, renterIncome:74033, familyIncome4:129300, sfhPrice:1155000, condoPrice:515000,  sfhPTI:0.5226, condoPTI:0.233, sfhIdx:57.4, condoIdx:128.7, sfhGap:98274, condoGap:0,  rent:2029, askRent:2881, sfhMortgage:5768, condoMortgage:2572, buildAuth:2736, tenantRentPTI:0.3352, mortgageOwnerPTI:0.2574, rentBurdenedPct:0.5768, rentSeverelyBurdenedPct:0.2892, ownerBurdenedPct:0.4513, ownerSeverelyBurdenedPct:0.066, zoriYoY:0.0587, cpiRentYoY:0.0291, bedroomRent:{br0:1458,br1:1605,br2:2086,br3plus:3149} },
+  Maui:     { income:97161, ownerIncome:116568, renterIncome:70296, familyIncome4:110900, sfhPrice:1250000, condoPrice:675000,  sfhPTI:0.6426, condoPTI:0.347, sfhIdx:46.7, condoIdx:86.5, sfhGap:133111, condoGap:18259, rent:1861, askRent:3507, sfhMortgage:6242, condoMortgage:3371, buildAuth:651, tenantRentPTI:0.3272, mortgageOwnerPTI:0.2664, rentBurdenedPct:0.5589, rentSeverelyBurdenedPct:0.3, ownerBurdenedPct:0.3977, ownerSeverelyBurdenedPct:0.0711, zoriYoY:0.0344, bedroomRent:{br0:1365,br1:1330,br2:2020,br3plus:2755} },
+  Hawaii:   { income:78639, ownerIncome:90664, renterIncome:54668, familyIncome4:98800, sfhPrice:585000,  condoPrice:672500,  sfhPTI:0.3866, condoPTI:0.4445, sfhIdx:77.6, condoIdx:67.5, sfhGap:26186,   condoGap:43663, rent:1355, askRent:2698, sfhMortgage:2921, condoMortgage:3358, buildAuth:911, tenantRentPTI:0.3053, mortgageOwnerPTI:0.2435, rentBurdenedPct:0.5162, rentSeverelyBurdenedPct:0.2723, ownerBurdenedPct:0.3919, ownerSeverelyBurdenedPct:0.0573, zoriYoY:0.0375, bedroomRent:{br0:1138,br1:1127,br2:1500,br3plus:1958} },
+  Kauai:    { income:97668, ownerIncome:109877, renterIncome:70359, familyIncome4:132900, sfhPrice:1350000, condoPrice:785000,  sfhPTI:0.7362, condoPTI:0.4281, sfhIdx:40.7, condoIdx:70.1, sfhGap:159776, condoGap:46921, rent:1767, askRent:4689, sfhMortgage:6741, condoMortgage:3920, buildAuth:106, tenantRentPTI:0.3083, mortgageOwnerPTI:0.2604, rentBurdenedPct:0.5196, rentSeverelyBurdenedPct:0.221, ownerBurdenedPct:0.3548, ownerSeverelyBurdenedPct:0.0534, zoriYoY:0.1824, bedroomRent:{br0:1660,br1:1436,br2:1825,br3plus:2745} },
 };
 const counties = ['State','Honolulu','Maui','Hawaii','Kauai'];
 const shortLbl = { State:'State', Honolulu:'Honolulu', Maui:'Maui', Hawaii:'Hawaiʻi', Kauai:'Kauaʻi' };
@@ -3629,11 +3639,15 @@ function calcAffordPrice(income, ratePct, downPct = 20) {
 function updateAfford() {
   const rate = parseFloat(document.getElementById('rate-slider').value);
   const d = countyData[currentCounty];
-  const affordPrice = calcAffordPrice(d.income, rate);
+  // Buy-side denominator: owner-occupied median income (ACS B25119), matching
+  // the owner-income basis of the static sfhIdx/sfhGap literals so this banner
+  // agrees with the SFH card. Falls back to all-household income if suppressed.
+  const buyIncome = d.ownerIncome || d.income;
+  const affordPrice = calcAffordPrice(buyIncome, rate);
   const sfhDiff = d.sfhPrice - affordPrice;
   const condoDiff = d.condoPrice - affordPrice;
-  const incomeNeeded = Math.round(d.income + d.sfhGap);
-  const coverage = Math.max(0, Math.min(d.income / incomeNeeded, 1));
+  const incomeNeeded = Math.round(buyIncome + d.sfhGap);
+  const coverage = Math.max(0, Math.min(buyIncome / incomeNeeded, 1));
   const incomePct = Math.round(coverage * 100);
   const gapPct = 100 - incomePct;
   const affordable = d.sfhGap <= 0;
@@ -3692,7 +3706,7 @@ function updateAfford() {
   document.getElementById('afford-banner').innerHTML = `
     <div class="afford-banner-label">${eyebrowLbl}</div>
     <div class="afford-narrative">
-      A typical household can afford a home up to <span class="num-badge num-badge--outline">${fmt(affordPrice)}</span>
+      A typical home-owning household can afford a home up to <span class="num-badge num-badge--outline">${fmt(affordPrice)}</span>
       ${affordable
         ? `&mdash; at or above the <span class="num-badge num-badge--green">✓ ${fmt(d.sfhPrice)}</span> median single-family price.`
         : `&mdash; but the median single-family sells for <span class="num-badge num-badge--coral">▲ ${fmt(d.sfhPrice)}</span>.`}
@@ -3789,9 +3803,11 @@ function selectCounty(county) {
                        : idx >= 80  ? 'num-badge--green'
                        : idx >= 55  ? 'num-badge--amber'
                        :              'num-badge--coral';
+    const incomeTip = `This county's median income among home-owning households (${fmt(d.ownerIncome || d.income)}, ACS B25119) — the buyer-side benchmark for whether the median home is affordable. Owner income is used because it reflects who actually buys.`;
+    const typicalIncome = `<span class="tip-term tip-wrap tip-left" tabindex="0" role="button" aria-label="What is typical income?" data-tip="${incomeTip}">Typical income</span>`;
     const coverageLine = idx >= 100
-      ? `Typical income covers <span class="num-badge num-badge--green">the full cost</span> at this price.`
-      : `Typical income covers <span class="num-badge ${coverBadgeCls}">${coverPct}%</span> of what's needed.`;
+      ? `${typicalIncome} covers <span class="num-badge num-badge--green">the full cost</span> at this price.`
+      : `${typicalIncome} covers <span class="num-badge ${coverBadgeCls}">${coverPct}%</span> of what's needed.`;
     return `
       <div class="mcard-v2 mcard-v2--${kind}">
         <div class="mcard-v2-header">
@@ -3899,7 +3915,7 @@ function selectCounty(county) {
     <div class="pti-lede">${ledeText}</div>
     <div class="pti-single-grid">
       <div class="pti-panel">
-        <div class="pti-panel-header pti-panel-header--${isRent ? 'sfh' : 'condo'}">${panelLabel} <span class="pti-panel-sub">· ${panelSubLabel}</span></div>
+        <div class="pti-panel-header pti-panel-header--${isRent ? 'sfh' : 'condo'}">${panelLabel} <span class="pti-panel-info tip-wrap tip-right" tabindex="0" role="button" aria-label="About this measure" data-tip="${panelSubLabel}">ⓘ</span></div>
         ${counties.map(c => ptiRow(c, c === 'State', mode)).join('')}
       </div>
     </div>
@@ -3930,12 +3946,6 @@ function selectCounty(county) {
     // CPI is the underlying series). Outer islands get ZORI YoY only.
     const cpiChip   = (isState || c === 'Honolulu') ? rentYoyChip(rd.cpiRentYoY) : '';
     const zoriChip  = rentYoyChip(rd.zoriYoY);
-    // Spread badge — asking vs. contract multiple. Suppress when ratio is
-    // close to 1 (avoids visual noise on cheaper markets).
-    const spread = (rd.rent > 0) ? rd.askRent / rd.rent : 0;
-    const spreadBadge = spread >= 1.25
-      ? `<span class="rent-spread">${spread.toFixed(1)}× contract</span>`
-      : '';
     return `<div class="rent-row is-clickable${isCurrent ? ' is-current' : ''}${isState ? ' rent-row--state' : ''}" role="button" tabindex="0" data-county="${c}" title="View ${fullLbl[c]}">
       <div class="rent-row-lbl">${shortLbl[c]}${isState ? '<span class="rent-row-eyebrow">Statewide</span>' : ''}</div>
       <div class="rent-bar-group">
@@ -3949,7 +3959,7 @@ function selectCounty(county) {
           <div class="rent-hbar-track">
             <div class="rent-hbar" style="width:${w2}%;background:var(--coral-500);" data-tip="Asking rent · ${fmt(rd.askRent)}/mo"></div>
           </div>
-          <div class="rent-hbar-val">${fmt(rd.askRent)}${zoriChip}${spreadBadge}</div>
+          <div class="rent-hbar-val">${fmt(rd.askRent)}${zoriChip}</div>
         </div>
       </div>
     </div>`;
@@ -3971,9 +3981,16 @@ function selectCounty(county) {
     };
     const cpi = (typeof blsRentLatestPeriod !== 'undefined') ? fmtMonth(blsRentLatestPeriod) : null;
     const zori= (typeof zoriLatestPeriod   !== 'undefined') ? fmtMonth(zoriLatestPeriod)   : null;
-    pill.textContent = (cpi && zori)
+    const freshness = (cpi && zori)
       ? `CPI as of ${cpi} · ZORI as of ${zori}`
       : (cpi ? `CPI as of ${cpi}` : (zori ? `ZORI as of ${zori}` : ''));
+    if (freshness) {
+      pill.setAttribute('data-tip', freshness);
+      pill.textContent = 'ⓘ';
+    } else {
+      pill.removeAttribute('data-tip');
+      pill.textContent = '';
+    }
   }
 
   // Re-render goods pane so it's ready when user switches tabs
@@ -4117,7 +4134,10 @@ function pctSigned(x) { return (x>=0?'+':'') + (x*100).toFixed(1) + '%'; }
 function renderGoodsPane() {
   const g = groceryData[currentCounty];
   const gas = (typeof gasData !== 'undefined') ? gasData[currentCounty] : null;
-  const income = countyData[currentCounty].income;
+  // The grocery basket is a USDA 4-person reference family, so the food-share
+  // denominator stays on the HUD 4-person family income (familyIncome4), NOT the
+  // ACS median *household* income used for housing affordability.
+  const income = countyData[currentCounty].familyIncome4;
   if (!g) return;
 
   // --- TFP anchor (USDA Thrifty Food Plan, HI reference family of 4) -----
@@ -4178,7 +4198,7 @@ function renderGoodsPane() {
       <span class="num-badge num-badge--outline goods-narr-num" data-tip="${sourceTip}">$${displayMonthly.toLocaleString()}/mo</span>
       on groceries${gasTxt ? ' and pays ' + gasTxt : ''} —
       <span class="num-badge ${shareBadgeCls}">${sharePct.toFixed(1)}%</span>
-      of median household income goes to food alone.
+      of a four-person family's income goes to food alone.
     </div>`;
 
   /* 2. Paired cards — Groceries + Gas */
@@ -4269,7 +4289,7 @@ function renderGoodsPane() {
     const rows = counties.map(c => {
       const gd = groceryData[c];
       const gx = gasData[c] || {};
-      const cIncome = countyData[c].income;
+      const cIncome = countyData[c].familyIncome4;   // 4-person family basis (grocery)
       const cMult   = (gd.groceryIdx || 100) / 100;
       const cTfpMo  = tfp ? tfp.hawaii.family4Monthly * cMult : null;
       const cShare  = cTfpMo ? (cTfpMo * 12) / cIncome : gd.groceryShareOfIncome;
@@ -4608,7 +4628,7 @@ function buildDataPeriods() {
                    originalPeriod: tfp.hawaii.originalPeriod || null } : null,
     cpi:       (cpi && cpi.allItems && cpi.allItems.latestPeriod)
                ? { period: cpi.allItems.latestPeriod, cadence: 'bimonthly' } : null,
-    income:    { period: 'FY 2025',  cadence: 'annual' },
+    income:    { period: '2024',     cadence: 'annual' },
     buildAuth: { period: '2025',     cadence: 'annual' },
   };
 }
@@ -4631,7 +4651,7 @@ function renderDataFreshness() {
     ['Grocery basket',                                                    dp.grocery],
     ['Groceries (<span class="gloss" data-gloss="TFP">TFP</span>)',       dp.tfp],
     ['Honolulu <span class="gloss" data-gloss="CPI">CPI</span>',          dp.cpi],
-    ['<span class="gloss" data-gloss="HUD">Income</span>',                dp.income],
+    ['<span class="gloss" data-gloss="ACS">Income</span>',                dp.income],
     ['<span class="gloss" data-gloss="DBEDT">Construction</span>',        dp.buildAuth],
   ];
   list.innerHTML = rows
@@ -4667,7 +4687,7 @@ const GLOSSARY = {
                 source: "USDA CNPP Alaska–Hawaii TFP",
                 href:   "https://www.fns.usda.gov/cnpp/usda-food-plans-cost-food-reports-monthly-reports" },
   ACS:        { term: "American Community Survey",
-                def:  "Census Bureau's rolling 5-year household survey. Used here for median contract rent by county (table B25058).",
+                def:  "Census Bureau's rolling 5-year household survey. Used here for median household income (table B19013, the housing-affordability denominator) and median contract rent by county (table B25058).",
                 source: "Census ACS",
                 href:   "https://www.census.gov/programs-surveys/acs" },
   HUD:        { term: "U.S. Department of Housing and Urban Development",
@@ -4740,7 +4760,7 @@ const GLOSSARY = {
     def:  "HUD definition: a household that spends 50% or more of gross income on housing — the deepest tier of housing stress, typically forcing tradeoffs against food, healthcare, or savings." },
   affordabilityIndex: {
     term: "Affordability index",
-    def:  "100 = a typical Hawaiʻi household can just afford the median home at a 30% payment-to-income ratio on the current mortgage rate. Below 100 = unaffordable; above 100 = affordable." },
+    def:  "100 = a household at the median owner-occupied income (ACS B25119) can just afford the median home at a 30% payment-to-income ratio on the current mortgage rate. Below 100 = unaffordable; above 100 = affordable. The buy-side index uses owner income because it reflects who actually buys; the rent-burden gauge uses renter income." },
   contractRent: {
     term: "Contract rent",
     def:  "The rent actually being paid under current leases, excluding utilities. Reflects existing tenants (Census ACS table B25058)." },
@@ -4978,8 +4998,10 @@ function renderSummaryStrip() {
   const txtEl  = document.getElementById('kpi-home-idx-text');
   if (fillEl && gapEl && txtEl) {
     if (currentHomeView === 'rent') {
-      // Rent burden: rent × 12 / income. <25% green, 25–30% amber, ≥30% coral.
-      const burden = (d.rent * 12) / d.income; // 0–1
+      // Rent burden: rent × 12 / renter income (ACS B25119 renter-occupied
+      // median; falls back to all-household income). <25% green, 25–30% amber,
+      // ≥30% coral.
+      const burden = (d.rent * 12) / (d.renterIncome || d.income); // 0–1
       const burdenPct = burden * 100;
       // Bar scale: 0–40% maps to 0–100% fill; cap at 40%.
       const capped = Math.min(burdenPct, 40);
@@ -4996,7 +5018,7 @@ function renderSummaryStrip() {
       gapEl.style.width  = (100 - fillPct).toFixed(1) + '%';
       txtEl.innerHTML = burdenPct.toFixed(0) + '% of income · <span class="kpi-idx-verdict ' + vcls + '">' + vlbl + '</span>';
     } else {
-      // SFH affordability index: 100 = affordable at median income.
+      // SFH affordability index: 100 = affordable at median owner income.
       const idx = d.sfhIdx;
       const incomePct = Math.min(idx, 100);
       const gapPct    = Math.max(0, 100 - incomePct);
@@ -5051,7 +5073,7 @@ function renderSummaryStrip() {
     gasSub.textContent = 'regular · /gal';
   }
 
-  // Tile 4 — Median income (4-person, HUD)
+  // Tile 4 — Median household income (ACS B19013, all households)
   countUpKPI(document.getElementById('kpi-income-value'), d.income, fmtMoneyBig);
 }
 
