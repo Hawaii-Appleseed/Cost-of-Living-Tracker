@@ -1777,18 +1777,19 @@
   }
   .pti-panel-header--sfh   { color: var(--ocean-700); border-color: var(--ocean-700); }
   .pti-panel-header--condo { color: var(--coral-300); border-color: var(--coral-300); }
-  /* Lowercase italic provenance line tucked into the panel header
-     (e.g. "median gross rent as % of income (ACS B25071)") — makes the
-     source legible without breaking the visual rhythm of the header. */
-  .pti-panel-sub {
+  /* Small ⓘ in the panel header that carries the measure's provenance line
+     (e.g. "share of owner households … cost-burdened, by county") as a hover
+     tooltip — keeps the header uncluttered. Inherits the header's themed color. */
+  .pti-panel-info {
     font-size: 13px;
     text-transform: none;
     letter-spacing: 0;
     font-weight: 400;
-    font-style: italic;
-    color: var(--text-lt);
-    margin-left: 2px;
+    opacity: 0.6;
+    cursor: pointer;
   }
+  .pti-panel-info:hover,
+  .pti-panel-info:focus-visible { opacity: 1; outline: none; }
   /* Single-panel layout used by the realized-burden views (rent OR
      mortgage). Keeps the bar geometry identical to the split grid so
      row widths and animations stay consistent — just one column. */
@@ -2007,31 +2008,19 @@
   .rent-yoy--warm  { background: #fbedd1; color: #8a6028; }
   .rent-yoy--cool  { background: #def0e8; color: #2a6b5a; }
   .rent-yoy--flat  { background: #e8edf1; color: #475c6b; }
-  /* Asking-vs-tenant spread badge (e.g. "2.6× contract") on the asking-rent
-     row, tucked under the value as a small italic sublabel. */
-  .rent-spread {
-    display: block;
-    font-size: 12px;
-    font-style: italic;
-    color: var(--text-lt);
-    margin-top: 1px;
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-  }
-  /* CPI / ZORI freshness pill in the Rental market card-sub. */
-  .rent-freshness-pill {
-    display: inline-block;
-    margin-left: 8px;
-    padding: 1px 8px;
+  /* CPI / ZORI freshness — small ⓘ affordance carrying the as-of periods as a
+     hover tooltip so the Rental market card-sub stays uncluttered. */
+  .rent-freshness-info {
     font-size: 13px;
-    font-style: italic;
     color: var(--text-lt);
-    background: rgba(0,0,0,0.04);
-    border-radius: 999px;
+    opacity: 0.7;
+    cursor: pointer;
+    margin-left: 6px;
     vertical-align: baseline;
-    white-space: nowrap;
   }
-  .rent-freshness-pill:empty { display: none; }
+  .rent-freshness-info:hover,
+  .rent-freshness-info:focus-visible { opacity: 1; color: var(--ocean); outline: none; }
+  .rent-freshness-info:empty { display: none; }
   /* Per-bedroom median-rent tiles (ACS B25031) — 4-up grid below the rent
      bars. Reuses the construction-card aesthetic (subtle shadow, accent). */
   .rent-bedroom-title {
@@ -2155,10 +2144,6 @@
   @media (max-width: 580px) {
     .rent-bedroom-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
-  @media (max-width: 520px) {
-    .rent-freshness-pill { display: block; margin-left: 0; margin-top: 4px; }
-  }
-
   .legend-row { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 19px; color: var(--text-lt); margin-bottom: 10px; }
   .swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; margin-right: 3px; vertical-align: middle; }
 
@@ -3123,6 +3108,31 @@
      renders washed-out. Restore full opacity while the host is hovered —
      the tooltip is only visible during hover anyway. */
   [data-tip]:hover { opacity: 1 !important; }
+  /* Wrapping variant for long tooltips (full sentences, not short labels) —
+     normal wrap + bounded width so they don't run off-screen on mobile.
+     max-width is viewport-clamped so the pill never exceeds the screen. */
+  [data-tip].tip-wrap:hover::after {
+    white-space: normal;
+    width: max-content;
+    max-width: min(260px, calc(100vw - 24px));
+    text-align: left;
+    line-height: 1.35;
+  }
+  /* Edge-aware anchoring (mobile): centered tooltips overflow the viewport
+     when their trigger sits near a screen edge. tip-left anchors the pill's
+     LEFT edge to the trigger (extends rightward) for left-side triggers;
+     tip-right anchors the RIGHT edge (extends leftward) for right-side ones.
+     Scoped to ≤520px — on desktop there's room to keep the centered default. */
+  @media (max-width: 520px) {
+    [data-tip].tip-wrap:hover::after { max-width: min(240px, calc(100vw - 28px)); }
+    [data-tip].tip-wrap.tip-left:hover::after  { left: 0; right: auto; transform: none; }
+    [data-tip].tip-wrap.tip-right:hover::after { left: auto; right: 0; transform: none; }
+  }
+  /* Inline dotted-underline term that reveals its [data-tip] tooltip on hover. */
+  .tip-term {
+    border-bottom: 1px dotted var(--text-lt);
+    cursor: help;
+  }
 
   /* When a glossary chip sits inside a data-tip host (e.g. the "proj."
      period-tag inside #goods-groc-date), hovering the chip puts BOTH the
@@ -3351,7 +3361,7 @@
 
   <div class="card">
     <div class="card-title">Rental market</div>
-    <div class="card-sub rent-card-sub"><span class="gloss" data-gloss="contractRent">Tenant rent</span> on existing leases vs. <span class="gloss" data-gloss="askingRent">asking rent</span> on new listings &nbsp;·&nbsp; both exclude utilities <span class="rent-freshness-pill" id="rent-freshness-pill"></span></div>
+    <div class="card-sub rent-card-sub"><span class="gloss" data-gloss="contractRent">Tenant rent</span> on existing leases vs. <span class="gloss" data-gloss="askingRent">asking rent</span> on new listings &nbsp;·&nbsp; both exclude utilities <span class="rent-freshness-info tip-wrap tip-right" id="rent-freshness-pill" tabindex="0" role="button" aria-label="Data as-of periods"></span></div>
     <div class="legend-row">
       <span><span class="swatch" style="background:var(--ocean-300);"></span><span class="gloss" data-gloss="rentNowcast">Tenant rent</span></span>
       <span><span class="swatch" style="background:var(--coral-500);"></span><span class="gloss" data-gloss="askingRent">Asking rent</span></span>
@@ -3789,9 +3799,11 @@ function selectCounty(county) {
                        : idx >= 80  ? 'num-badge--green'
                        : idx >= 55  ? 'num-badge--amber'
                        :              'num-badge--coral';
+    const incomeTip = `This county's median household income (${fmt(d.income)}) — half of households earn more, half less. It's the benchmark earner used to gauge whether the median home is affordable.`;
+    const typicalIncome = `<span class="tip-term tip-wrap tip-left" tabindex="0" role="button" aria-label="What is typical income?" data-tip="${incomeTip}">Typical income</span>`;
     const coverageLine = idx >= 100
-      ? `Typical income covers <span class="num-badge num-badge--green">the full cost</span> at this price.`
-      : `Typical income covers <span class="num-badge ${coverBadgeCls}">${coverPct}%</span> of what's needed.`;
+      ? `${typicalIncome} covers <span class="num-badge num-badge--green">the full cost</span> at this price.`
+      : `${typicalIncome} covers <span class="num-badge ${coverBadgeCls}">${coverPct}%</span> of what's needed.`;
     return `
       <div class="mcard-v2 mcard-v2--${kind}">
         <div class="mcard-v2-header">
@@ -3899,7 +3911,7 @@ function selectCounty(county) {
     <div class="pti-lede">${ledeText}</div>
     <div class="pti-single-grid">
       <div class="pti-panel">
-        <div class="pti-panel-header pti-panel-header--${isRent ? 'sfh' : 'condo'}">${panelLabel} <span class="pti-panel-sub">· ${panelSubLabel}</span></div>
+        <div class="pti-panel-header pti-panel-header--${isRent ? 'sfh' : 'condo'}">${panelLabel} <span class="pti-panel-info tip-wrap tip-right" tabindex="0" role="button" aria-label="About this measure" data-tip="${panelSubLabel}">ⓘ</span></div>
         ${counties.map(c => ptiRow(c, c === 'State', mode)).join('')}
       </div>
     </div>
@@ -3930,12 +3942,6 @@ function selectCounty(county) {
     // CPI is the underlying series). Outer islands get ZORI YoY only.
     const cpiChip   = (isState || c === 'Honolulu') ? rentYoyChip(rd.cpiRentYoY) : '';
     const zoriChip  = rentYoyChip(rd.zoriYoY);
-    // Spread badge — asking vs. contract multiple. Suppress when ratio is
-    // close to 1 (avoids visual noise on cheaper markets).
-    const spread = (rd.rent > 0) ? rd.askRent / rd.rent : 0;
-    const spreadBadge = spread >= 1.25
-      ? `<span class="rent-spread">${spread.toFixed(1)}× contract</span>`
-      : '';
     return `<div class="rent-row is-clickable${isCurrent ? ' is-current' : ''}${isState ? ' rent-row--state' : ''}" role="button" tabindex="0" data-county="${c}" title="View ${fullLbl[c]}">
       <div class="rent-row-lbl">${shortLbl[c]}${isState ? '<span class="rent-row-eyebrow">Statewide</span>' : ''}</div>
       <div class="rent-bar-group">
@@ -3949,7 +3955,7 @@ function selectCounty(county) {
           <div class="rent-hbar-track">
             <div class="rent-hbar" style="width:${w2}%;background:var(--coral-500);" data-tip="Asking rent · ${fmt(rd.askRent)}/mo"></div>
           </div>
-          <div class="rent-hbar-val">${fmt(rd.askRent)}${zoriChip}${spreadBadge}</div>
+          <div class="rent-hbar-val">${fmt(rd.askRent)}${zoriChip}</div>
         </div>
       </div>
     </div>`;
@@ -3971,9 +3977,16 @@ function selectCounty(county) {
     };
     const cpi = (typeof blsRentLatestPeriod !== 'undefined') ? fmtMonth(blsRentLatestPeriod) : null;
     const zori= (typeof zoriLatestPeriod   !== 'undefined') ? fmtMonth(zoriLatestPeriod)   : null;
-    pill.textContent = (cpi && zori)
+    const freshness = (cpi && zori)
       ? `CPI as of ${cpi} · ZORI as of ${zori}`
       : (cpi ? `CPI as of ${cpi}` : (zori ? `ZORI as of ${zori}` : ''));
+    if (freshness) {
+      pill.setAttribute('data-tip', freshness);
+      pill.textContent = 'ⓘ';
+    } else {
+      pill.removeAttribute('data-tip');
+      pill.textContent = '';
+    }
   }
 
   // Re-render goods pane so it's ready when user switches tabs
