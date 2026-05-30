@@ -80,12 +80,20 @@ DBEDT_COL_KEYS = ["State", "Honolulu", "Hawaii", "Kauai", "Maui"]  # columns 1�
 # MORTGAGE_RATE_PCT MUST stay in sync with the rate-slider DEFAULT in the
 # HTML (id="rate-slider" value=…). At the default slider position the live
 # banner's affordPrice and the stored idx/gap agree; if they diverge the
-# stored metrics would contradict the calculator on first paint. Bump both
-# together when refreshing the Freddie Mac PMMS rate.
-MORTGAGE_RATE_PCT   = 6.38   # 30-yr fixed, Freddie Mac PMMS (matches slider default)
+# stored metrics would contradict the calculator on first paint. These are now
+# kept in sync AUTOMATICALLY each run (fetch_mortgage_rate + patch_mortgage_rate).
+MORTGAGE_RATE_PCT   = 6.38   # 30-yr fixed, Freddie Mac PMMS — FALLBACK only (see below)
 DOWN_PAYMENT_FRAC   = 0.20   # 20% down → LTV 0.80
 DTI_FRONT_FRAC      = 0.30   # 30% of gross income to P&I
 MORTGAGE_TERM_MONTHS = 360   # 30-year amortization
+
+# fetch_mortgage_rate() pulls the live weekly 30-yr fixed (Freddie Mac PMMS) from
+# FRED series MORTGAGE30US and patch_mortgage_rate() writes it into the HTML rate
+# slider — so the slider default, the derived idx/gap/PTI literals, and the live
+# calculator all share ONE source and no longer need hand-syncing. MORTGAGE_RATE_PCT
+# above is the fallback used only when FRED_API_KEY is unset or the fetch fails.
+FRED_API_KEY          = os.environ.get("FRED_API_KEY", "")
+FRED_MORTGAGE_SERIES  = "MORTGAGE30US"
 
 # ─── Rent anchor year (SINGLE SOURCE OF TRUTH) ──────────────────
 # Both the ACS contract-rent dollar anchor and the BLS rent-CPI base-year
@@ -1421,6 +1429,25 @@ HOUSING_PERIOD_RE = re.compile(
 )
 
 
+RATE_SLIDER_VALUE_RE = re.compile(r'(id="rate-slider"[^>]*\svalue=")[\d.]+(")')
+RATE_BUBBLE_RE       = re.compile(r'(id="rate-bubble"[^>]*>)[\d.]+%')
+RATE_DISPLAY_RE      = re.compile(r'(id="rate-display"[^>]*>)[\d.]+%')
+
+
+def patch_mortgage_rate(html: str, rate_pct: float) -> str:
+    """Patch the rate-slider default (input value + bubble + display) to *rate_pct*
+    so the live calculator opens at the SAME rate the static idx/gap/PTI literals
+    were computed with. Single source of truth = fetch_mortgage_rate()."""
+    rate_str = f"{rate_pct:.2f}"
+    html, n1 = RATE_SLIDER_VALUE_RE.subn(lambda m: f"{m.group(1)}{rate_str}{m.group(2)}", html, count=1)
+    html, n2 = RATE_BUBBLE_RE.subn(lambda m: f"{m.group(1)}{rate_str}%", html, count=1)
+    html, n3 = RATE_DISPLAY_RE.subn(lambda m: f"{m.group(1)}{rate_str}%", html, count=1)
+    if not (n1 and n2 and n3):
+        print(f"  WARNING: rate-slider patch incomplete "
+              f"(value={n1}, bubble={n2}, display={n3}) — check #rate-slider markup")
+    return html
+
+
 def patch_periods(html: str, zori_period: str | None, bls_rent_period: str | None,
                   housing_period: str | None = None) -> str:
     """Patch the ZORI_PERIOD, BLS_RENT_PERIOD, and HOUSING_PERIOD marker
@@ -1801,6 +1828,40 @@ def _afford_price(income: float, rate_pct: float) -> float:
     return loan_amt / ltv
 
 
+def fetch_mortgage_rate() -> float:
+    """Fetch the latest weekly 30-yr fixed mortgage rate (Freddie Mac PMMS) from
+    FRED series MORTGAGE30US. Returns a percent float (e.g. 6.38).
+
+    This is the single source of truth for the rate that drives the static
+    idx/gap/PTI literals AND the HTML slider default — removing the old footgun
+    where MORTGAGE_RATE_PCT and the slider's value="…" had to be bumped by hand
+    together. Requires a free FRED_API_KEY env var; on any failure (no key,
+    network, parse, or an out-of-band value) falls back to MORTGAGE_RATE_PCT with
+    a warning so a run never breaks on the rate alone.
+    """
+    if not FRED_API_KEY:
+        print(f"  FRED_API_KEY unset — using fallback mortgage rate {MORTGAGE_RATE_PCT:.2f}%")
+        return MORTGAGE_RATE_PCT
+    import json
+    url = (f"https://api.stlouisfed.org/fred/series/observations"
+           f"?series_id={FRED_MORTGAGE_SERIES}&api_key={FRED_API_KEY}"
+           f"&file_type=json&sort_order=desc&limit=1")
+    try:
+        data = json.loads(fetch_bytes(url))
+        obs  = data.get("observations") or []
+        raw  = obs[0]["value"] if obs else "."
+        rate = float(raw)   # FRED uses "." for missing observations → ValueError
+        if not (2.0 <= rate <= 15.0):
+            raise ValueError(f"rate {rate} outside sane 2–15% band")
+        date = obs[0].get("date", "?")
+        print(f"  FRED {FRED_MORTGAGE_SERIES}: {rate:.2f}% (week of {date})")
+        return round(rate, 2)
+    except Exception as e:
+        print(f"  WARNING: FRED mortgage-rate fetch failed ({e}) — "
+              f"using fallback {MORTGAGE_RATE_PCT:.2f}%")
+        return MORTGAGE_RATE_PCT
+
+
 def compute_derived_affordability(all_prices: dict, rate_pct: float = MORTGAGE_RATE_PCT) -> None:
     """Recompute the price-derived affordability metrics in place so they track
     the (smoothed) Redfin price instead of remaining frozen literals.
@@ -1881,6 +1942,7 @@ def _write_html(
     bls_rent_period: str | None,
     housing_period: str | None,
     dry_run: bool,
+    mortgage_rate: float = MORTGAGE_RATE_PCT,
 ) -> None:
     """Patch and write (or dry-run report) both dashboard HTML files."""
     for target in targets:
@@ -1890,6 +1952,7 @@ def _write_html(
         html    = target.read_text(encoding="utf-8")
         patched = patch_html(html, all_prices)
         patched = patch_periods(patched, zori_period, bls_rent_period, housing_period)
+        patched = patch_mortgage_rate(patched, mortgage_rate)
         if patched == html:
             print(f"\n{target.name}: no changes needed — prices already current.")
             continue
@@ -1960,7 +2023,7 @@ def main():
         return
 
     housing_period = (all_prices.get("State", {}).get("period") or "")[:7] or None
-    _write_html(targets, all_prices, zori_period, bls_rent_period, housing_period, dry_run)
+    _write_html(targets, all_prices, zori_period, bls_rent_period, housing_period, dry_run, mortgage_rate)
 
 
 if __name__ == "__main__":
