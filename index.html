@@ -468,6 +468,13 @@
     .kpi:nth-child(3) { border-left: none; padding-left: 0; }
     .kpi:nth-child(2), .kpi:nth-child(4) { padding-right: 0; }
     .kpi-value { font-size: 1.938rem; }
+    /* In the 2-up mobile grid the right-column cell is only ~139px wide, so
+       the longest label ("MEDIAN INCOME") at 15px/0.14em (~145px) spilled past
+       the card toward the screen edge and read as clipped. Tighten the label
+       type on mobile and let the icon+label wrapper shrink (min-width:0) with
+       an ellipsis safety net so no label can ever overflow its cell. */
+    .kpi-label { font-size: 12.5px; letter-spacing: 0.05em; min-width: 0; }
+    .kpi-label-row > div { min-width: 0; }
   }
 
   main {
@@ -601,6 +608,14 @@
   .top-items-table td { padding: 9px 10px; border-bottom: 1px solid var(--sand); color: var(--text-mid); }
   .top-items-table td:nth-child(2), .top-items-table td:nth-child(3) { text-align: right; font-variant-numeric: tabular-nums; }
   .top-items-table tr:last-child td { border-bottom: none; }
+  /* On phones the 18px/3-column table forced a ~5px horizontal scroll and
+     wrapped item names one word per line. Shrink the type and tighten cell
+     padding so all three columns fit the viewport without scrolling. */
+  @media (max-width: 520px) {
+    .top-items-table { font-size: 15px; }
+    .top-items-table th { font-size: 12.5px; padding: 7px 5px; }
+    .top-items-table td { padding: 8px 5px; }
+  }
 
   /* Staple item price cards */
   .staple-items-panel { margin-top: 22px; }
