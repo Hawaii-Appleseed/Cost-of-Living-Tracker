@@ -22,6 +22,10 @@ jobs:
     env:
       BLS_API_KEY:    ${{ secrets.BLS_API_KEY }}
       CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
+      # Drives the live 30-yr fixed mortgage rate (Freddie Mac PMMS via FRED).
+      # Optional — without it redfin-price-updater.py falls back to the
+      # MORTGAGE_RATE_PCT constant (with a warning) rather than failing.
+      FRED_API_KEY:   ${{ secrets.FRED_API_KEY }}
 
     steps:
       - name: Check out repo

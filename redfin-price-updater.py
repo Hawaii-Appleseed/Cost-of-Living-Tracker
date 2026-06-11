@@ -253,6 +253,16 @@ ZORI_COUNTY_MAP = {
     "Kauai County":    "Kauai",
 }
 
+# Population weights for rolling the four counties up to a statewide figure.
+# Used for (a) the statewide askRent level, (b) the statewide ZORI YoY, and
+# (c) the statewide ZORI growth RATIO that feeds the blended nowcast. (a)/(b)
+# renormalize over whatever counties are present in a given month; (c) does the
+# same so the State ratio is a weighted mean of per-county ratios (NOT a
+# ratio of weighted means over mismatched county sets — Zillow began
+# publishing Kauaʻi only in Feb 2025, so its anchor-year average is missing,
+# and ratio-of-means would otherwise inject a composition shift).
+ZORI_STATE_POP_WEIGHTS = {"Honolulu": 0.72, "Hawaii": 0.14, "Maui": 0.10, "Kauai": 0.04}
+
 # Redfin property type → which countyData field to update
 PROP_TYPE_MAP = {
     "Single Family Residential": "sfhPrice",
@@ -467,7 +477,7 @@ def fetch_zori_asking_rents() -> dict:
                     pass
 
     # Compute statewide weighted average if all counties present
-    weights = {"Honolulu": 0.72, "Hawaii": 0.14, "Maui": 0.10, "Kauai": 0.04}
+    weights = ZORI_STATE_POP_WEIGHTS
     if all(k in result for k in weights):
         state_avg = sum(result[k] * w for k, w in weights.items())
         result["State"] = round(state_avg)
@@ -770,10 +780,11 @@ def fetch_census_burden_anchor() -> dict:
 def fetch_bls_series_ratio(series_id: str, anchor_year: str) -> tuple[float, str] | tuple[None, None]:
     """
     Generic BLS series ratio fetcher. Returns (latest / anchor_year_avg, latest_period).
-    Anchor avg is the mean of all monthly observations in `anchor_year`.
-    Used to drive realized-burden nowcasts from the ACS 5-year mid-point
-    to the current period for both CPI All Items (owner side) and the
-    Hawaiʻi private wages series (income denominator on both sides).
+    Anchor avg is the mean of all monthly observations in `anchor_year` (the ACS
+    vintage YEAR, e.g. 2024 — a full-year average, not a 5-year mid-point).
+    Used to drive realized-burden nowcasts from that anchor-year average to the
+    current period for both CPI All Items (owner side) and the Hawaiʻi private
+    wages series (income denominator on both sides).
     """
     import json
     api_key = os.environ.get("BLS_API_KEY", "")
@@ -835,6 +846,14 @@ def nowcast_burden_anchors(anchor: dict, anchor_year: str) -> dict:
     Hawaiʻi-specific series available). Cost-burden shares are not
     nowcasted — they're tagged as ACS 5-yr in the UI.
 
+    `anchor_year` is the ACS vintage YEAR (RENT_ANCHOR_YEAR, e.g. 2024) — each
+    factor's denominator is that year's full-year average, NOT a 5-year
+    mid-point. The three series (rent CPI, all-items CPI, CES wages) publish on
+    different lags, so each factor's numerator may be a different latest month;
+    `_nowcastPeriod` reports the wage series' latest period (the income
+    denominator on both PTI numbers), and the factor periods are printed
+    individually below for transparency.
+
     Returns anchor extended with nowcasted fields per county.
     """
     if not anchor:
@@ -854,15 +873,21 @@ def nowcast_burden_anchors(anchor: dict, anchor_year: str) -> dict:
             if a.get(k) is not None:
                 a[k] = round(a[k], 4)
 
-    rent_ratio,  _ = fetch_bls_series_ratio(BLS_RENT_SERIES,       anchor_year)
-    cost_ratio,  _ = fetch_bls_series_ratio(BLS_CPI_ALL_ITEMS_HNL, anchor_year)
-    wage_ratio,  nowcast_period = fetch_bls_series_ratio(BLS_WAGES_HI_PRIVATE, anchor_year)
+    rent_ratio,  rent_period = fetch_bls_series_ratio(BLS_RENT_SERIES,       anchor_year)
+    cost_ratio,  cost_period = fetch_bls_series_ratio(BLS_CPI_ALL_ITEMS_HNL, anchor_year)
+    wage_ratio,  wage_period = fetch_bls_series_ratio(BLS_WAGES_HI_PRIVATE,  anchor_year)
     if None in (rent_ratio, cost_ratio, wage_ratio):
         print(f"  WARNING: realized-burden nowcast skipped (missing BLS factor: "
               f"rent={rent_ratio}, cost={cost_ratio}, wage={wage_ratio})")
         return anchor
-    print(f"  Nowcast factors ({anchor_year} → {nowcast_period}): "
-          f"rent={rent_ratio:.3f}, cost={cost_ratio:.3f}, wage={wage_ratio:.3f}")
+    # `_nowcastPeriod` (UI label) tracks the wage series — the income
+    # denominator shared by both PTI numbers. Print each factor's own latest
+    # period too, since the three series publish on different lags.
+    nowcast_period = wage_period
+    print(f"  Nowcast factors (anchor {anchor_year} avg → latest): "
+          f"rent={rent_ratio:.3f} ({rent_period}), "
+          f"cost={cost_ratio:.3f} ({cost_period}), "
+          f"wage={wage_ratio:.3f} ({wage_period})")
     for key in ("State", "Honolulu", "Maui", "Hawaii", "Kauai"):
         if key not in anchor:
             continue
@@ -924,13 +949,18 @@ def fetch_bls_rent_ratio() -> tuple[float, float, str, float | None]:
         raise ValueError(f"No BLS monthly data found for base year {BLS_BASE_YEAR}")
     base_avg = sum(base_vals) / len(base_vals)
 
-    # Monthly observations newest-first, skipping the annual M13 row and "-".
+    # Monthly observations, skipping the annual M13 row and "-". BLS returns
+    # newest-first today, but don't rely on that — sort explicitly descending by
+    # (year, period) so `monthly[0]` is always the latest print and the
+    # smoothing window below is always the trailing N. (A silent ascending
+    # response would otherwise anchor the headline rent to the oldest month.)
     monthly = [
         r for r in series_data
         if r["period"].startswith("M")
         and r["period"] != "M13"
         and r["value"] != "-"
     ]
+    monthly.sort(key=lambda r: (r["year"], r["period"]), reverse=True)
     if not monthly:
         raise ValueError("No recent BLS monthly value found")
     recent = monthly[0]
@@ -1688,11 +1718,27 @@ def _fetch_rents(all_prices: dict) -> tuple[
     blend_bls_ratio = bls_ratio_smooth if bls_ratio_smooth is not None else bls_ratio
     if blend_bls_ratio and zori_anchor_avg:
         zori_ratios: dict[str, float] = {}
-        for key in ("Honolulu", "Maui", "Hawaii", "Kauai", "State"):
+        for key in ("Honolulu", "Maui", "Hawaii", "Kauai"):
             cur  = (all_prices.get(key) or {}).get("askRent")
             base = zori_anchor_avg.get(key)
             if cur and base:
                 zori_ratios[key] = cur / base
+        # Statewide ratio = population-weighted mean of the per-county RATIOS
+        # over counties that have both endpoints, renormalized across whatever
+        # is present. Computing it from the State askRent / State anchor instead
+        # would mix mismatched county sets (Kauaʻi is in the current weighted
+        # askRent but missing from the anchor-year average — Zillow began
+        # publishing it only in Feb 2025), injecting ~1.5–2pp of phantom growth
+        # because Kauaʻi rents run well above the state mean. That biased State
+        # ratio is also the proxy for Kauaʻi's own ZORI leg, so the error would
+        # compound. See ZORI_STATE_POP_WEIGHTS.
+        present_state = {k: ZORI_STATE_POP_WEIGHTS[k]
+                         for k in ZORI_STATE_POP_WEIGHTS if k in zori_ratios}
+        if present_state:
+            wsum = sum(present_state.values())
+            zori_ratios["State"] = sum(
+                zori_ratios[k] * (w / wsum) for k, w in present_state.items()
+            )
         # Proxy missing-county ZORI ratios from the state-level ratio (same
         # approach as the Honolulu BLS CPI being applied statewide).
         proxy = zori_ratios.get("State")
@@ -1970,6 +2016,13 @@ def main():
 
     all_prices = _fetch_sale_prices()
 
+    # Live 30-yr fixed mortgage rate (Freddie Mac PMMS via FRED). Single source
+    # of truth for BOTH the price-derived idx/gap/PTI literals and the HTML
+    # rate-slider default, so they agree at first paint. Falls back to
+    # MORTGAGE_RATE_PCT when FRED_API_KEY is unset or the fetch fails.
+    print("\nFetching live 30-yr fixed mortgage rate (FRED MORTGAGE30US)...")
+    mortgage_rate = fetch_mortgage_rate()
+
     _, bls_rent_period, bls_rent_yoy, zori_period, zori_yoy_map = _fetch_rents(all_prices)
 
     # ── Realized-burden anchor + nowcast (renter GRAPI, owner SMOCAPI,
@@ -2014,7 +2067,8 @@ def main():
 
     # Recompute price-derived affordability metrics (idx/gap/mortgage/PTI) so
     # they track the freshly smoothed prices + incomes instead of drifting.
-    compute_derived_affordability(all_prices, MORTGAGE_RATE_PCT)
+    # Uses the live FRED rate (same value patched into the slider default).
+    compute_derived_affordability(all_prices, mortgage_rate)
 
     _print_summary(all_prices, build_period)
 

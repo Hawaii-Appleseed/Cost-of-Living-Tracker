@@ -273,6 +273,17 @@ Factors are statewide and applied uniformly across all five geographies —
 BLS does not publish county-level CPI or wages for Hawaiʻi, and statewide
 is the finest Hawaiʻi-specific series available.
 
+**Why the burden numerator uses CPI-rent only, not the blended nowcast.**
+The displayed tenant *rent dollars* (`rent`) grow by the blended CPI/ZORI(/FMR)
+factor, but the rent-*burden* numerator (`tenantRentPTI`) grows the ACS GRAPI
+anchor by the CPI-rent factor alone. This is deliberate: GRAPI measures what
+*existing* tenants pay, and the Honolulu rent CPI (`CUURS49ASEHA`, rent of
+primary residence) is the matching existing-tenant deflator. ZORI and FMR
+describe *new-lease / asking* rent, which is the right signal for a forward
+nowcast of market rent but overstates what sitting tenants actually pay. So the
+two figures can diverge — the headline rent dollars run hotter than the burden
+when asking rent leads — and that gap is expected, not a bug.
+
 Cost-burden shares (B25070 / B25091) are **not** nowcasted — they're
 distributional and move slowly. The UI tags them with the ACS 5-year
 period so users know they're anchor-vintage figures.
