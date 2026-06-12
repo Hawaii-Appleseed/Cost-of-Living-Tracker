@@ -3446,9 +3446,9 @@
     </div>
     <div class="slider-row" id="rate-slider-row">
       <div class="slider-label">Mortgage rate</div>
-      <input type="range" id="rate-slider" class="has-progress" min="3.0" max="9.0" step="0.05" value="6.48" oninput="updateCalc(); updateAfford()">
-      <div class="slider-bubble" id="rate-bubble">6.48%</div>
-      <div class="slider-val" id="rate-display">6.48%</div>
+      <input type="range" id="rate-slider" class="has-progress" min="3.0" max="9.0" step="0.05" value="6.52" oninput="updateCalc(); updateAfford()">
+      <div class="slider-bubble" id="rate-bubble">6.52%</div>
+      <div class="slider-val" id="rate-display">6.52%</div>
     </div>
     <div class="slider-row" id="down-slider-row">
       <div class="slider-label">Down payment</div>
@@ -3558,11 +3558,11 @@
 
 <script>
 const countyData = {
-  State:    { income:123000,  sfhPrice:971300,  condoPrice:545900,  sfhPTI:0.4782, condoPTI:0.2687, sfhIdx:62.7, condoIdx:111.6, sfhGap:73048,  condoGap:0, rent:1924, askRent:2990, sfhMortgage:4901, condoMortgage:2755, buildAuth:4404, tenantRentPTI:0.3311, mortgageOwnerPTI:0.2566, rentBurdenedPct:0.5667, rentSeverelyBurdenedPct:0.2859, ownerBurdenedPct:0.4307, ownerSeverelyBurdenedPct:0.0646, zoriYoY:0.0583, cpiRentYoY:0.0285, bedroomRent:{br0:1436,br1:1533,br2:1996,br3plus:2964} },
-  Honolulu: { income:129300, sfhPrice:1150000, condoPrice:515000,  sfhPTI:0.5386, condoPTI:0.2412, sfhIdx:55.7, condoIdx:124.4, sfhGap:102817, condoGap:0,  rent:2032, askRent:2881, sfhMortgage:5803, condoMortgage:2599, buildAuth:2736, tenantRentPTI:0.3361, mortgageOwnerPTI:0.2576, rentBurdenedPct:0.5768, rentSeverelyBurdenedPct:0.2892, ownerBurdenedPct:0.4513, ownerSeverelyBurdenedPct:0.066, zoriYoY:0.0587, cpiRentYoY:0.0285, bedroomRent:{br0:1458,br1:1605,br2:2086,br3plus:3149} },
-  Maui:     { income:110900,  sfhPrice:1203250, condoPrice:645000,  sfhPTI:0.657, condoPTI:0.3522, sfhIdx:45.7, condoIdx:85.2, sfhGap:131965, condoGap:19287, rent:1863, askRent:3507, sfhMortgage:6072, condoMortgage:3255, buildAuth:651, tenantRentPTI:0.3281, mortgageOwnerPTI:0.2665, rentBurdenedPct:0.5589, rentSeverelyBurdenedPct:0.3, ownerBurdenedPct:0.3977, ownerSeverelyBurdenedPct:0.0711, zoriYoY:0.0344, bedroomRent:{br0:1365,br1:1330,br2:2020,br3plus:2755} },
-  Hawaii:   { income:98800,  sfhPrice:570000,  condoPrice:595000,  sfhPTI:0.3493, condoPTI:0.3647, sfhIdx:85.9, condoIdx:82.3, sfhGap:16249,   condoGap:21295, rent:1356, askRent:2698, sfhMortgage:2876, condoMortgage:3002, buildAuth:911, tenantRentPTI:0.3062, mortgageOwnerPTI:0.2436, rentBurdenedPct:0.5162, rentSeverelyBurdenedPct:0.2723, ownerBurdenedPct:0.3919, ownerSeverelyBurdenedPct:0.0573, zoriYoY:0.0375, bedroomRent:{br0:1138,br1:1127,br2:1500,br3plus:1958} },
-  Kauai:    { income:132900,  sfhPrice:1300000, condoPrice:800000,  sfhPTI:0.5923, condoPTI:0.3645, sfhIdx:50.6, condoIdx:82.3, sfhGap:129493, condoGap:28573, rent:1753, askRent:4689, sfhMortgage:6560, condoMortgage:4037, buildAuth:106, tenantRentPTI:0.3092, mortgageOwnerPTI:0.2606, rentBurdenedPct:0.5196, rentSeverelyBurdenedPct:0.221, ownerBurdenedPct:0.3548, ownerSeverelyBurdenedPct:0.0534, zoriYoY:0.1824, bedroomRent:{br0:1660,br1:1436,br2:1825,br3plus:2745} },
+  State:    { income:123000,  sfhPrice:971300,  condoPrice:545900,  sfhPTI:0.4802, condoPTI:0.2699, sfhIdx:62.5, condoIdx:111.2, sfhGap:73866,  condoGap:0, rent:1950, askRent:2990, sfhMortgage:4922, condoMortgage:2766, buildAuth:4404, tenantRentPTI:0.338, mortgageOwnerPTI:0.2619, rentBurdenedPct:0.5667, rentSeverelyBurdenedPct:0.2859, ownerBurdenedPct:0.4307, ownerSeverelyBurdenedPct:0.0646, zoriYoY:0.0583, cpiRentYoY:0.0285, bedroomRent:{br0:1436,br1:1533,br2:1996,br3plus:2964}, rentMethod:"renter-wtd of counties", rentAsOf:"2026-05" },
+  Honolulu: { income:129300, sfhPrice:1150000, condoPrice:515000,  sfhPTI:0.5408, condoPTI:0.2422, sfhIdx:55.5, condoIdx:123.9, sfhGap:103785, condoGap:0,  rent:2025, askRent:2881, sfhMortgage:5827, condoMortgage:2610, buildAuth:2736, tenantRentPTI:0.3431, mortgageOwnerPTI:0.2629, rentBurdenedPct:0.5768, rentSeverelyBurdenedPct:0.2892, ownerBurdenedPct:0.4513, ownerSeverelyBurdenedPct:0.066, zoriYoY:0.0587, cpiRentYoY:0.0285, bedroomRent:{br0:1458,br1:1605,br2:2086,br3plus:3149}, rentMethod:"passthrough", rentAsOf:"2026-05" },
+  Maui:     { income:110900,  sfhPrice:1203250, condoPrice:645000,  sfhPTI:0.6597, condoPTI:0.3536, sfhIdx:45.5, condoIdx:84.8, sfhGap:132978, condoGap:19830, rent:1900, askRent:3507, sfhMortgage:6097, condoMortgage:3268, buildAuth:651, tenantRentPTI:0.335, mortgageOwnerPTI:0.2721, rentBurdenedPct:0.5589, rentSeverelyBurdenedPct:0.3, ownerBurdenedPct:0.3977, ownerSeverelyBurdenedPct:0.0711, zoriYoY:0.0344, bedroomRent:{br0:1365,br1:1330,br2:2020,br3plus:2755}, rentMethod:"passthrough", rentAsOf:"2026-05" },
+  Hawaii:   { income:98800,  sfhPrice:570000,  condoPrice:595000,  sfhPTI:0.3508, condoPTI:0.3662, sfhIdx:85.5, condoIdx:81.9, sfhGap:16729,   condoGap:21796, rent:1600, askRent:2698, sfhMortgage:2888, condoMortgage:3015, buildAuth:911, tenantRentPTI:0.3126, mortgageOwnerPTI:0.2487, rentBurdenedPct:0.5162, rentSeverelyBurdenedPct:0.2723, ownerBurdenedPct:0.3919, ownerSeverelyBurdenedPct:0.0573, zoriYoY:0.0375, bedroomRent:{br0:1138,br1:1127,br2:1500,br3plus:1958}, rentMethod:"passthrough", rentAsOf:"2026-05" },
+  Kauai:    { income:132900,  sfhPrice:1300000, condoPrice:800000,  sfhPTI:0.5948, condoPTI:0.366, sfhIdx:50.4, condoIdx:82.0, sfhGap:130588, condoGap:29246, rent:1850, askRent:4689, sfhMortgage:6587, condoMortgage:4054, buildAuth:106, tenantRentPTI:0.3156, mortgageOwnerPTI:0.266, rentBurdenedPct:0.5196, rentSeverelyBurdenedPct:0.221, ownerBurdenedPct:0.3548, ownerSeverelyBurdenedPct:0.0534, zoriYoY:0.1824, bedroomRent:{br0:1660,br1:1436,br2:1825,br3plus:2745}, rentMethod:"passthrough", rentAsOf:"2026-05" },
 };
 const counties = ['State','Honolulu','Maui','Hawaii','Kauai'];
 const shortLbl = { State:'State', Honolulu:'Honolulu', Maui:'Maui', Hawaii:'Hawaiʻi', Kauai:'Kauaʻi' };
@@ -4621,8 +4621,15 @@ function buildDataPeriods() {
     housing:   housingPeriod ? { period: housingPeriod, cadence: 'monthly' } : null,
     askRent:   (typeof zoriLatestPeriod !== 'undefined' && zoriLatestPeriod)
                ? { period: zoriLatestPeriod, cadence: 'monthly' } : null,
-    rent:      (typeof blsRentLatestPeriod !== 'undefined' && blsRentLatestPeriod)
-               ? { period: blsRentLatestPeriod, cadence: 'monthly', projected: true } : null,
+    rent:      (function(){
+                 // Prefer the selected county's own nowcast target month +
+                 // method (item 8); fall back to the global BLS-rent period.
+                 var cd = (typeof countyData !== 'undefined') ? countyData[currentCounty] : null;
+                 var p  = (cd && cd.rentAsOf) ? cd.rentAsOf
+                          : ((typeof blsRentLatestPeriod !== 'undefined') ? blsRentLatestPeriod : null);
+                 return p ? { period: p, cadence: 'monthly', projected: true,
+                              method: (cd && cd.rentMethod) || null } : null;
+               })(),
     gas:       gasPeriod ? { period: gasPeriod, cadence: 'daily' } : null,
     grocery:   (g && g.lastUpdated)
                ? { period: g.lastUpdated.slice(0, 7),
@@ -4798,7 +4805,7 @@ const GLOSSARY = {
     href:   "https://www.bls.gov/regions/west/ro9/news-release/consumerpriceindex_honolulu.htm" },
   rentNowcast: {
     term: "Tenant rent · nowcast",
-    def:  "Blended estimate of what existing tenants pay this month, anchored to ACS 2024 median contract rent by county and grown forward by a weighted blend of three signals: Honolulu CPI rent (official but lags asking rent by ~12 months), Zillow ZORI growth (a leading indicator from new listings), and — on the neighbor islands — HUD Fair Market Rent (a county-specific signal). Weights vary by county: Honolulu and statewide are 70% CPI / 30% ZORI; Maui is 50/50 CPI/ZORI; Hawaiʻi Island is ~⅓ each CPI/ZORI/FMR; Kauaʻi is 40% CPI / 40% ZORI / 20% FMR. Outer islands lean less on Honolulu CPI because it is a Honolulu-only sample. The blend accepts some asking-rent signal to cut the lag without over-reacting to new-listing noise.",
+    def:  "Estimate of what existing tenants pay this month. We start from the most recent hard number — the 2024 American Community Survey median contract rent for each county — and carry it forward to this month using two signals: the official Honolulu rent-inflation index (what sitting tenants actually pay, but it lags new leases by about a year) and Zillow's asking-rent index (a leading signal from new listings). A 'pass-through' model treats stock rents as gradually catching up to asking rents as leases turn over, so the estimate can keep rising toward where asking rents have already gone — something a simple average of the two could never do. Statewide is the renter-weighted average of the counties. It's an estimate, not a survey count: figures are shown to the nearest $25 because the underlying data carries a margin of error of roughly ±5–9%. The method actually used each month is recorded alongside the number.",
     source: "Method: Cleveland Fed WP 22-38r",
     href:   "https://www.clevelandfed.org/publications/working-paper/2023/wp-2238r-disentangling-rent-index-differences" },
   gasSource: {
