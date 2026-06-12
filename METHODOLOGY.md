@@ -70,21 +70,50 @@ We fetch the Honolulu (and every other county's) ACS anchor dollar value
 **live** from the Census API each run, so the dollar value cannot drift out
 of sync with the anchor year. No hardcoded dollar figures live in the repo.
 
-### Re-anchoring cadence
+### Anchor vintage: ACS 1-year, not 5-year (Q-audit item 2)
+
+The contract-rent anchor (table **B25058**) uses the ACS **1-year** estimate
+for all five geographies (`COUNTY_ANCHOR_OVERRIDE`), with the 5-year only as a
+per-geography fallback when a 1-year cell is suppressed. Reason: the 5-year
+estimate pools 2020–2024, so its "level" is centred around ~2022 — but the
+nowcast multiplies the anchor by a *2024→present* growth factor, which would
+silently omit ~2 years of rent growth. The 1-year 2024 level is a true 2024
+level, consistent with the calendar-2024 BLS base-year average and ZORI anchor
+average the growth factors are built on. (All HI counties and the State exceed
+the 65k-population threshold the 1-year requires.)
+
+The **bedroom-rent tiles** (B25031) and **cost-burden distributions**
+(B25070/B25091) intentionally stay on the 5-year — they hit small-cell
+suppression on thin neighbor-island samples that the 5-year smooths over.
+
+### Re-anchoring cadence (and backtest re-validation — item 5)
 
 Update `RENT_ANCHOR_YEAR` **once per year, in December or January**, when
-the new ACS 5-year vintage is published. Steps:
+the new ACS vintage is published. Steps:
 
 1. Bump the constant:
    ```python
    RENT_ANCHOR_YEAR = "2025"   # or whatever the new vintage is
    ```
 2. Do a dry-run: `python3 redfin-price-updater.py --dry-run` and confirm the
-   printed "anchor ACS {year} $X,XXX × ratio {r}" line reflects the new vintage.
+   printed "anchor ACS {year} $X,XXX" lines reflect the new vintage.
 3. Sanity-check the four counties: moving from vintage N to N+1 should shift
    each county's anchor by a small single-digit %. A 20%+ jump means Census
    hasn't published the new vintage yet, or you're hitting a cached URL.
-4. Run end-to-end and verify the dashboard's rent figures move sanely.
+4. **Re-run the backtest gate** so the model parameters stay validated against
+   the new ground truth:
+   `CENSUS_API_KEY=… python3 scripts/backtest_rent_nowcast.py`. Confirm the
+   pass-through λ and the convex-blend weights are still within the noise floor
+   of the optimum, and that the chosen method still beats the alternative inside
+   the 8% MAPE budget. Update `RENT_PASSTHROUGH_LAMBDA` / `RENT_PRODUCTION_METHOD`
+   if the verdict moves. (Kauaʻi weights stay provisional until it has ≥2 years
+   of ZORI history, ≈2027.)
+5. **Chain-link the level jump.** Re-anchoring shifts the absolute level by a
+   step (the new vintage is a fresher, higher base). For one cycle, note the
+   old-anchor and new-anchor rents in the commit message so the December
+   discontinuity is visible and reviewable rather than a silent jump.
+6. Run end-to-end and verify the dashboard's rent figures move sanely; the
+   freshness check (`scripts/check_freshness.py`) must pass.
 
 **Why re-anchor at all?** The BLS Honolulu rent CPI is an *index*, not a
 dollar value — it only tells us "rent today is X% of rent in 1982-84." To
@@ -101,6 +130,63 @@ that's intentional and required: the index-to-dollar conversion is only
 valid when the ACS dollar year and the BLS base-average year are the same.
 The two named constants exist so the intent reads clearly at each use site.
 **Never set them to different years** without fully re-deriving the scaling.
+
+---
+
+## Rent nowcast model
+
+The published `rent` is the ACS 1-year anchor carried forward to the current
+month. Three structural properties (Q-audit items 3, 4, 7):
+
+### 1. One target month for every leg (item 3)
+
+The two monthly signals end on different months — BLS Honolulu rent CPI is
+bimonthly, ZORI is monthly — and HUD FMR is annual. Mixing growth-to-different-
+endpoints understates or overstates the blend. We pick a single
+`target_month = max(latest BLS-rent month, latest ZORI month)` and bring each
+leg to it: the lagging leg is extrapolated with the project's canonical
+damped-trend machinery (`smoothed_monthly_rate → clip ±PROJ_MONTHLY_CAP →
+damped_compound_factor`, the same code the grocery/TFP side uses — imported from
+`census_forecaster.bls.projection`). The published `rentAsOf` per county is this
+single target month.
+
+### 2. Pass-through model, not a convex blend (item 4)
+
+A convex blend `w·cpi + (1−w)·zori` can never leave the interval between its
+legs. When BOTH proxies undershoot realized growth — the Big Island 2022→24
+case (ACS +31% vs CPI +10%, ZORI +16%) — no weighting can reach the target. We
+instead use a **log-space pass-through**:
+
+```
+rent = anchor · cpi_factor^(1−λ) · zori_factor^λ
+```
+
+λ is the lease-turnover pass-through completeness. λ=0 → pure CPI; λ=1 → fully
+caught up to asking; **λ>1 → overshoot**, projecting continued catch-up toward
+accumulated asking-rent growth even after asking flattens — which is how the
+model exceeds both contemporaneous legs.
+
+λ is calibrated by `scripts/backtest_rent_nowcast.py` against ACS 1-year ground
+truth and promoted to production (`RENT_PRODUCTION_METHOD = "passthrough"`) only
+when it beats the convex blend within the 8% MAPE budget. **2026-06-11 run:**
+outer-island pooled MAPE 5.59% at λ=0.65 (vs blend 5.64%); Big Island error
+7.83%→6.42%. Both models are always computed; the constant selects what ships,
+and each county records the method used in `rentMethod`.
+
+### 3. State = renter-weighted aggregate (item 7)
+
+The statewide rent is **not** an independent blend. It is the renter-household-
+weighted average of the four county nowcasts, with weights from ACS **B25003**
+(renter-occupied counts, fetched per run) — so the State figure reconciles with
+its counties by construction, and the weights apply to a renter quantity (the
+old hardcoded total-population weights over-counted low-renter-share islands).
+
+### Display precision (item 8)
+
+Rents are rounded to the nearest **$25**. The backtest noise floor (ACS 1-yr MoE
+±5–9% on the neighbor islands) is far wider than $1, so dollar-precise display
+would imply false confidence. The exact method used each month is written to
+`rentMethod` and surfaced in the dashboard's data-freshness tooltip.
 
 ---
 
@@ -255,19 +341,29 @@ bring the realized burden up to the current dashboard period we apply
 a BLS-driven nowcast factor on the numerator and denominator:
 
 ```
-rent_factor   = CPI_rent_HNL(latest)  / CPI_rent_HNL(anchor_year_avg)
-cost_factor   = CPI_all_HNL(latest)   / CPI_all_HNL(anchor_year_avg)
-income_factor = wage_HI(latest)       / wage_HI(anchor_year_avg)
+rent_factor   = CPI_rent_HNL(latest)         / CPI_rent_HNL(anchor_year_avg)
+cost_factor   = CPI_all_HNL(latest)          / CPI_all_HNL(anchor_year_avg)
+income_factor = wage_HI(trailing-12mo mean)  / wage_HI(anchor_year_avg)
 
 tenantRentPTI    = B25071 × (rent_factor / income_factor)
 mortgageOwnerPTI = B25092 × (cost_factor / income_factor)
 ```
 
+**Income factor uses a trailing-12-month wage mean (Q-audit item 6).** The CES
+wage series is *not seasonally adjusted*, so a single latest month carries
+bonus/seasonal noise that would move every county's burden in lockstep (the same
+factor divides both PTIs). Averaging a full year removes that at the cost of ~6
+months of extra lag — acceptable for a slow-moving denominator. The numerator
+month still differs by series; the UI label tracks the wage series. (A better
+concept is BEA quarterly state personal income — multiple earners, transfers,
+retirees — but it is a heavier integration; the CES proxy assumes household
+income tracks per-worker private earnings.)
+
 | Series | Code | Role |
 |---|---|---|
 | Honolulu CPI, rent of primary residence | `CUURS49ASEHA` | Rent-burden numerator |
 | Honolulu CPI, all items | `CUURS49ASA0` | Owner-burden numerator proxy — locked-in mortgage P&I + slow-growing tax / insurance / utilities ≈ general CPI |
-| Hawaiʻi state private avg weekly earnings (NSA) | `SMU15000000500000011` | Income denominator (both sides) |
+| Hawaiʻi state private avg weekly earnings (NSA) | `SMU15000000500000011` | Income denominator (both sides), trailing-12mo mean |
 
 Factors are statewide and applied uniformly across all five geographies —
 BLS does not publish county-level CPI or wages for Hawaiʻi, and statewide

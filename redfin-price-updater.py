@@ -41,6 +41,23 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from ha_common.http_client import fetch_bytes, fetch_text   # noqa: E402
 from ha_common.html_patcher import patch_html_files  # noqa: E402
 
+# Canonical damped-trend projection helpers (same source the grocery/TFP side
+# uses — see tfp-updater.py). Reused here to bring a lagging monthly rent leg
+# forward to a common target month so the blend's legs share one endpoint
+# instead of each ending at its own latest print. Soft-optional: if the
+# package isn't installed the rent nowcast falls back to NOT extrapolating
+# (legs stay at their own latest month, the pre-alignment behaviour).
+try:
+    from census_forecaster.bls.projection import (   # noqa: E402
+        smoothed_monthly_rate as _bls_smoothed_monthly_rate,
+        damped_compound_factor as _bls_damped_compound_factor,
+        PROJ_MONTHLY_CAP as _PROJ_MONTHLY_CAP,
+    )
+    _PROJECTION_AVAILABLE = True
+except ImportError:
+    _PROJECTION_AVAILABLE = False
+    _PROJ_MONTHLY_CAP = 0.0189
+
 try:
     import openpyxl
     _OPENPYXL_AVAILABLE = True
@@ -228,13 +245,28 @@ BLENDED_RENT_3LEG_WEIGHTS = {
 # instead of a single bumpy print.
 BLS_RENT_SMOOTHING_WINDOW = 3
 
-# Per-county ACS vintage override. Default is the 5-year (CENSUS_BASE_URL).
-# Maui uses the 1-year because the 2020–2024 5-yr dilutes the post-Lahaina
-# rental shock by averaging it with pre-fire years; the 1-yr 2024 captures
-# the single-year impact. ACS 1-yr only publishes for areas ≥65k pop.
-# Other counties qualify but currently keep 5-yr for stability.
+# ACS vintage for the CONTRACT-RENT ANCHOR (B25058 only — the dollar level the
+# nowcast scales forward). All five geographies use the 1-year now.
+#
+# WHY 1-yr for everyone (was Maui-only): the 5-year level (2020–2024) is centred
+# ~2022, but the nowcast multiplies it by a 2024→present growth factor — so a
+# 5-yr anchor silently OMITS ~2 years of rent growth. The 1-yr 2024 level is a
+# true 2024 level, aligned with the calendar-2024 BLS base-year average and ZORI
+# anchor average the growth factors are built on. (Maui already used 1-yr to
+# avoid diluting the post-Lahaina shock; the same logic — wrong sample window —
+# applies everywhere.) All HI counties + the State are >65k pop so all publish
+# 1-yr. Each fetch falls back to the 5-yr value if a 1-yr cell is suppressed.
+#
+# NOTE: only the contract-rent ANCHOR moves to 1-yr. The bedroom-rent tiles
+# (B25031) and cost-burden distributions (B25070/B25091) stay on the 5-yr —
+# they hit small-cell suppression on thin neighbor-island samples that the 5-yr
+# smooths over. See METHODOLOGY.md § Rent-anchor year.
 COUNTY_ANCHOR_OVERRIDE = {
-    "Maui": "acs1",
+    "State":    "acs1",
+    "Honolulu": "acs1",
+    "Hawaii":   "acs1",
+    "Maui":     "acs1",
+    "Kauai":    "acs1",
 }
 
 # Redfin region name → countyData key in the HTML file
@@ -409,6 +441,7 @@ def fetch_zori_asking_rents() -> dict:
     result = {}
     anchor_avg = {}
     yoy_pct = {}   # per-county YoY % using same-month-prior-year column
+    recent_points = {}  # per-county ascending [{year,period,value}] for extrapolation
     latest_date_header = None  # e.g. "2026-03-31" → we'll convert to "2026-03"
     for row in reader:
         if len(row) < 10:
@@ -447,6 +480,26 @@ def fetch_zori_asking_rents() -> dict:
         if not window_vals:
             continue
         result[key] = round(sum(window_vals) / len(window_vals))
+
+        # Collect up to 8 recent (header-date, value) pairs as ASCENDING
+        # {year, period:"MNN", value} points so the blend can extrapolate this
+        # county's ZORI ratio forward to the common target month. ZORI headers
+        # are ISO dates "YYYY-MM-DD".
+        pts = []
+        for i in range(last_idx, 8, -1):
+            cell = row[i].strip() if i < len(row) else ""
+            hdr  = headers[i] if i < len(headers) else ""
+            if not cell or len(hdr) < 7:
+                continue
+            try:
+                val = float(cell)
+            except ValueError:
+                continue
+            pts.append({"year": int(hdr[:4]), "period": f"M{hdr[5:7]}", "value": val})
+            if len(pts) >= 8:
+                break
+        if pts:
+            recent_points[key] = list(reversed(pts))  # ascending
 
         # Capture the column header (date) once; should be identical across counties
         if latest_date_header is None and last_idx < len(headers):
@@ -510,6 +563,7 @@ def fetch_zori_asking_rents() -> dict:
     result["_anchor_year"] = RENT_ANCHOR_YEAR
     result["_yoy_pct"] = yoy_pct  # per-county YoY % — used by NTR/ATR audit
     result["_smoothing_window"] = ZORI_SMOOTHING_WINDOW
+    result["_recent_points"] = recent_points  # per-county ascending monthly points
     return result
 
 
@@ -528,11 +582,12 @@ def fetch_census_rent() -> dict:
     """
     Download median contract rent (B25058_001E) for Hawaii state + 4 counties.
 
-    The default vintage is ACS 5-year (CENSUS_BASE_URL). Per-county overrides
-    in COUNTY_ANCHOR_OVERRIDE can switch a single county to ACS 1-year — used
-    for Maui (post-Lahaina-fire single-year shock that the 5-yr dilutes by
-    averaging with pre-fire years). Each override is fetched independently;
-    failure falls back to the 5-yr value already in the result dict.
+    A 5-year base is pulled first for every geography, then each geography in
+    COUNTY_ANCHOR_OVERRIDE (now ALL five — see the constant) is re-fetched at
+    ACS 1-year and overwrites the 5-yr value. The 1-yr level is a true 2024
+    level aligned with the calendar-2024 growth factors; the 5-yr (a ~2022
+    level) is kept only as a per-geography fallback when a 1-yr cell is
+    suppressed or the fetch fails.
 
     Contract rent excludes utilities — directly comparable to Zillow ZORI.
     Returns {countyKey: {rent: int, rentAnchorVariant: "acs5"|"acs1"}}
@@ -574,13 +629,20 @@ def fetch_census_rent() -> dict:
         if key:
             result[key] = {"rent": int(row[rent_idx]), "rentAnchorVariant": "acs5"}
 
-    # ── 2. Per-county 1-yr overrides (e.g. Maui post-fire) ──────────────
-    for cty, variant in COUNTY_ANCHOR_OVERRIDE.items():
-        if variant != "acs1" or cty not in county_fips:
+    # ── 2. 1-yr overrides for every geography in COUNTY_ANCHOR_OVERRIDE ──
+    # State uses for=state:15; counties use for=county:<fips>. Each is fetched
+    # independently and falls back to the 5-yr value already in `result` on a
+    # suppressed cell or any error.
+    for geo, variant in COUNTY_ANCHOR_OVERRIDE.items():
+        if variant != "acs1":
             continue
-        fips = county_fips[cty]
-        url = (f"{_census_base_url('acs1')}?get={CENSUS_RENT_VAR},NAME"
-               f"&for=county:{fips}&in=state:15{key_qs}")
+        if geo == "State":
+            url = f"{_census_base_url('acs1')}?get={CENSUS_RENT_VAR}&for=state:15{key_qs}"
+        elif geo in county_fips:
+            url = (f"{_census_base_url('acs1')}?get={CENSUS_RENT_VAR},NAME"
+                   f"&for=county:{county_fips[geo]}&in=state:15{key_qs}")
+        else:
+            continue
         try:
             data = _get(url)
             hdr, *rows = data
@@ -589,20 +651,68 @@ def fetch_census_rent() -> dict:
                 v_raw = rows[0][r_idx]
                 v = int(v_raw) if v_raw and v_raw not in ("-", "null") and int(v_raw) > 0 else None
                 if v is not None:
-                    result.setdefault(cty, {})
-                    prev = result[cty].get("rent")
-                    result[cty]["rent"] = v
-                    result[cty]["rentAnchorVariant"] = "acs1"
+                    result.setdefault(geo, {})
+                    prev = result[geo].get("rent")
+                    result[geo]["rent"] = v
+                    result[geo]["rentAnchorVariant"] = "acs1"
                     pf = f" (was 5-yr ${prev:,})" if prev else ""
-                    print(f"  → {cty}: ACS 1-yr {CENSUS_ACS_YEAR} override ${v:,}{pf}")
+                    print(f"  → {geo}: ACS 1-yr {CENSUS_ACS_YEAR} anchor ${v:,}{pf}")
                 else:
-                    print(f"  WARNING: {cty} 1-yr override returned suppressed value; "
-                          f"falling back to 5-yr ${result.get(cty, {}).get('rent', '?')}")
+                    print(f"  WARNING: {geo} 1-yr anchor returned suppressed value; "
+                          f"falling back to 5-yr ${result.get(geo, {}).get('rent', '?')}")
         except Exception as e:
-            print(f"  WARNING: {cty} 1-yr override fetch failed ({e}); "
-                  f"keeping 5-yr ${result.get(cty, {}).get('rent', '?')}")
+            print(f"  WARNING: {geo} 1-yr anchor fetch failed ({e}); "
+                  f"keeping 5-yr ${result.get(geo, {}).get('rent', '?')}")
 
     return result
+
+
+# ACS B25003 — tenure. _003E = renter-occupied housing units. Used to build
+# the renter-household weights that aggregate per-county rent nowcasts into the
+# State figure (Q-audit item 7), replacing the old hardcoded total-population
+# weights (which mis-weighted a renter quantity, over-counting low-renter-share
+# neighbor islands). 5-yr is fine here — these counts are slow-moving and the
+# 5-yr avoids small-cell noise.
+CENSUS_RENTER_VAR = "B25003_003E"
+
+
+def fetch_census_renter_weights() -> dict:
+    """Return {countyKey: renter_household_share} normalized over the 4 counties.
+
+    Pulls ACS 5-yr renter-occupied household counts (B25003_003E) for the four
+    counties and returns each county's share of the statewide renter total, so
+    State rent = Σ_c share_c · county_rent. Returns {} on any failure (caller
+    falls back to the legacy ZORI_STATE_POP_WEIGHTS).
+    """
+    import json
+    if not CENSUS_API_KEY:
+        print("  WARNING: CENSUS_API_KEY not set; skipping renter-weight fetch "
+              "(State will use legacy population weights).")
+        return {}
+    url = (f"{_census_base_url('acs5')}?get={CENSUS_RENTER_VAR},NAME"
+           f"&for=county:*&in=state:15&key={CENSUS_API_KEY}")
+    try:
+        data = json.loads(fetch_bytes(url))
+    except (OSError, json.JSONDecodeError) as e:
+        print(f"  WARNING: renter-weight fetch failed ({e}); using legacy weights.")
+        return {}
+    hdr, *rows = data
+    v_idx, n_idx = hdr.index(CENSUS_RENTER_VAR), hdr.index("NAME")
+    counts = {}
+    for row in rows:
+        key = CENSUS_NAME_MAP.get(row[n_idx])
+        try:
+            if key and int(row[v_idx]) > 0:
+                counts[key] = int(row[v_idx])
+        except (TypeError, ValueError):
+            continue
+    total = sum(counts.values())
+    if not total:
+        return {}
+    weights = {k: c / total for k, c in counts.items()}
+    print("  Renter-household weights (B25003): "
+          + ", ".join(f"{k} {w:.3f}" for k, w in weights.items()))
+    return weights
 
 
 def fetch_census_bedroom_rent() -> dict:
@@ -777,14 +887,19 @@ def fetch_census_burden_anchor() -> dict:
     return result
 
 
-def fetch_bls_series_ratio(series_id: str, anchor_year: str) -> tuple[float, str] | tuple[None, None]:
+def fetch_bls_series_ratio(series_id: str, anchor_year: str,
+                           trailing_window: int = 1) -> tuple[float, str] | tuple[None, None]:
     """
-    Generic BLS series ratio fetcher. Returns (latest / anchor_year_avg, latest_period).
+    Generic BLS series ratio fetcher. Returns (numerator / anchor_year_avg, period).
     Anchor avg is the mean of all monthly observations in `anchor_year` (the ACS
     vintage YEAR, e.g. 2024 — a full-year average, not a 5-year mid-point).
-    Used to drive realized-burden nowcasts from that anchor-year average to the
-    current period for both CPI All Items (owner side) and the Hawaiʻi private
-    wages series (income denominator on both sides).
+
+    `trailing_window` (item 6): the numerator is the mean of the most recent
+    `trailing_window` monthly observations rather than the single latest print.
+    Used =12 for the CES wage series (the burden income denominator) so the
+    factor isn't whipsawed by December-bonus seasonality (the series is NSA) or
+    a single noisy print that would otherwise move every county's burden in
+    lockstep. =1 (default) keeps the single-latest behaviour for CPI legs.
     """
     import json
     api_key = os.environ.get("BLS_API_KEY", "")
@@ -824,9 +939,12 @@ def fetch_bls_series_ratio(series_id: str, anchor_year: str) -> tuple[float, str
     if not anchor_vals:
         return None, None
     anchor_avg = sum(anchor_vals) / len(anchor_vals)
-    y_last, p_last, v_last = monthly[-1]
+    y_last, p_last, _ = monthly[-1]
     latest_period = f"{y_last}-{p_last[1:]}"   # M04 → 04
-    return v_last / anchor_avg, latest_period
+    # Numerator: trailing-window mean (window=1 → single latest print).
+    window = monthly[-trailing_window:] if trailing_window > 1 else monthly[-1:]
+    numerator = sum(v for (_, _, v) in window) / len(window)
+    return numerator / anchor_avg, latest_period
 
 
 def nowcast_burden_anchors(anchor: dict, anchor_year: str) -> dict:
@@ -875,7 +993,13 @@ def nowcast_burden_anchors(anchor: dict, anchor_year: str) -> dict:
 
     rent_ratio,  rent_period = fetch_bls_series_ratio(BLS_RENT_SERIES,       anchor_year)
     cost_ratio,  cost_period = fetch_bls_series_ratio(BLS_CPI_ALL_ITEMS_HNL, anchor_year)
-    wage_ratio,  wage_period = fetch_bls_series_ratio(BLS_WAGES_HI_PRIVATE,  anchor_year)
+    # Wage (income denominator): trailing-12-month mean — the CES series is NSA,
+    # so a single latest month carries bonus/seasonal noise that would move every
+    # county's burden in lockstep (item 6). Costs ~6 mo of extra lag, fine for a
+    # slow-moving denominator. The numerator periods still differ by series; the
+    # UI label tracks the wage series (the shared denominator).
+    wage_ratio,  wage_period = fetch_bls_series_ratio(BLS_WAGES_HI_PRIVATE,  anchor_year,
+                                                      trailing_window=12)
     if None in (rent_ratio, cost_ratio, wage_ratio):
         print(f"  WARNING: realized-burden nowcast skipped (missing BLS factor: "
               f"rent={rent_ratio}, cost={cost_ratio}, wage={wage_ratio})")
@@ -999,7 +1123,14 @@ def fetch_bls_rent_ratio() -> tuple[float, float, str, float | None]:
     yoy_str = f", YoY {yoy_pct:+.2f}%" if yoy_pct is not None else ""
     print(f"  BLS {BLS_RENT_SERIES}: base_avg={base_avg:.2f}, current={current_idx:.3f}, "
           f"ratio={ratio_now:.4f} (3-mo smoothed {ratio_smoothed:.4f}, period {period}{yoy_str})")
-    return ratio_now, ratio_smoothed, period, yoy_pct
+    # Ascending {year, period, value} points (most recent ~8) for target-month
+    # extrapolation in the blend. base_avg is the anchor-year average so callers
+    # can build the ratio at any target month via extrapolate_ratio_to().
+    points = [
+        {"year": int(r["year"]), "period": r["period"], "value": float(r["value"])}
+        for r in sorted(monthly, key=lambda r: (r["year"], r["period"]))[-8:]
+    ]
+    return ratio_now, ratio_smoothed, period, yoy_pct, base_avg, points
 
 
 def fetch_bls_rent(honolulu_acs_anchor: int) -> dict:
@@ -1017,13 +1148,16 @@ def fetch_bls_rent(honolulu_acs_anchor: int) -> dict:
     Returns {"Honolulu": {"rent": int}, "_period": "YYYY-MM",
              "_ratio": float (latest, single-month),
              "_ratio_smoothed": float (3-month trailing mean for blend),
-             "_yoy_pct": float|None}.
+             "_yoy_pct": float|None,
+             "_base_avg": float (anchor-year index average),
+             "_points": [{year,period,value}, …] ascending (for extrapolation)}.
 
     The CPI-only `rent` value uses the latest single-month ratio (it's a
     display fallback when the blend can't run). The blended nowcast in
-    _fetch_rents() reads _ratio_smoothed instead.
+    _fetch_rents() reads _ratio_smoothed (and _points/_base_avg for the
+    target-month alignment).
     """
-    ratio_now, ratio_smoothed, period, yoy_pct = fetch_bls_rent_ratio()
+    ratio_now, ratio_smoothed, period, yoy_pct, base_avg, points = fetch_bls_rent_ratio()
     scaled_rent   = round(honolulu_acs_anchor * ratio_now)
     print(f"  → Honolulu rent ${scaled_rent:,} "
           f"(anchor ACS {RENT_ANCHOR_YEAR} ${honolulu_acs_anchor:,} × ratio {ratio_now:.4f}, "
@@ -1034,7 +1168,55 @@ def fetch_bls_rent(honolulu_acs_anchor: int) -> dict:
         "_ratio":           ratio_now,
         "_ratio_smoothed":  ratio_smoothed,
         "_yoy_pct":         yoy_pct,
+        "_base_avg":        base_avg,
+        "_points":          points,
     }
+
+
+def _ym_of(period_iso: str) -> tuple[int, int]:
+    """'2026-05' → (2026, 5)."""
+    y, m = period_iso.split("-")
+    return int(y), int(m)
+
+
+def _months_ahead(from_ym: tuple[int, int], to_ym: tuple[int, int]) -> int:
+    """Signed month count from from_ym to to_ym (negative if to_ym is earlier)."""
+    return (to_ym[0] - from_ym[0]) * 12 + (to_ym[1] - from_ym[1])
+
+
+def extrapolate_ratio_to(
+    points: list[dict],
+    anchor_avg: float,
+    target_ym: tuple[int, int],
+) -> float | None:
+    """Growth ratio of a monthly series at *target_ym* vs *anchor_avg*.
+
+    `points` is an ASCENDING list of {year:int, period:"MNN", value:float}.
+    Returns value_at(target) / anchor_avg, where value_at(target) is:
+      • the latest observed value, if target ≤ latest observation, OR
+      • the latest value carried forward to target via the canonical
+        damped-trend extrapolation (smoothed_monthly_rate → clip ±cap →
+        damped_compound_factor — the same machinery the grocery/TFP side
+        uses, see tfp-updater.py).
+
+    This is what lets the blend's lagging leg (e.g. ZORI a month behind BLS)
+    be brought to a single common target month so the legs share one endpoint.
+    If the projection package is unavailable, or the trend can't be estimated,
+    the latest value is used as-is (no extrapolation) — never an error.
+    """
+    if not points or not anchor_avg:
+        return None
+    latest = points[-1]
+    latest_ym = (latest["year"], int(latest["period"][1:]))
+    n = _months_ahead(latest_ym, target_ym)
+    if n <= 0 or not _PROJECTION_AVAILABLE:
+        return latest["value"] / anchor_avg
+    rate = _bls_smoothed_monthly_rate(points)
+    if rate is None:
+        return latest["value"] / anchor_avg
+    rate = max(min(rate, _PROJ_MONTHLY_CAP), -_PROJ_MONTHLY_CAP)
+    factor = _bls_damped_compound_factor(rate, n)
+    return latest["value"] * factor / anchor_avg
 
 
 def blend_rent_nowcast(
@@ -1103,6 +1285,78 @@ def blend_rent_nowcast(
         "zori_weight":  zori_w,
         "fmr_weight":   fmr_w,
     }
+
+
+# ── Lease-turnover pass-through model (Q-audit item 4) ───────────────────────
+# A convex blend `w·cpi + (1−w)·zori` can never leave the interval between its
+# legs, so when BOTH proxies undershoot realized stock-rent growth (the Big
+# Island 2022→24 case: ACS +31% vs CPI +10%, ZORI +16%) no weighting can reach
+# the target. The pass-through model instead treats stock (existing-tenant) rent
+# as converging on asking rent as leases turn over:
+#
+#   passthrough_factor = cpi_factor^(1−λ) · zori_factor^λ
+#
+# a log-space bridge between the realized CPI growth factor and the asking-rent
+# (ZORI) growth factor since the anchor. λ is the pass-through completeness:
+#   λ = 0   → pure CPI (no catch-up to asking)
+#   λ = 1   → fully caught up to current asking
+#   λ > 1   → overshoot — projects continued catch-up toward accumulated asking
+#             growth even after asking flattens; THIS is what lets the model
+#             exceed both contemporaneous legs (the convex blend cannot).
+# One interpretable parameter instead of five hand-tuned county weights. λ is
+# calibrated by scripts/backtest_rent_nowcast.py against ACS 1-yr ground truth
+# and only promoted to production if it beats the blend within the 8% budget.
+# Calibrated by scripts/backtest_rent_nowcast.py (2026-06-11 run): on the
+# outer-island ACS 1-yr ground truth, λ=0.65 gives 5.59% MAPE — beating the best
+# convex blend (5.64% at w=0.4) and well inside the 8% budget. λ>1 overshoot
+# also cut the Big Island (Hawaiʻi) error 7.83%→6.42% by projecting continued
+# catch-up to accumulated asking-rent growth, which no convex blend could reach.
+RENT_PASSTHROUGH_LAMBDA = 0.65
+
+# Which model drives the published `rent`. "blend" = the legacy convex
+# CPI/ZORI(/FMR) blend; "passthrough" = the log-space pass-through model above.
+# Promoted to "passthrough" after the 2026-06-11 backtest gate confirmed it beats
+# the blend within the 8% MAPE budget (Q-audit item 4). Both paths are always
+# computed for logging; this only selects what's written. To re-validate after a
+# re-anchor, re-run scripts/backtest_rent_nowcast.py (see METHODOLOGY.md).
+RENT_PRODUCTION_METHOD = "passthrough"
+
+
+def passthrough_rent_nowcast(
+    acs_anchor: float,
+    cpi_factor: float,
+    zori_factor: float,
+    lam: float = RENT_PASSTHROUGH_LAMBDA,
+) -> dict:
+    """Lease-turnover pass-through nowcast (see RENT_PASSTHROUGH_LAMBDA).
+
+    rent = acs_anchor · cpi_factor^(1−λ) · zori_factor^λ
+
+    Both factors are growth ratios vs. the same ACS anchor year. Returns the
+    same component keys as blend_rent_nowcast() (cpi_scaled/zori_implied) plus
+    the realized `passthrough` value and the λ used, so callers can log all
+    three and the methodology tooltip can show the method.
+    """
+    pt_factor = (cpi_factor ** (1.0 - lam)) * (zori_factor ** lam)
+    return {
+        "passthrough":  round(acs_anchor * pt_factor),
+        "cpi_scaled":   round(acs_anchor * cpi_factor),
+        "zori_implied": round(acs_anchor * zori_factor),
+        "cpi_factor":   cpi_factor,
+        "zori_factor":  zori_factor,
+        "lambda":       lam,
+    }
+
+
+def round_to_25(x: float | int | None) -> int | None:
+    """Round a rent dollar value to the nearest $25 (Q-audit item 8).
+
+    Dollar-precise rents ($1,753) imply ±$1 confidence on a ±5–9% estimate;
+    nearest-$25 quietly drops the false precision. None passes through.
+    """
+    if x is None:
+        return None
+    return int(round(x / 25.0) * 25)
 
 
 def _load_ntr_atr_benchmarks() -> dict:
@@ -1506,25 +1760,34 @@ def patch_periods(html: str, zori_period: str | None, bls_rent_period: str | Non
     return html
 
 
-def patch_html(html: str, prices: dict) -> str:
+def patch_html(html: str, prices: dict) -> tuple[str, list[str]]:
     """
     Replace per-county fields in the countyData object via line-anchored
-    regex. Three field shapes are handled:
+    regex. Four field shapes are handled:
 
-      - int_fields   — `field:1234`            (\\d+ matcher)
-      - float_fields — `field:0.305`           ([\\d.-]+ matcher; signed)
-      - nested_fields — `field:{k1:v1, k2:v2}` (literal-block replace)
+      - int_fields    — `field:1234`            (\\d+ matcher)
+      - float_fields  — `field:0.305`           ([\\d.-]+ matcher; signed)
+      - string_fields — `field:"text"`          (quoted-value matcher)
+      - nested_fields — `field:{k1:v1, k2:v2}`  (literal-block replace)
         Nested fields write a fresh `{...}` literal containing only the
         sub-keys we control; missing sub-keys render as `null` so the JS
         renderer can fall back gracefully.
+
+    Returns (patched_html, misses) where `misses` is a list of
+    "County.field" strings that were present in `prices` but could not be
+    written (an existing stub wasn't found in the HTML). main() treats a
+    non-empty `misses` list as fatal in non-dry-run mode (item 1) so a silent
+    patch failure can't ship stale data under a fresh "as of" label.
     """
-    int_fields   = ("sfhPrice", "condoPrice", "rent", "askRent", "income",
-                    "sfhGap", "condoGap", "sfhMortgage", "condoMortgage")
-    float_fields = ("tenantRentPTI", "mortgageOwnerPTI",
-                    "rentBurdenedPct", "rentSeverelyBurdenedPct",
-                    "ownerBurdenedPct", "ownerSeverelyBurdenedPct",
-                    "zoriYoY", "cpiRentYoY",
-                    "sfhIdx", "condoIdx", "sfhPTI", "condoPTI")
+    misses: list[str] = []
+    int_fields    = ("sfhPrice", "condoPrice", "rent", "askRent", "income",
+                     "sfhGap", "condoGap", "sfhMortgage", "condoMortgage")
+    float_fields  = ("tenantRentPTI", "mortgageOwnerPTI",
+                     "rentBurdenedPct", "rentSeverelyBurdenedPct",
+                     "ownerBurdenedPct", "ownerSeverelyBurdenedPct",
+                     "zoriYoY", "cpiRentYoY",
+                     "sfhIdx", "condoIdx", "sfhPTI", "condoPTI")
+    string_fields = ("rentMethod", "rentAsOf")
     # Each nested_field maps to its ordered sub-keys for deterministic output.
     nested_fields = {
         "bedroomRent": ("br0", "br1", "br2", "br3plus"),
@@ -1568,8 +1831,29 @@ def patch_html(html: str, prices: dict) -> str:
         for field in int_fields + float_fields:
             if field in vals and f'{field}:{vals[field]}' not in new_html:
                 print(f"  WARNING: could not set {county_key}.{field}")
+                misses.append(f"{county_key}.{field}")
 
         html = new_html
+
+        # String fields — handled like nested fields with a full-line regex
+        # (the `replacer` above can't reach them: its `[^}]*` capture stops at
+        # the first `}`, which is inside bedroomRent, and the string fields sit
+        # after that). `.*?` under MULTILINE (no DOTALL) stays on the county's
+        # one line and spans the bedroomRent literal.
+        for field in string_fields:
+            if field not in vals or vals[field] is None:
+                continue
+            str_re = rf'(^\s*{re.escape(county_key)}:\s*\{{.*?){field}:"[^"]*"'
+            html, n = re.subn(
+                str_re,
+                lambda m: m.group(1) + f'{field}:"{vals[field]}"',
+                html,
+                flags=re.MULTILINE,
+            )
+            if n == 0:
+                print(f"  WARNING: could not set {county_key}.{field} "
+                      f"(string stub not found — add {field}:\"\" to countyData)")
+                misses.append(f"{county_key}.{field}")
 
         # Nested-object fields — re-match the per-county block (now updated
         # with scalar replacements) and swap the entire nested literal.
@@ -1587,8 +1871,9 @@ def patch_html(html: str, prices: dict) -> str:
             if n == 0:
                 print(f"  WARNING: could not set {county_key}.{field} "
                       f"(nested field not found in HTML — first run? add the field stub manually)")
+                misses.append(f"{county_key}.{field}")
 
-    return html
+    return html, misses
 
 
 def _fetch_sale_prices() -> dict:
@@ -1665,23 +1950,28 @@ def _fetch_rents(all_prices: dict) -> tuple[
         bls_ratio        = bls_rent.pop("_ratio",           None)
         bls_ratio_smooth = bls_rent.pop("_ratio_smoothed",  None)
         bls_rent_yoy     = bls_rent.pop("_yoy_pct",         None)
+        bls_base_avg     = bls_rent.pop("_base_avg",        None)
+        bls_points       = bls_rent.pop("_points",          []) or []
         for key, vals in bls_rent.items():
             all_prices.setdefault(key, {}).update(vals)
+        # Interim CPI-only rent for every geography (display fallback if the
+        # blend/pass-through below can't run; otherwise overwritten by it).
         if bls_ratio:
             for key in ("Maui", "Hawaii", "Kauai", "State"):
                 if key in all_prices and "rent" in all_prices[key]:
                     anchor = acs_rent_anchor.get(key, all_prices[key]["rent"])
                     all_prices[key]["rent"] = round(anchor * bls_ratio)
-                    print(f"  {key}: ACS ${anchor:,} × {bls_ratio:.4f} "
-                          f"= ${all_prices[key]['rent']:,} (BLS-scaled)")
         print(f"  Updated rents to BLS-scaled estimate ({bls_rent_period})")
     except Exception as e:
+        bls_base_avg = None
+        bls_points = []
         print(f"  WARNING: BLS rent fetch failed ({e}) — rents stay at raw ACS values")
 
     # ── 3. Zillow ZORI ───────────────────────────────────────────────────────
     zori_period      = None
     zori_anchor_avg  = {}
     zori_yoy_map     = {}
+    zori_recent_pts  = {}
     print("\nFetching Zillow ZORI asking rent data...")
     try:
         zori_rents       = fetch_zori_asking_rents()
@@ -1689,6 +1979,7 @@ def _fetch_rents(all_prices: dict) -> tuple[
         zori_anchor_avg  = zori_rents.pop("_anchor_avg",  {}) or {}
         zori_anchor_year = zori_rents.pop("_anchor_year", RENT_ANCHOR_YEAR)
         zori_yoy_map     = zori_rents.pop("_yoy_pct",     {}) or {}
+        zori_recent_pts  = zori_rents.pop("_recent_points", {}) or {}
         zori_rents.pop("_smoothing_window", None)   # metadata only — not a county
         for key, ask_rent in zori_rents.items():
             all_prices.setdefault(key, {})["askRent"] = ask_rent
@@ -1709,93 +2000,106 @@ def _fetch_rents(all_prices: dict) -> tuple[
         print(f"  HUD FMR 2-BR growth ({fmr_window}): "
               + ", ".join(f"{k} {v:.3f}" for k, v in fmr_ratios.items()))
 
-    # ── 4. Blended rent nowcast ───────────────────────────────────────────────
-    # Per-county weights: Honolulu/State 70/30 CPI/ZORI; Maui 50/50 CPI/ZORI;
-    # Hawaiʻi & Kauaʻi use a 3-leg CPI/ZORI/FMR blend (BLENDED_RENT_3LEG_WEIGHTS)
-    # when their FMR ratio is available, else fall back to 2-leg. Plus a 3-mo
-    # trailing-mean BLS ratio so a single bumpy CPI print doesn't whipsaw the
-    # headline. Falls back to CPI-only rent when ZORI/BLS inputs are missing.
+    # ── 3.6 Renter-household weights for the State aggregate (item 7) ─────────
+    print("\nFetching ACS renter-household weights (B25003) for State aggregate...")
+    renter_weights = fetch_census_renter_weights()
+
+    # ── 4. Rent nowcast — target-month-aligned legs, model-selected ──────────
+    # (a) Pick ONE target month = the freshest of the BLS-rent and ZORI months,
+    #     so both legs share a single endpoint instead of each ending at its own
+    #     latest print (item 3).
+    # (b) Build the CPI leg factor (Honolulu rent CPI, applied statewide) and the
+    #     per-county ZORI factor AT that target month via damped extrapolation.
+    # (c) Combine via RENT_PRODUCTION_METHOD: the legacy convex blend or the
+    #     log-space pass-through (item 4). Both are computed for logging.
+    # (d) State is a renter-household-weighted aggregate of the county nowcasts
+    #     (item 7), not an independent blend.
+    # (e) Each county records rentMethod + rentAsOf; the dollar value is rounded
+    #     to the nearest $25 (item 8). Falls back to CPI-only when inputs miss.
     blend_bls_ratio = bls_ratio_smooth if bls_ratio_smooth is not None else bls_ratio
-    if blend_bls_ratio and zori_anchor_avg:
-        zori_ratios: dict[str, float] = {}
+    if blend_bls_ratio and zori_anchor_avg and bls_rent_period and zori_period:
+        bls_ym, zori_ym = _ym_of(bls_rent_period), _ym_of(zori_period)
+        target_ym  = max(bls_ym, zori_ym)
+        rent_as_of = f"{target_ym[0]:04d}-{target_ym[1]:02d}"
+
+        # CPI leg factor at target. Keep the 3-mo-smoothed (denoised) ratio when
+        # BLS already reaches the target; only extrapolate when target is beyond.
+        if _months_ahead(bls_ym, target_ym) <= 0:
+            cpi_factor = blend_bls_ratio
+        else:
+            cpi_factor = extrapolate_ratio_to(bls_points, bls_base_avg, target_ym) or blend_bls_ratio
+
+        # Per-county ZORI factor at target (extrapolate each county's series).
+        zori_factors: dict[str, float] = {}
         for key in ("Honolulu", "Maui", "Hawaii", "Kauai"):
-            cur  = (all_prices.get(key) or {}).get("askRent")
-            base = zori_anchor_avg.get(key)
-            if cur and base:
-                zori_ratios[key] = cur / base
-        # Statewide ratio = population-weighted mean of the per-county RATIOS
-        # over counties that have both endpoints, renormalized across whatever
-        # is present. Computing it from the State askRent / State anchor instead
-        # would mix mismatched county sets (Kauaʻi is in the current weighted
-        # askRent but missing from the anchor-year average — Zillow began
-        # publishing it only in Feb 2025), injecting ~1.5–2pp of phantom growth
-        # because Kauaʻi rents run well above the state mean. That biased State
-        # ratio is also the proxy for Kauaʻi's own ZORI leg, so the error would
-        # compound. See ZORI_STATE_POP_WEIGHTS.
-        present_state = {k: ZORI_STATE_POP_WEIGHTS[k]
-                         for k in ZORI_STATE_POP_WEIGHTS if k in zori_ratios}
-        if present_state:
-            wsum = sum(present_state.values())
-            zori_ratios["State"] = sum(
-                zori_ratios[k] * (w / wsum) for k, w in present_state.items()
-            )
-        # Proxy missing-county ZORI ratios from the state-level ratio (same
-        # approach as the Honolulu BLS CPI being applied statewide).
-        proxy = zori_ratios.get("State")
+            base, pts = zori_anchor_avg.get(key), zori_recent_pts.get(key)
+            if base and pts:
+                r = extrapolate_ratio_to(pts, base, target_ym)
+                if r is not None:
+                    zori_factors[key] = r
+        # Renter-weighted state ZORI factor — proxy for counties lacking a baseline.
+        wmap = renter_weights or ZORI_STATE_POP_WEIGHTS
+        present = {k: wmap[k] for k in wmap if k in zori_factors}
+        proxy = (sum(zori_factors[k] * w for k, w in present.items()) / sum(present.values())
+                 if present else None)
         if proxy is not None:
             for key in ("Honolulu", "Maui", "Hawaii", "Kauai"):
-                if key not in zori_ratios and (all_prices.get(key) or {}).get("askRent"):
-                    zori_ratios[key] = proxy
+                if key not in zori_factors and (all_prices.get(key) or {}).get("askRent"):
+                    zori_factors[key] = proxy
                     print(f"  {key}: no {zori_anchor_year} ZORI baseline — "
-                          f"using state ratio {proxy:.4f} as proxy")
+                          f"using renter-weighted state factor {proxy:.4f} as proxy")
 
-        smooth_tag = " (3-mo smoothed)" if bls_ratio_smooth is not None else ""
-        print(f"\nComputing blended rent nowcast — per-county weights{smooth_tag}...")
+        print(f"\nComputing rent nowcast → target {rent_as_of}, "
+              f"method={RENT_PRODUCTION_METHOD}, cpi_factor={cpi_factor:.4f}...")
+        for key in ("Honolulu", "Maui", "Hawaii", "Kauai"):
+            v = all_prices.get(key)
+            if not v or key not in acs_rent_anchor or key not in zori_factors:
+                continue
+            anchor, zf, fmr_r = acs_rent_anchor[key], zori_factors[key], fmr_ratios.get(key)
+            w3 = BLENDED_RENT_3LEG_WEIGHTS.get(key)
+            if w3 and fmr_r is not None:
+                b = blend_rent_nowcast(anchor, cpi_factor, zf, cpi_weight=w3["cpi"],
+                                       zori_weight=w3["zori"], fmr_ratio=fmr_r, fmr_weight=w3["fmr"])
+                blend_method = "cpi+zori+fmr"
+            else:
+                b = blend_rent_nowcast(anchor, cpi_factor, zf,
+                                       cpi_weight=BLENDED_RENT_CPI_WEIGHTS.get(key, 0.7))
+                blend_method = "cpi+zori"
+            pt = passthrough_rent_nowcast(anchor, cpi_factor, zf)
+            if RENT_PRODUCTION_METHOD == "passthrough":
+                v["rent"], v["rentMethod"] = round_to_25(pt["passthrough"]), "passthrough"
+            else:
+                v["rent"], v["rentMethod"] = round_to_25(b["blended"]), blend_method
+            v["rentAsOf"] = rent_as_of
+            print(f"  {key:<9} CPI ${b['cpi_scaled']:>5,}  ZORI ${b['zori_implied']:>5,}  "
+                  f"blend ${b['blended']:>5,}  passthrough ${pt['passthrough']:>5,}  "
+                  f"→ rent ${v['rent']:>5,} ({v['rentMethod']})")
+
+        # State = renter-household-weighted aggregate of the county nowcasts.
+        county_rents = {k: all_prices[k]["rent"] for k in ("Honolulu", "Maui", "Hawaii", "Kauai")
+                        if all_prices.get(k, {}).get("rent")}
+        wmap_s = renter_weights or {k: ZORI_STATE_POP_WEIGHTS[k]
+                                    for k in ("Honolulu", "Maui", "Hawaii", "Kauai")}
+        present_s = {k: wmap_s[k] for k in wmap_s if k in county_rents}
+        if present_s:
+            state_rent = (sum(county_rents[k] * w for k, w in present_s.items())
+                          / sum(present_s.values()))
+            sv = all_prices.setdefault("State", {})
+            sv["rent"] = round_to_25(state_rent)
+            sv["rentMethod"] = "renter-wtd of counties" if renter_weights else "pop-wtd of counties"
+            sv["rentAsOf"] = rent_as_of
+            print(f"  State     = {'renter' if renter_weights else 'pop'}-weighted aggregate "
+                  f"of counties → rent ${sv['rent']:,}")
+    else:
+        print("  Skipping rent nowcast (missing BLS ratio, ZORI baseline, or periods) — "
+              "marking any CPI-only rent as fallback")
         for key in ("Honolulu", "Maui", "Hawaii", "Kauai", "State"):
             v = all_prices.get(key)
-            if not v or key not in acs_rent_anchor or key not in zori_ratios:
-                continue
-            w3    = BLENDED_RENT_3LEG_WEIGHTS.get(key)
-            fmr_r = fmr_ratios.get(key)
-            if w3 and fmr_r is not None:
-                # 3-leg CPI/ZORI/FMR (Hawaiʻi, Kauaʻi)
-                b = blend_rent_nowcast(
-                    acs_anchor  = acs_rent_anchor[key],
-                    bls_ratio   = blend_bls_ratio,
-                    zori_ratio  = zori_ratios[key],
-                    cpi_weight  = w3["cpi"],
-                    zori_weight = w3["zori"],
-                    fmr_ratio   = fmr_r,
-                    fmr_weight  = w3["fmr"],
-                )
-                v["rent"] = b["blended"]
-                print(f"  {key:<9}  {int(round(w3['cpi']*100))}/{int(round(w3['zori']*100))}/"
-                      f"{int(round(w3['fmr']*100))} CPI/ZORI/FMR  "
-                      f"CPI ${b['cpi_scaled']:>5,}  ZORI ${b['zori_implied']:>5,}  "
-                      f"FMR ${b['fmr_implied']:>5,}  → blended ${b['blended']:>5,}  "
-                      f"(bls={b['bls_ratio']:.3f}, zori={b['zori_ratio']:.3f}, "
-                      f"fmr={b['fmr_ratio']:.3f})")
-            else:
-                # 2-leg CPI/ZORI (Honolulu, State, Maui — and Hawaiʻi/Kauaʻi
-                # if the FMR fetch failed this run)
-                cpi_w = BLENDED_RENT_CPI_WEIGHTS.get(key, 0.7)
-                b = blend_rent_nowcast(
-                    acs_anchor = acs_rent_anchor[key],
-                    bls_ratio  = blend_bls_ratio,
-                    zori_ratio = zori_ratios[key],
-                    cpi_weight = cpi_w,
-                )
-                v["rent"] = b["blended"]
-                zw = int(round((1 - cpi_w) * 100))
-                cw = int(round(cpi_w * 100))
-                fb = "  [FMR unavailable → 2-leg fallback]" if (w3 and fmr_r is None) else ""
-                print(f"  {key:<9}  {cw}/{zw} CPI/ZORI  "
-                      f"CPI-scaled ${b['cpi_scaled']:>5,}  "
-                      f"ZORI-implied ${b['zori_implied']:>5,}  "
-                      f"→ blended ${b['blended']:>5,}  "
-                      f"(bls_ratio={b['bls_ratio']:.3f}, zori_ratio={b['zori_ratio']:.3f}){fb}")
-    else:
-        print("  Skipping blended nowcast (missing BLS ratio or ZORI 2024 baseline)")
+            if v and v.get("rent"):
+                v["rent"] = round_to_25(v["rent"])
+                v.setdefault("rentMethod", "cpi-only-fallback")
+                if bls_rent_period:
+                    v.setdefault("rentAsOf", bls_rent_period)
 
     # ── 5. Export per-county YoY signals to countyData (Q2) ─────────────────
     # ZORI YoY is per-county; BLS rent CPI is Honolulu-only so we attach it
@@ -1989,14 +2293,20 @@ def _write_html(
     housing_period: str | None,
     dry_run: bool,
     mortgage_rate: float = MORTGAGE_RATE_PCT,
-) -> None:
-    """Patch and write (or dry-run report) both dashboard HTML files."""
+) -> list[str]:
+    """Patch and write (or dry-run report) both dashboard HTML files.
+
+    Returns the combined list of patch MISSES across all targets (as
+    "file:County.field") so main() can fail the run rather than silently
+    ship a file where a field couldn't be updated (item 1)."""
+    all_misses: list[str] = []
     for target in targets:
         if not target.exists():
             print(f"\nSkipping {target.name} — not found")
             continue
         html    = target.read_text(encoding="utf-8")
-        patched = patch_html(html, all_prices)
+        patched, misses = patch_html(html, all_prices)
+        all_misses += [f"{target.name}:{m}" for m in misses]
         patched = patch_periods(patched, zori_period, bls_rent_period, housing_period)
         patched = patch_mortgage_rate(patched, mortgage_rate)
         if patched == html:
@@ -2007,6 +2317,7 @@ def _write_html(
         else:
             target.write_text(patched, encoding="utf-8")
             print(f"\nUpdated {target.name} with latest Redfin prices.")
+    return all_misses
 
 
 def main():
@@ -2072,12 +2383,55 @@ def main():
 
     _print_summary(all_prices, build_period)
 
+    housing_period = (all_prices.get("State", {}).get("period") or "")[:7] or None
+
+    # Run the patchers in both modes so a dry-run still validates that every
+    # field (incl. the rentMethod/rentAsOf string stubs) can be written.
+    misses = _write_html(targets, all_prices, zori_period, bls_rent_period,
+                         housing_period, dry_run, mortgage_rate)
+
     if dry_run:
-        print("\n--dry-run: no files modified")
+        tail = f" ({len(misses)} patch misses: {', '.join(misses)})" if misses else ""
+        print(f"\n--dry-run: no files modified{tail}")
         return
 
-    housing_period = (all_prices.get("State", {}).get("period") or "")[:7] or None
-    _write_html(targets, all_prices, zori_period, bls_rent_period, housing_period, dry_run, mortgage_rate)
+    # ── Source-of-truth JSON artifact (item 1) ──────────────────────────────
+    # The dashboard stays self-contained (data is inlined into the HTML by the
+    # patchers above — the Squarespace single-file embed can't fetch at
+    # runtime), but we ALSO emit a diffable JSON snapshot with per-metric asOf.
+    # scripts/check_freshness.py reads this to fail CI on stale data.
+    _write_dashboard_json(all_prices, {
+        "housingPeriod": housing_period,
+        "blsRentPeriod": bls_rent_period,
+        "zoriPeriod":    zori_period,
+        "buildPeriod":   build_period,
+        "mortgageRate":  mortgage_rate,
+    })
+
+    if misses:
+        print(f"\nERROR: {len(misses)} field(s) could not be patched into the HTML — "
+              f"refusing to ship a partially-updated dashboard:\n  " + "\n  ".join(misses))
+        sys.exit(1)
+
+
+def _write_dashboard_json(all_prices: dict, meta: dict) -> None:
+    """Write data/dashboard.json — the diffable source-of-truth snapshot.
+
+    Captures the full per-county data plus a `_meta` block carrying the run
+    timestamp and the per-metric reference periods, so scripts/check_freshness.py
+    can detect a silently-stale metric (e.g. a dead Census key that left rent
+    frozen while prices refreshed)."""
+    import json
+    import datetime
+    out = {k: v for k, v in all_prices.items() if isinstance(v, dict)}
+    out["_meta"] = {
+        "generatedAt": datetime.datetime.now().isoformat(timespec="seconds"),
+        **meta,
+    }
+    path = Path(__file__).parent / "data" / "dashboard.json"
+    path.parent.mkdir(exist_ok=True)
+    path.write_text(json.dumps(out, indent=2, sort_keys=True), encoding="utf-8")
+    print(f"\nWrote {path.relative_to(Path(__file__).parent)} (source-of-truth snapshot).")
 
 
 if __name__ == "__main__":

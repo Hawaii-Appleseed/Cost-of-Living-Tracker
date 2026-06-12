@@ -2,6 +2,8 @@
 
 A clean, modern dashboard displaying Hawaii housing affordability metrics across different counties.
 
+> 📖 **New here?** [**How it works (plain language)**](docs/how-it-works.md) explains where every number comes from and how fresh it is — no jargon. For the precise formulas, see [METHODOLOGY.md](METHODOLOGY.md).
+
 ## Features
 
 - **Interactive Dashboard**: Toggle between Single Family Homes and Condos

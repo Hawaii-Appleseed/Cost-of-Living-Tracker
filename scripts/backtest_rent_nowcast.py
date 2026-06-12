@@ -216,6 +216,44 @@ def mape_for_weight(cases, w):
     return 100.0 * sum(apes) / len(apes)
 
 
+# Pass-through model (item 4): pred = anchor · bls^(1-λ) · zori^λ — a log-space
+# bridge between the realized-CPI and asking-rent growth factors. λ>1 lets it
+# overshoot BOTH legs (the convex blend above cannot), which is the case the
+# Big Island needs. λ swept past 1.0 to test for overshoot benefit.
+LAMBDA_GRID = [round(0.05 * i, 2) for i in range(0, 31)]   # 0.0 .. 1.5
+
+
+def mape_for_lambda(cases, lam):
+    if not cases:
+        return None
+    apes = []
+    for c in cases:
+        factor = (c["bls_factor"] ** (1.0 - lam)) * (c["zori_factor"] ** lam)
+        pred = c["anchor"] * factor
+        apes.append(abs(pred / c["actual"] - 1.0))
+    return 100.0 * sum(apes) / len(apes)
+
+
+def best_blend(subset):
+    """(best_weight, best_mape) over the convex weight grid."""
+    bw, bm = None, 1e9
+    for w in WEIGHT_GRID:
+        m = mape_for_weight(subset, w)
+        if m is not None and m < bm:
+            bw, bm = w, m
+    return bw, bm
+
+
+def best_lambda(subset):
+    """(best_lambda, best_mape) over the pass-through λ grid."""
+    bl, bm = None, 1e9
+    for lam in LAMBDA_GRID:
+        m = mape_for_lambda(subset, lam)
+        if m is not None and m < bm:
+            bl, bm = lam, m
+    return bl, bm
+
+
 def main():
     if not CENSUS_API_KEY:
         print("ERROR: set CENSUS_API_KEY"); return
@@ -272,6 +310,45 @@ def main():
            [c for c in cases if c["county"] in OUTER_ISLANDS])
     for county in COUNTY_FIPS:
         report(f"{county} only", [c for c in cases if c["county"] == county])
+
+    # ── Pass-through model vs convex blend (item 4 gate) ─────────────────────
+    print("\n" + "=" * 64)
+    print("PASS-THROUGH MODEL (item 4):  pred = anchor · bls^(1-λ) · zori^λ")
+    print("=" * 64)
+    BUDGET = 8.0
+    subsets = {
+        "ALL pooled":   cases,
+        "OUTER pooled": [c for c in cases if c["county"] in OUTER_ISLANDS],
+        **{c: [x for x in cases if x["county"] == c] for c in COUNTY_FIPS},
+    }
+    print(f"\n  {'subset':<14} {'blend(w*)':>12} {'passthru(λ*)':>16} {'winner':>10}")
+    pooled_pt_mape = None
+    for name, subset in subsets.items():
+        if not subset:
+            continue
+        bw, bm = best_blend(subset)
+        bl, lm = best_lambda(subset)
+        if name == "OUTER pooled":
+            pooled_pt_mape, pooled_pt_lambda = lm, bl
+        winner = "passthru" if lm < bm else "blend"
+        print(f"  {name:<14} w={bw:.1f}:{bm:>6.2f}%  λ={bl:.2f}:{lm:>6.2f}%  {winner:>10}")
+
+    # Verdict for the OUTER-pooled subset (the weakest, FMR-motivating case).
+    outer = subsets["OUTER pooled"]
+    bw, bm = best_blend(outer)
+    bl, lm = best_lambda(outer)
+    print(f"\n  VERDICT (OUTER pooled, budget {BUDGET:.0f}%):")
+    print(f"    convex blend best:  w={bw:.1f}  MAPE {bm:.2f}%")
+    print(f"    pass-through best:   λ={bl:.2f}  MAPE {lm:.2f}%")
+    ship = lm <= BUDGET and lm <= bm
+    if ship:
+        print(f"    → SHIP pass-through: beats blend AND within budget. "
+              f"Set RENT_PASSTHROUGH_LAMBDA={bl:.2f}, RENT_PRODUCTION_METHOD='passthrough'.")
+    else:
+        why = "exceeds budget" if lm > BUDGET else "does not beat the blend"
+        print(f"    → KEEP blend: pass-through {why}. "
+              f"Leave RENT_PRODUCTION_METHOD='blend'.")
+    print("=" * 64)
 
 
 if __name__ == "__main__":

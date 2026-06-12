@@ -64,6 +64,13 @@ jobs:
         run: python tfp-updater.py
         continue-on-error: true
 
+      # Fail the build if any housing/rent/burden metric went silently stale
+      # (e.g. a soft-failed fetch from a bad API key left old data under a fresh
+      # "as of" label). Reads the data/dashboard.json snapshot the Redfin
+      # patcher writes. NOT continue-on-error — staleness must break CI.
+      - name: Check dashboard data freshness
+        run: python scripts/check_freshness.py
+
       # Guard: both HTML files must stay byte-identical — each updater patches
       # both. A divergence here means one patcher or a manual edit missed a file.
       - name: Verify HTML mirror is in sync (index.html == squarespace-single-file.html)
@@ -77,6 +84,7 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add squarespace-single-file.html index.html
+          git add data/dashboard.json 2>/dev/null || true
           git add data/gas_prices_history.csv 2>/dev/null || true
           git add pipelines/grocery/data/output pipelines/grocery/data/cpi_cache 2>/dev/null || true
           git diff --staged --quiet \
