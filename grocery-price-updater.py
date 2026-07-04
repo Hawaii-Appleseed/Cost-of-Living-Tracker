@@ -40,6 +40,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
 from ha_common.html_patcher import patch_html_files  # noqa: E402
 from ha_common.js_lit import js_lit  # noqa: E402
+from ha_common.sanity import GROCERY_BOUNDS, scan_record  # noqa: E402
 GROCERY_PIPELINE_ROOT = PROJECT_ROOT / "pipelines" / "grocery"
 HOUSEHOLD_CSV = GROCERY_PIPELINE_ROOT / "data" / "output" / "household_estimates.csv"
 COUNTY_CSV    = GROCERY_PIPELINE_ROOT / "data" / "output" / "county_comparison.csv"
@@ -428,6 +429,18 @@ def main() -> int:
 
     print(f"Loading grocery data from {GROCERY_PIPELINE_ROOT}/data/output/")
     data = build_grocery_data()
+
+    # Refuse to publish implausible values (mis-parsed CSV, broken CPI
+    # adjustment) — the HTML keeps its last-good block instead.
+    problems: list[str] = []
+    for c in ("State", "Honolulu", "Maui", "Hawaii", "Kauai"):
+        problems += scan_record(f"grocery.{c}", data[c], GROCERY_BOUNDS)
+    if problems:
+        print("ERROR: sanity check failed — refusing to patch:", file=sys.stderr)
+        for p in problems:
+            print(f"  ✗ {p}", file=sys.stderr)
+        return 1
+
     for c in ("State", "Honolulu", "Maui", "Hawaii", "Kauai"):
         g = data[c]
         print(f"  {c:9s} basket=${g['basketWithTax']:6.2f}/wk  "

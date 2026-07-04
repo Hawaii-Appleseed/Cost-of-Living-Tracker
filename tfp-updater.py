@@ -45,6 +45,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
 from ha_common.html_patcher import patch_html_files  # noqa: E402
 from ha_common.http_client import fetch_bytes  # noqa: E402
+from ha_common.sanity import TFP_HI_BOUNDS, TFP_US48_BOUNDS, SanityError, check_range  # noqa: E402
 DEFAULT_FILES = [
     PROJECT_ROOT / "squarespace-single-file.html",
     PROJECT_ROOT / "index.html",
@@ -531,6 +532,17 @@ def main() -> int:
                   f"(×{ratio:.4f} via food CPI {cpi_per})")
         else:
             print("  No projection applied (raw TFP period ≥ ref month, or BLS fetch failed)")
+
+    # Refuse to publish an implausible parse (shifted PDF table cell, wrong
+    # row) — None is fine, that's the documented soft-fail → null-field path.
+    try:
+        check_range("tfp.hawaii", hi_monthly, *TFP_HI_BOUNDS)
+        check_range("tfp.us48", us_monthly, *TFP_US48_BOUNDS)
+        if projection:
+            check_range("tfp.hawaii(projected)", projection[0], *TFP_HI_BOUNDS)
+    except SanityError as exc:
+        print(f"ERROR: sanity check failed — refusing to patch: {exc}", file=sys.stderr)
+        return 1
 
     # --- Build and patch ---
     new_block = build_block(hi_monthly, us_monthly, hi_period, us_period, ak_hi_url,

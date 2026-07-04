@@ -38,6 +38,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from ha_common.html_patcher import patch_html_files  # noqa: E402
 from ha_common.http_client import fetch_text  # noqa: E402
 from ha_common.js_lit import js_lit as _js_lit  # noqa: E402
+from ha_common.sanity import GAS_BOUNDS, scan_record  # noqa: E402
 SOURCE_URL   = "https://gasprices.aaa.com/?state=HI"
 HISTORY_CSV  = PROJECT_ROOT / "data" / "gas_prices_history.csv"
 
@@ -270,6 +271,22 @@ def main() -> int:
 
     if not data:
         print("  ERROR: no price data extracted — page structure may have changed.", file=sys.stderr)
+        return 1
+
+    # Refuse to publish implausible or incomplete data — a missing county
+    # previously shipped silent $0.00 rows; a mis-parsed cell would ship a
+    # wrong price under a fresh "As of" label. Last-good HTML stays instead.
+    problems: list[str] = []
+    for cty in ("State", "Honolulu", "Maui", "Hawaii", "Kauai"):
+        d = data.get(cty)
+        if not d or d.get("regular") is None:
+            problems.append(f"gas.{cty}: no regular price parsed — AAA page structure may have changed")
+        else:
+            problems += scan_record(f"gas.{cty}", d, GAS_BOUNDS)
+    if problems:
+        print("  ERROR: sanity check failed — refusing to patch:", file=sys.stderr)
+        for p in problems:
+            print(f"    ✗ {p}", file=sys.stderr)
         return 1
 
     for cty in ("State", "Honolulu", "Maui", "Hawaii", "Kauai"):

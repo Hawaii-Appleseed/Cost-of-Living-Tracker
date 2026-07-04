@@ -40,6 +40,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from ha_common.http_client import fetch_bytes, fetch_text   # noqa: E402
 from ha_common.html_patcher import patch_html_files  # noqa: E402
+from ha_common.sanity import (  # noqa: E402
+    BEDROOM_RENT_BOUNDS, HOUSING_BOUNDS, check_range, SanityError, scan_record,
+)
 
 # Canonical damped-trend projection helpers (same source the grocery/TFP side
 # uses — see tfp-updater.py). Reused here to bring a lagging monthly rent leg
@@ -2382,6 +2385,26 @@ def main():
     compute_derived_affordability(all_prices, mortgage_rate)
 
     _print_summary(all_prices, build_period)
+
+    # Refuse to publish implausible values — one mis-parsed column upstream
+    # (Redfin TSV, Census JSON, HUD XLSX/PDF) would otherwise ship an
+    # order-of-magnitude-wrong number under a fresh "As of" label. Absent /
+    # None fields are fine: soft-failed fetches leave fields out so the HTML
+    # keeps its last-good value.
+    sanity_problems: list[str] = []
+    for cty in ("State", "Honolulu", "Maui", "Hawaii", "Kauai"):
+        row = all_prices.get(cty) or {}
+        sanity_problems += scan_record(cty, row, HOUSING_BOUNDS)
+        for tier, val in (row.get("bedroomRent") or {}).items():
+            try:
+                check_range(f"{cty}.bedroomRent.{tier}", val, *BEDROOM_RENT_BOUNDS)
+            except SanityError as exc:
+                sanity_problems.append(str(exc))
+    if sanity_problems:
+        print("\nERROR: sanity check failed — refusing to patch or write the snapshot:")
+        for p in sanity_problems:
+            print(f"  ✗ {p}")
+        sys.exit(1)
 
     housing_period = (all_prices.get("State", {}).get("period") or "")[:7] or None
 
