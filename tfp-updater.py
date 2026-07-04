@@ -39,12 +39,12 @@ from datetime import date
 from pathlib import Path
 
 import pdfplumber
-import requests
 
 # -----------------------------------------------------------------
 PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
 from ha_common.html_patcher import patch_html_files  # noqa: E402
+from ha_common.http_client import fetch_bytes  # noqa: E402
 DEFAULT_FILES = [
     PROJECT_ROOT / "squarespace-single-file.html",
     PROJECT_ROOT / "index.html",
@@ -86,14 +86,13 @@ def fetch_bls_food_cpi(start_year: int, end_year: int) -> list[dict] | None:
     if api_key:
         payload["registrationkey"] = api_key
     try:
-        resp = requests.post(
+        raw = fetch_bytes(
             BLS_API_URL,
-            data=json.dumps(payload),
+            data=json.dumps(payload).encode("utf-8"),
             headers={"Content-Type": "application/json", "User-Agent": "Mozilla/5.0"},
             timeout=30,
         )
-        resp.raise_for_status()
-        data = resp.json()
+        data = json.loads(raw)
         if data.get("status") != "REQUEST_SUCCEEDED":
             return None
         series = data.get("Results", {}).get("series", [])
@@ -285,14 +284,17 @@ def project_tfp_forward(hi_monthly: float, hi_period: str,
 
 # -----------------------------------------------------------------
 def try_fetch(url: str, timeout: int = 30) -> bytes | None:
-    """GET url and return bytes if status 200, else None."""
+    """GET url and return bytes on success, else None.
+
+    retries=0: this probes slug variants where a 404 is the expected
+    common case — backing off and retrying every miss would triple the
+    walk time for no benefit.
+    """
     try:
-        r = requests.get(url, timeout=timeout, allow_redirects=True)
-        if r.status_code == 200 and r.content:
-            return r.content
-    except requests.RequestException:
-        pass
-    return None
+        content = fetch_bytes(url, timeout=timeout, retries=0)
+        return content or None
+    except Exception:
+        return None
 
 
 def fetch_pdf_by_slug(slug_prefix: str, today: date | None = None) -> tuple[bytes, str] | None:
