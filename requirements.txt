@@ -16,5 +16,17 @@ plotly>=5.18
 # so each package must be installed from its own subdirectory. census-common
 # is listed first because census-forecaster depends on it by name — pip needs
 # the direct URL on hand to resolve that dependency.
-census-common @ git+https://github.com/dtomkatsu/Census-Forecaster.git@main#subdirectory=packages/common
-census-forecaster @ git+https://github.com/dtomkatsu/Census-Forecaster.git@main#subdirectory=packages/census_forecaster
+#
+# Pinned to a commit hash (not @main) so upstream changes can't break this
+# repo's install between syncs. To bump: update both hashes to the same
+# upstream commit and re-run `pip install -r requirements.txt` + pytest.
+#
+# NOTE: census-forecaster's pyproject force-includes src/census_forecaster/data
+# on top of the package include, so hatchling >= 1.26 refuses to build the
+# wheel ("A second file is being added to the wheel archive at the same
+# path"). Until that force-include is removed upstream, install with
+#   PIP_CONSTRAINT=build-constraints.txt pip install -r requirements.txt
+# which pins hatchling < 1.26 inside the isolated build env (the CI workflow
+# already does this).
+census-common @ git+https://github.com/dtomkatsu/Census-Forecaster.git@f0bea1b2dd5d76c24fc8f2f888869ae7bca11205#subdirectory=packages/common
+census-forecaster @ git+https://github.com/dtomkatsu/Census-Forecaster.git@f0bea1b2dd5d76c24fc8f2f888869ae7bca11205#subdirectory=packages/census_forecaster

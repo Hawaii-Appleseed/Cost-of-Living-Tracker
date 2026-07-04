@@ -36,8 +36,13 @@ jobs:
         with:
           python-version: '3.12'
 
+      # PIP_CONSTRAINT pins hatchling < 1.26 inside the isolated build env —
+      # required until census-forecaster's redundant data force-include is
+      # removed upstream (see build-constraints.txt).
       - name: Install dependencies
         run: pip install -r requirements.txt
+        env:
+          PIP_CONSTRAINT: build-constraints.txt
 
       # 1. Grocery pipeline: CPI-adjusts baseline prices → regenerates CSVs
       #    under pipelines/grocery/data/output/.
