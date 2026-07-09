@@ -202,6 +202,8 @@
      header's right padding rather than sitting next to the inflation chip. */
   .header-meta-county { margin-left: auto; }
   @media (max-width: 640px) {
+    /* On narrow screens, drop to the next line (still right-aligned) so
+       the inflation chip and 'As of' have room to breathe. */
     .header-meta-county { margin-left: 0; flex-basis: 100%; display: flex; justify-content: flex-end; }
   }
   .county-select {
@@ -312,6 +314,9 @@
     transition: transform 0.15s;
   }
   .pti-mode-btn.is-open .caret { transform: rotate(-135deg) translate(-1px, -2px); }
+  /* Anchor the popover to a tight inline-block wrapper that sits exactly
+     under the toggle button — using .card-title as the anchor pushed the
+     popover all the way to the left edge of the title row. */
   .pti-mode-anchor {
     position: relative;
     display: inline-block;
@@ -1788,7 +1793,8 @@
   .pti-panel-header--sfh   { color: var(--ocean-700); border-color: var(--ocean-700); }
   .pti-panel-header--condo { color: var(--coral-300); border-color: var(--coral-300); }
   /* Small ⓘ in the panel header that carries the measure's provenance line
-     as a hover tooltip — keeps the header uncluttered. Themed by the header. */
+     (e.g. "share of owner households … cost-burdened, by county") as a hover
+     tooltip — keeps the header uncluttered. Inherits the header's themed color. */
   .pti-panel-info {
     font-size: 13px;
     text-transform: none;
@@ -1799,27 +1805,38 @@
   }
   .pti-panel-info:hover,
   .pti-panel-info:focus-visible { opacity: 1; outline: none; }
+  /* Single-panel layout used by the realized-burden views (rent OR
+     mortgage). Keeps the bar geometry identical to the split grid so
+     row widths and animations stay consistent — just one column. */
   .pti-single-grid {
     display: grid;
     grid-template-columns: 1fr;
   }
   .pti-single-grid .pti-panel {
+    /* Stretch to the card's full width — the bars are easier to read,
+       per-county differences register more clearly, and the 30/50%
+       zone bands have room to breathe. */
     width: 100%;
     margin: 0 auto;
   }
 
-  /* Share-bucket bar track: bands mark <30% / 30–50% / 50%+ of households. */
+  /* Zone-tinted bar track: three background bands (seafoam / amber / coral)
+     mark the share-of-burdened-households brackets — <30% of households,
+     30–50%, 50%+. 50% tick marks the "majority burdened" threshold. */
   .pti-bar-track {
     flex: 1;
     height: 18px;
     border-radius: 5px;
     position: relative;
-    overflow: visible;
+    overflow: visible; /* allow anchor tick label to overhang above */
     background: linear-gradient(to right,
       rgba(30,138,115,0.20)  0%,   rgba(30,138,115,0.20) 30%,
       rgba(224,138,91,0.20) 30%,   rgba(224,138,91,0.20) 50%,
       rgba(201,79,58,0.20)  50%,   rgba(201,79,58,0.20)  100%);
   }
+  /* Severe-share overlay: darker coral inner bar drawn over the primary
+     burdened bar to show what fraction of the burdened share is severe
+     (≥50% of income on housing). */
   .pti-bar-fill.pti-bar-fill--severe {
     background: var(--coral-700, #8a3525) !important;
     opacity: 0.92;
@@ -1990,25 +2007,37 @@
     font-variant-numeric: tabular-nums;
     flex-shrink: 0;
   }
-  /* YoY chip in the rent-grid right column. */
+  /* YoY chip rendered to the right of the rent value on each rent row.
+     Compact — fits in the existing right-aligned column without re-flow. */
   .rent-yoy {
     display: inline-flex; align-items: center; gap: 2px;
     font-size: 13px; font-weight: 600;
-    padding: 2px 6px; border-radius: 4px; margin-left: 6px;
-    vertical-align: middle; font-variant-numeric: tabular-nums;
-    letter-spacing: -0.01em; white-space: nowrap;
+    padding: 2px 6px; border-radius: 4px;
+    margin-left: 6px;
+    vertical-align: middle;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
   }
   .rent-yoy--hot   { background: #fbe2da; color: #a8442f; }
   .rent-yoy--warm  { background: #fbedd1; color: #8a6028; }
   .rent-yoy--cool  { background: #def0e8; color: #2a6b5a; }
   .rent-yoy--flat  { background: #e8edf1; color: #475c6b; }
+  /* CPI / ZORI freshness — small ⓘ affordance carrying the as-of periods as a
+     hover tooltip so the Rental market card-sub stays uncluttered. */
   .rent-freshness-info {
-    font-size: 13px; color: var(--text-lt); opacity: 0.7;
-    cursor: pointer; margin-left: 6px; vertical-align: baseline;
+    font-size: 13px;
+    color: var(--text-lt);
+    opacity: 0.7;
+    cursor: pointer;
+    margin-left: 6px;
+    vertical-align: baseline;
   }
   .rent-freshness-info:hover,
   .rent-freshness-info:focus-visible { opacity: 1; color: var(--ocean); outline: none; }
   .rent-freshness-info:empty { display: none; }
+  /* Per-bedroom median-rent tiles (ACS B25031) — 4-up grid below the rent
+     bars. Reuses the construction-card aesthetic (subtle shadow, accent). */
   .rent-bedroom-title {
     font-size: 16px;
     font-weight: 500;
@@ -2130,12 +2159,13 @@
   @media (max-width: 580px) {
     .rent-bedroom-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
-
   .legend-row { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 19px; color: var(--text-lt); margin-bottom: 10px; }
   .swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; margin-right: 3px; vertical-align: middle; }
 
-  /* Construction hard-cost cards — visual upgrade (icons, accent stripe,
-     range bar, delta chip, sparkline). Data binds via renderConstructionCards(). */
+  /* Construction hard-cost cards — visual upgrade over plain sand boxes:
+     accent-stripe by building type, type icon, mini range-bar showing
+     low-to-high spread, delta chip + annualized growth rate, sparkline,
+     subtle elevation + hover lift. Data binds via renderConstructionCards(). */
   .rlb-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; margin-bottom: 16px; }
   .rlb-card {
     position: relative;
@@ -2158,46 +2188,90 @@
     width: 4px;
     background: var(--rlb-accent, #1a7a9a);
   }
-  .rlb-card--mf  { --rlb-accent: #1a7a9a; }
-  .rlb-card--sf  { --rlb-accent: #5ab59a; }
-  .rlb-card--pkg { --rlb-accent: #e08a5b; }
-  .rlb-card-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-  .rlb-icon { color: var(--rlb-accent, #1a7a9a); flex-shrink: 0; }
-  .rlb-label { font-size: 17px; font-weight: 500; color: var(--text); letter-spacing: 0.01em; }
-  .rlb-range-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
+  .rlb-card--mf  { --rlb-accent: #1a7a9a; }  /* ocean-500 */
+  .rlb-card--sf  { --rlb-accent: #5ab59a; }  /* seafoam-500 */
+  .rlb-card--pkg { --rlb-accent: #e08a5b; }  /* coral-300 */
+  .rlb-card-head {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 12px;
+  }
+  .rlb-icon {
+    color: var(--rlb-accent, #1a7a9a);
+    flex-shrink: 0;
+  }
+  .rlb-label {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: 0.01em;
+  }
+  .rlb-range-bar {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 3px;
+  }
   .rlb-range-low, .rlb-range-high {
-    font-size: 19px; font-weight: 600; color: var(--text);
-    font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
   }
   .rlb-range-track {
-    flex: 1; height: 4px; border-radius: 2px;
-    background: linear-gradient(to right, var(--rlb-accent, #1a7a9a) 0%, var(--rlb-accent, #1a7a9a) 100%);
-    opacity: 0.55; position: relative;
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(to right,
+      var(--rlb-accent, #1a7a9a) 0%,
+      var(--rlb-accent, #1a7a9a) 100%);
+    opacity: 0.55;
+    position: relative;
   }
-  .rlb-range-track::before, .rlb-range-track::after {
-    content: ''; position: absolute; top: 50%; transform: translateY(-50%);
-    width: 8px; height: 8px; border-radius: 50%;
+  .rlb-range-track::before,
+  .rlb-range-track::after {
+    content: '';
+    position: absolute;
+    top: 50%; transform: translateY(-50%);
+    width: 8px; height: 8px;
+    border-radius: 50%;
     background: var(--rlb-accent, #1a7a9a);
   }
   .rlb-range-track::before { left: -1px; }
   .rlb-range-track::after  { right: -1px; }
   .rlb-range-unit {
-    font-size: 12px; color: var(--text-lt);
-    letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 12px;
+    font-size: 12px;
+    color: var(--text-lt);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
   }
-  .rlb-trend { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .rlb-trend {
+    display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap;
+  }
   .rlb-delta {
     display: inline-flex; align-items: center; gap: 3px;
-    font-size: 14px; font-weight: 600; padding: 3px 8px; border-radius: 6px;
-    font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+    font-size: 14px; font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
   }
   .rlb-delta--hot  { background: #fbe2da; color: #a8442f; }
   .rlb-delta--warm { background: #fbedd1; color: #8a6028; }
   .rlb-delta--mild { background: #e8edf1; color: #475c6b; }
-  .rlb-annual { font-size: 13px; color: var(--text-lt); font-variant-numeric: tabular-nums; }
+  .rlb-annual {
+    font-size: 13px;
+    color: var(--text-lt);
+    font-variant-numeric: tabular-nums;
+  }
   .rlb-sparkline {
-    display: block; width: 100%; height: 28px; margin-top: 8px;
-    color: var(--rlb-accent, #1a7a9a); opacity: 0.85; overflow: visible;
+    display: block;
+    width: 100%;
+    height: 28px;
+    margin-top: 8px;
+    color: var(--rlb-accent, #1a7a9a);
+    opacity: 0.85;
+    overflow: visible;
   }
 
   .calc-section {
@@ -3308,6 +3382,9 @@
       <span><span class="swatch" style="background:var(--coral-500);"></span><span class="gloss" data-gloss="askingRent">Asking rent</span></span>
     </div>
     <div id="rent-grid"></div>
+    <!-- Per-bedroom median rent tiles (ACS B25031). Rendered for the
+         currently-selected county. Gracefully shows "—" when ACS suppresses
+         a cell (4-BR / 5+-BR in smaller counties). -->
     <div class="rent-bedroom-section" id="rent-bedroom-section" style="margin-top:18px;display:none;">
       <div class="rent-bedroom-title">Median rent by bedroom &middot; <select id="rent-bedroom-geo" class="rent-bedroom-geo" aria-label="Select geography for bedroom rents" onchange="renderBedroomTiles(this.value)"><option value="State">Statewide</option><option value="Honolulu">Honolulu</option><option value="Maui">Maui</option><option value="Hawaii">Hawaiʻi</option><option value="Kauai">Kauaʻi</option></select> <span class="rent-bedroom-info" tabindex="0" role="button" aria-label="About these figures" data-tip="Gross rent (incl. utilities) · ACS 5-yr · Census B25031">ⓘ</span></div>
       <div class="rent-bedroom-grid" id="rent-bedroom-tiles"></div>
@@ -3569,6 +3646,7 @@ function calcAffordPrice(income, ratePct, downPct = 20) {
   const r = ratePct / 100 / 12;
   const n = 360;
   const loanAmt = r === 0 ? monthlyMax * n : monthlyMax * (1 - Math.pow(1+r,-n)) / r;
+  // LTV (loan-to-value) = 1 - down%. Clamp to avoid divide-by-zero at 100% down.
   const ltv = Math.max(0.001, 1 - downPct / 100);
   return loanAmt / ltv;
 }
@@ -3773,12 +3851,17 @@ function selectCounty(county) {
       mcardV2('sfh',   'Single-family home', d.sfhPrice,   d.sfhIdx,   d.sfhMortgage,   housingBadge)
     + mcardV2('condo', 'Condo',              d.condoPrice, d.condoIdx, d.condoMortgage, housingBadge);
 
-  // Share-of-households scale (0–100%). Each bar shows the share of
-  // households that are cost-burdened (≥30% of income on housing); inner
-  // darker-coral overlay shows the severely-burdened subset (≥50%).
+  // Bar scale: 0–100% of households. The 50% tick marks the "majority of
+  // households are burdened" threshold; gradient bands behind the bar
+  // mirror the share buckets (<30 / 30–50 / 50+).
   const majorityTickPct = 50;
   const shareColor = v => v >= 0.50 ? '#c94f3a' : v >= 0.30 ? '#e08a5b' : '#1e8a73';
 
+  // Build one row: each bar shows the SHARE of households that are
+  // cost-burdened (≥30% of income on housing). An inner darker-coral
+  // overlay shows the subset that's severely burdened (≥50% of income).
+  // This swaps the previous median-PTI visualization, which didn't match
+  // the headline "X% of households are cost-burdened" lede.
   const ptiRow = (c, isState, mode) => {
     const burd = (typeof burdenShare === 'function' ? burdenShare(c) : 0) || 0;
     const sev  = (typeof severeShare === 'function' ? severeShare(c) : 0) || 0;
@@ -3805,10 +3888,14 @@ function selectCounty(county) {
     `;
   };
 
-  // Realized-burden panel (see METHODOLOGY.md §2.4). Rent → ACS B25071
-  // median GRAPI; Mortgage → ACS B25092 median SMOCAPI for owners with
-  // a mortgage. Both nowcast from the ACS 5-year mid-point to current
-  // using BLS Honolulu rent/all-items CPI + Hawaiʻi private wages.
+  // Build realized-burden panel for the active mode.
+  // Sources (per METHODOLOGY.md §2.4):
+  //   Rent     → ACS B25071 median GRAPI for renters, nowcast to current
+  //              period via BLS Honolulu rent CPI / Hawaiʻi wages.
+  //   Mortgage → ACS B25092 median SMOCAPI for owners with a mortgage,
+  //              nowcast via BLS Honolulu all-items CPI / Hawaiʻi wages.
+  // Cost-burden shares (B25070 / B25091) drive the lede; they're not
+  // nowcasted (slow-moving distributional shares, ACS 5-year only).
   const mode = (typeof currentPtiMode !== 'undefined') ? currentPtiMode : 'mortgage';
   const isRent = (mode === 'rent');
   const burdenPTI   = c => isRent ? countyData[c].tenantRentPTI    : countyData[c].mortgageOwnerPTI;
@@ -3818,10 +3905,14 @@ function selectCounty(county) {
   const panelLabel    = isRent ? 'Renters' : 'Owners with mortgage';
   const panelSubLabel = isRent ? 'share of renter households that are cost-burdened, by county'
                                : 'share of owner households (w/ mortgage) that are cost-burdened, by county';
+  const householdType = isRent ? 'renter' : 'owner';
   const householdTypePl = isRent ? 'renter households' : 'owner households with a mortgage';
 
-  const stateBurdened = burdenShare('State') || 0;
-  const stateSevere   = severeShare('State') || 0;
+  // Statewide cost-burden shares drive the lede sentence — answers
+  // "what share of {household type} pay too much for housing" in plain
+  // language, which is more interpretable than a median ratio.
+  const stateBurdened  = burdenShare('State') || 0;
+  const stateSevere    = severeShare('State') || 0;
   const fmtPct = v => (v * 100).toFixed(0) + '%';
   const burdenBadgeCls = stateBurdened >= 0.50 ? 'num-badge--coral'
                        : stateBurdened >= 0.30 ? 'num-badge--amber'
@@ -3841,23 +3932,31 @@ function selectCounty(county) {
     </div>
   `;
 
+  const maxRentH = Math.max(...counties.map(c => countyData[c].askRent));
+  // YoY chip helper — same severity bands as the gas card (>5% hot,
+  // 2-5% warm, <-2% cool, otherwise flat). Returns the chip HTML or "".
   const rentYoyChip = (yoyDecimal) => {
     if (yoyDecimal === undefined || yoyDecimal === null || yoyDecimal === 0) return '';
     const pct = yoyDecimal * 100;
-    const tier = pct >= 5 ? 'hot' : pct >= 2 ? 'warm' : pct <= -2 ? 'cool' : 'flat';
+    const tier = pct >= 5  ? 'hot'
+              : pct >= 2  ? 'warm'
+              : pct <= -2 ? 'cool'
+              : 'flat';
     const arrow = pct > 0.5 ? '▲' : pct < -0.5 ? '▼' : '';
-    const sign = pct >= 0 ? '+' : '';
-    return `<span class="rent-yoy rent-yoy--${tier}">${arrow ? arrow + ' ' : ''}${sign}${pct.toFixed(1)}%</span>`;
+    const sign  = pct >= 0 ? '+' : '';
+    const arrowPfx = arrow ? `${arrow} ` : '';
+    return `<span class="rent-yoy rent-yoy--${tier}">${arrowPfx}${sign}${pct.toFixed(1)}%</span>`;
   };
-  const maxRentH = Math.max(...counties.map(c => countyData[c].askRent));
   document.getElementById('rent-grid').innerHTML = counties.map(c => {
     const rd = countyData[c];
     const w1 = (rd.rent / maxRentH * 100).toFixed(1);
     const w2 = (rd.askRent / maxRentH * 100).toFixed(1);
     const isState = c === 'State';
     const isCurrent = c === currentCounty;
-    const cpiChip = (isState || c === 'Honolulu') ? rentYoyChip(rd.cpiRentYoY) : '';
-    const zoriChip = rentYoyChip(rd.zoriYoY);
+    // CPI YoY is only meaningful for State and Honolulu (Honolulu BLS rent
+    // CPI is the underlying series). Outer islands get ZORI YoY only.
+    const cpiChip   = (isState || c === 'Honolulu') ? rentYoyChip(rd.cpiRentYoY) : '';
+    const zoriChip  = rentYoyChip(rd.zoriYoY);
     return `<div class="rent-row is-clickable${isCurrent ? ' is-current' : ''}${isState ? ' rent-row--state' : ''}" role="button" tabindex="0" data-county="${c}" title="View ${fullLbl[c]}">
       <div class="rent-row-lbl">${shortLbl[c]}${isState ? '<span class="rent-row-eyebrow">Statewide</span>' : ''}</div>
       <div class="rent-bar-group">
@@ -3877,8 +3976,10 @@ function selectCounty(county) {
     </div>`;
   }).join('');
 
+  // ── Bedroom tiles (ACS B25031) for the currently-selected county ──
   if (typeof renderBedroomTiles === 'function') renderBedroomTiles(currentCounty);
 
+  // ── CPI / ZORI freshness pill in the Rental market card-sub ──
   const pill = document.getElementById('rent-freshness-pill');
   if (pill) {
     const fmtMonth = (p) => {
@@ -3890,9 +3991,10 @@ function selectCounty(county) {
       } catch (_) { return p; }
     };
     const cpi = (typeof blsRentLatestPeriod !== 'undefined') ? fmtMonth(blsRentLatestPeriod) : null;
-    const zori = (typeof zoriLatestPeriod !== 'undefined') ? fmtMonth(zoriLatestPeriod) : null;
-    const freshness = (cpi && zori) ? `CPI as of ${cpi} · ZORI as of ${zori}`
-                      : (cpi ? `CPI as of ${cpi}` : (zori ? `ZORI as of ${zori}` : ''));
+    const zori= (typeof zoriLatestPeriod   !== 'undefined') ? fmtMonth(zoriLatestPeriod)   : null;
+    const freshness = (cpi && zori)
+      ? `CPI as of ${cpi} · ZORI as of ${zori}`
+      : (cpi ? `CPI as of ${cpi}` : (zori ? `ZORI as of ${zori}` : ''));
     if (freshness) {
       pill.setAttribute('data-tip', freshness);
       pill.textContent = 'ⓘ';
@@ -3908,6 +4010,9 @@ function selectCounty(county) {
   if (typeof renderDataFreshness === 'function') renderDataFreshness();
 }
 
+/* ---------------- Per-bedroom rent tiles (ACS B25031) ----------------
+   Renders 4 tiles (0BR / 1BR / 2BR / 3+BR) for the active county.
+   Gracefully handles ACS cell suppression — missing values show "—". */
 // Accent ramp: seafoam → deep-ocean as bedroom count climbs, so the eye
 // reads the rent gradient across unit sizes at a glance.
 const BEDROOM_ACCENTS = ['#5ab59a', '#3a9f93', '#1a7a9a', '#0f5a73'];
@@ -5036,11 +5141,15 @@ function closePtiModePopover() {
 function setPtiMode(mode) {
   if (mode !== 'mortgage' && mode !== 'rent') return;
   currentPtiMode = mode;
+  // Update button label — keep the article inside the span so the title
+  // reads grammatically in both modes ("a mortgage" / "rent").
   const nameEl = document.getElementById('pti-mode-name');
   if (nameEl) nameEl.textContent = (mode === 'rent') ? 'rent' : 'a mortgage';
+  // Update active-state in popover items
   document.querySelectorAll('.pti-mode-popover-item').forEach(b => {
     b.classList.toggle('is-active', b.getAttribute('data-mode') === mode);
   });
+  // Update the assumption tooltip on the ⓘ
   const tipEl = document.getElementById('pti-mode-tip');
   if (tipEl) {
     tipEl.setAttribute('data-tip', mode === 'rent'
@@ -5048,6 +5157,8 @@ function setPtiMode(mode) {
       : 'Share of owner households (with a mortgage) spending ≥30% of income on housing — mortgage, taxes, insurance, utilities (ACS B25091, 5-yr 2020-2024). Darker overlay = ≥50%.');
   }
   closePtiModePopover();
+  // Re-render the housing pane (which contains the PTI section) by
+  // calling selectCounty with the current county — it owns the render.
   if (typeof selectCounty === 'function') selectCounty(currentCounty);
 }
 document.addEventListener('click', (ev) => {
@@ -5376,8 +5487,13 @@ const rlbChart = new Chart(document.getElementById('rlb-chart'), {
 });
 
 /* ---------------- Construction hard-cost summary cards ----------------
-   Builds 3 enriched cards from rlbMF/rlbSF/rlbPkg arrays: type icon,
-   accent stripe, $/sf range bar, cumulative + annualized growth, sparkline. */
+   Builds 3 enriched cards (multifamily / single-family / ground parking)
+   from the rlbMF/rlbSF/rlbPkg arrays above. Each card shows:
+     - type icon + color-accent stripe
+     - low-to-high $/sf range with a mini track bar
+     - cumulative change chip (▲ +51%) colored by severity
+     - annualized growth rate
+     - small sparkline of the full quarterly series */
 const ICON_BUILDING2 = '<svg class="rlb-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>';
 const ICON_HOME      = '<svg class="rlb-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
 const ICON_PARKING   = '<svg class="rlb-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg>';
@@ -5385,6 +5501,7 @@ const ICON_PARKING   = '<svg class="rlb-icon" width="20" height="20" viewBox="0 
 function renderConstructionCards() {
   const grid = document.getElementById('rlb-grid');
   if (!grid) return;
+  // rlbLabels has 25 quarterly samples from Q1 2020 to Q1 2026 → 6.0 years.
   const yearsFromBase = (rlbLabels.length - 1) / 4;
   const types = [
     { key: 'mf',  label: 'Multifamily',    low: 310, high: 520, data: rlbMF,  icon: ICON_BUILDING2 },
@@ -5396,10 +5513,13 @@ function renderConstructionCards() {
     const last  = t.data[t.data.length - 1];
     const cumPct    = (last / first - 1) * 100;
     const annualPct = (Math.pow(last / first, 1 / yearsFromBase) - 1) * 100;
+    // Severity tier: ≥50% coral, ≥25% amber, else muted slate (still
+    // growth, just modest — keeps green reserved for genuinely good news).
     const tier = cumPct >= 50 ? 'hot' : cumPct >= 25 ? 'warm' : 'mild';
-    const cumArrow   = cumPct >= 0 ? '▲' : '▼';
-    const cumSign    = cumPct >= 0 ? '+' : '';
-    const annualSign = annualPct >= 0 ? '+' : '';
+    const cumArrow    = cumPct >= 0 ? '▲' : '▼';
+    const cumSign     = cumPct >= 0 ? '+' : '';
+    const annualSign  = annualPct >= 0 ? '+' : '';
+    // Sparkline: 25 points normalized into a 100×28 viewBox (stretch-fit).
     const W = 100, H = 28;
     const min = Math.min(...t.data);
     const max = Math.max(...t.data);
@@ -5412,7 +5532,10 @@ function renderConstructionCards() {
     }).join(' ');
     return `
       <div class="rlb-card rlb-card--${t.key}">
-        <div class="rlb-card-head">${t.icon}<div class="rlb-label">${t.label}</div></div>
+        <div class="rlb-card-head">
+          ${t.icon}
+          <div class="rlb-label">${t.label}</div>
+        </div>
         <div class="rlb-range-bar">
           <span class="rlb-range-low">$${t.low}</span>
           <span class="rlb-range-track" aria-hidden="true"></span>

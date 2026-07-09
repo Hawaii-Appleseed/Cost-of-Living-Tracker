@@ -39,6 +39,8 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
 from ha_common.html_patcher import patch_html_files  # noqa: E402
+from ha_common.js_lit import js_lit  # noqa: E402
+from ha_common.sanity import GROCERY_BOUNDS, scan_record  # noqa: E402
 GROCERY_PIPELINE_ROOT = PROJECT_ROOT / "pipelines" / "grocery"
 HOUSEHOLD_CSV = GROCERY_PIPELINE_ROOT / "data" / "output" / "household_estimates.csv"
 COUNTY_CSV    = GROCERY_PIPELINE_ROOT / "data" / "output" / "county_comparison.csv"
@@ -378,16 +380,8 @@ def build_grocery_data() -> dict:
 # HTML rendering & patching
 # -----------------------------------------------------------------
 def _js_lit(v) -> str:
-    """Render a Python value as a compact JS literal."""
-    if isinstance(v, bool):   return "true" if v else "false"
-    if isinstance(v, (int,)): return str(v)
-    if isinstance(v, float):  return repr(round(v, 4))
-    if isinstance(v, str):    return json.dumps(v, ensure_ascii=False)
-    if isinstance(v, list):
-        return "[ " + ", ".join(_js_lit(x) for x in v) + " ]"
-    if isinstance(v, dict):
-        return "{ " + ", ".join(f"{k}:{_js_lit(val)}" for k, val in v.items()) + " }"
-    raise TypeError(f"unsupported type {type(v)}")
+    """Render a Python value as a compact JS literal (4-digit floats)."""
+    return js_lit(v, float_digits=4)
 
 
 def render_grocery_data_block(data: dict) -> str:
@@ -435,6 +429,18 @@ def main() -> int:
 
     print(f"Loading grocery data from {GROCERY_PIPELINE_ROOT}/data/output/")
     data = build_grocery_data()
+
+    # Refuse to publish implausible values (mis-parsed CSV, broken CPI
+    # adjustment) — the HTML keeps its last-good block instead.
+    problems: list[str] = []
+    for c in ("State", "Honolulu", "Maui", "Hawaii", "Kauai"):
+        problems += scan_record(f"grocery.{c}", data[c], GROCERY_BOUNDS)
+    if problems:
+        print("ERROR: sanity check failed — refusing to patch:", file=sys.stderr)
+        for p in problems:
+            print(f"  ✗ {p}", file=sys.stderr)
+        return 1
+
     for c in ("State", "Honolulu", "Maui", "Hawaii", "Kauai"):
         g = data[c]
         print(f"  {c:9s} basket=${g['basketWithTax']:6.2f}/wk  "

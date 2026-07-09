@@ -25,11 +25,8 @@ Run:
 from __future__ import annotations
 
 import csv
-import json
 import re
-import ssl
 import sys
-import urllib.request
 from datetime import date, datetime, timezone
 from pathlib import Path
 
@@ -39,6 +36,9 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
 from ha_common.html_patcher import patch_html_files  # noqa: E402
+from ha_common.http_client import fetch_text  # noqa: E402
+from ha_common.js_lit import js_lit as _js_lit  # noqa: E402
+from ha_common.sanity import GAS_BOUNDS, scan_record  # noqa: E402
 SOURCE_URL   = "https://gasprices.aaa.com/?state=HI"
 HISTORY_CSV  = PROJECT_ROOT / "data" / "gas_prices_history.csv"
 
@@ -68,10 +68,8 @@ UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15"
 # Fetch
 # ------------------------------------------------------------------
 def fetch_html(url: str) -> str:
-    ctx = ssl.create_default_context()
-    req = urllib.request.Request(url, headers={"User-Agent": UA})
-    with urllib.request.urlopen(req, context=ctx, timeout=30) as resp:
-        return resp.read().decode("utf-8", errors="replace")
+    # Keep the browser-like UA — AAA serves the metro tables to browsers.
+    return fetch_text(url, headers={"User-Agent": UA}, timeout=30)
 
 
 # ------------------------------------------------------------------
@@ -228,17 +226,6 @@ def append_history(data: dict, fetched_at: str) -> None:
 # ------------------------------------------------------------------
 # HTML patch
 # ------------------------------------------------------------------
-def _js_lit(v) -> str:
-    if isinstance(v, bool):  return "true" if v else "false"
-    if isinstance(v, int):   return str(v)
-    if isinstance(v, float): return repr(round(v, 3))
-    if isinstance(v, str):   return json.dumps(v, ensure_ascii=False)
-    if isinstance(v, list):  return "[ " + ", ".join(_js_lit(x) for x in v) + " ]"
-    if isinstance(v, dict):
-        return "{ " + ", ".join(f"{k}:{_js_lit(val)}" for k, val in v.items()) + " }"
-    raise TypeError(f"unsupported type {type(v)}")
-
-
 def render_gas_data_block(data: dict, as_of: str) -> str:
     lines = ["/* GAS_DATA_START */", "const gasData = {"]
     order = ("State", "Honolulu", "Maui", "Hawaii", "Kauai")
@@ -284,6 +271,22 @@ def main() -> int:
 
     if not data:
         print("  ERROR: no price data extracted — page structure may have changed.", file=sys.stderr)
+        return 1
+
+    # Refuse to publish implausible or incomplete data — a missing county
+    # previously shipped silent $0.00 rows; a mis-parsed cell would ship a
+    # wrong price under a fresh "As of" label. Last-good HTML stays instead.
+    problems: list[str] = []
+    for cty in ("State", "Honolulu", "Maui", "Hawaii", "Kauai"):
+        d = data.get(cty)
+        if not d or d.get("regular") is None:
+            problems.append(f"gas.{cty}: no regular price parsed — AAA page structure may have changed")
+        else:
+            problems += scan_record(f"gas.{cty}", d, GAS_BOUNDS)
+    if problems:
+        print("  ERROR: sanity check failed — refusing to patch:", file=sys.stderr)
+        for p in problems:
+            print(f"    ✗ {p}", file=sys.stderr)
         return 1
 
     for cty in ("State", "Honolulu", "Maui", "Hawaii", "Kauai"):

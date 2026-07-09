@@ -12,7 +12,7 @@ pair — identical code, different tag.  This module gives them a single home.
 
 Usage::
 
-    from src.html_patcher import patch_data_block, patch_html_files
+    from ha_common.html_patcher import patch_data_block, patch_html_files
 
     new_block = build_my_block(data)
     patched_files = patch_html_files(DEFAULT_FILES, "CPI", new_block, dry_run=dry_run)

@@ -1,0 +1,39 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # PIP_CONSTRAINT pins hatchling < 1.26 inside the isolated build env —
+      # required until census-forecaster's redundant data force-include is
+      # removed upstream (see build-constraints.txt).
+      - name: Install dependencies
+        run: pip install -r requirements.txt pytest
+        env:
+          PIP_CONSTRAINT: build-constraints.txt
+
+      - name: Run test suite
+        run: python -m pytest -q
+
+      # The two dashboard copies must stay byte-identical (every updater
+      # patches both). Catch manual edits to one file at PR time instead of
+      # letting the monthly run trip over them weeks later.
+      - name: Verify HTML mirror is in sync
+        run: |
+          diff index.html squarespace-single-file.html \
+            && echo "HTML files are in sync ✓" \
+            || { echo "ERROR: index.html and squarespace-single-file.html have diverged!"; exit 1; }

@@ -6,7 +6,7 @@ one flaky CDN response could hang CI or produce a silent stale-data run.
 
 Usage::
 
-    from src.http_client import fetch_bytes, fetch_text
+    from ha_common.http_client import fetch_bytes, fetch_text
 
     raw = fetch_bytes("https://example.com/data.csv")
     text = fetch_text("https://example.com/page.html")

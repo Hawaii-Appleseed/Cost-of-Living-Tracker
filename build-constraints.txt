@@ -1,0 +1,12 @@
+# Build-environment constraints, applied via PIP_CONSTRAINT during
+# `pip install -r requirements.txt` (see .github/workflows/monthly-update.yml).
+#
+# census-forecaster's pyproject.toml both packages src/census_forecaster and
+# force-includes src/census_forecaster/data, so every data file is added to
+# the wheel twice. hatchling >= 1.26 turned that duplicate into a hard error;
+# earlier versions wrote the (harmless) duplicate zip entries, which is what
+# always shipped. Pin the build backend below 1.26 until the redundant
+# [tool.hatch.build.targets.wheel.force-include] block is removed upstream in
+# dtomkatsu/Census-Forecaster — then delete this file and the PIP_CONSTRAINT
+# wiring.
+hatchling<1.26

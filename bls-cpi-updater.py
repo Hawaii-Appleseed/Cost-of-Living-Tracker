@@ -44,6 +44,7 @@ sys.path.insert(0, str(GROCERY_ROOT))
 
 from src.cpi_fetcher import fetch_cpi_data      # noqa: E402 (grocery pipeline)
 from ha_common.html_patcher import patch_html_files   # noqa: E402
+from ha_common.sanity import CPI_YOY_BOUNDS, SanityError, check_range  # noqa: E402
 
 # ---------------------------------------------------------------
 SERIES = {
@@ -120,10 +121,24 @@ def main() -> int:
         raw = {sid: [] for sid in series_ids}
 
     yoy_by_key = {}
+    problems: list[str] = []
     for key, sid in SERIES.items():
         yoy, period = compute_yoy(raw.get(sid, []))
+        # A YoY outside its series' plausible band means a mangled series
+        # response, not inflation news — refuse to publish it. (None is fine:
+        # that's the documented soft-fail → null entry → hidden chip path.)
+        try:
+            check_range(f"cpi.{key}", yoy, *CPI_YOY_BOUNDS[key])
+        except SanityError as exc:
+            problems.append(str(exc))
         yoy_by_key[key] = {"yoy": yoy, "latestPeriod": period} if yoy is not None else None
         print(f"  {key:10s} ({sid}): YoY {yoy!r}  latest={period}")
+
+    if problems:
+        print("ERROR: sanity check failed — refusing to patch:", file=sys.stderr)
+        for p in problems:
+            print(f"  ✗ {p}", file=sys.stderr)
+        return 1
 
     new_block = build_block(yoy_by_key)
     print("\nNew cpiData block:\n" + new_block + "\n")

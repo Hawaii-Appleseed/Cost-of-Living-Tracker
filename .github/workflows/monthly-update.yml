@@ -19,6 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write   # needed to commit and push updated files
+      issues: write     # needed to file a tracking issue when the run fails
     env:
       BLS_API_KEY:    ${{ secrets.BLS_API_KEY }}
       CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
@@ -36,8 +37,18 @@ jobs:
         with:
           python-version: '3.12'
 
+      # PIP_CONSTRAINT pins hatchling < 1.26 inside the isolated build env —
+      # required until census-forecaster's redundant data force-include is
+      # removed upstream (see build-constraints.txt).
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r requirements.txt pytest
+        env:
+          PIP_CONSTRAINT: build-constraints.txt
+
+      # Gate: the suite must be green before any patcher rewrites the HTML —
+      # a broken blend/nowcast helper must not publish numbers.
+      - name: Run test suite
+        run: python -m pytest -q
 
       # 1. Grocery pipeline: CPI-adjusts baseline prices → regenerates CSVs
       #    under pipelines/grocery/data/output/.
@@ -91,3 +102,25 @@ jobs:
             && echo "No changes — data already up to date." \
             || git commit -m "chore: monthly data update $(date +'%Y-%m')"
           git push
+
+      # Failures otherwise surface only in the Actions tab, where a broken
+      # monthly push can sit unnoticed until the data is visibly stale. File
+      # (or bump) a tracking issue so there's an inbox notification instead.
+      - name: File tracking issue on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          run_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          title="Monthly data update failed"
+          existing="$(gh issue list --state open --search "\"$title\" in:title" \
+                        --json number --jq '.[0].number // empty')"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" \
+              --body "Failed again on $(date +'%Y-%m-%d'): $run_url"
+          else
+            gh issue create --title "$title" --body "$(printf '%s\n\n%s\n%s' \
+              "The scheduled monthly data update failed — the dashboard was NOT refreshed this cycle." \
+              "Run log: $run_url" \
+              "Common causes: an expired API key (BLS/Census/FRED), an upstream format change in a scraped source, a stale-data gate trip (scripts/check_freshness.py), or the HTML mirror drifting out of sync.")"
+          fi
