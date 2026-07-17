@@ -53,7 +53,14 @@
     /* Text scale */
     --text:     #1a2630;
     --text-mid: #4a6070;
-    --text-lt:  #7a95a5;
+    /* Was #7a95a5, which was below WCAG AA (4.5:1 for normal text) on every
+       background it sits on — 3.15:1 on white and only 2.73-2.80:1 on the
+       tinted panels (--bg, --sand, --bar-track, the -100 tints). This is the
+       lightest colour on the same hue that clears 4.5:1 against all of them
+       (4.52:1 on the darkest, --bg; 5.22:1 on white). Anything lighter fails
+       somewhere. Only ever used on light surfaces — the dark header sets its
+       own white/rgba text — so darkening it cannot regress the chrome. */
+    --text-lt:  #567080;
 
     /* ——— Semantic aliases ——— convenient short names that map into the
        palette above. --green / --amber now point at seafoam / coral-300
