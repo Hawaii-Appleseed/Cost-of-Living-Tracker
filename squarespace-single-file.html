@@ -475,6 +475,14 @@
        an ellipsis safety net so no label can ever overflow its cell. */
     .kpi-label { font-size: 12.5px; letter-spacing: 0.05em; min-width: 0; }
     .kpi-label-row > div { min-width: 0; }
+    /* The HOME/RENT pill is the home tile's label but never got the type-down
+       above: at 15px/0.08em it stays ~136px wide, and flex-shrink:0 meant it
+       could not give way — so it ran ~10px past its own cell and over the
+       divider into GROCERIES (only below ~396px, where the 2-up cell drops
+       under ~161px). Match the label's mobile type, tighten the option
+       padding, and drop the shrink lock so the pill can always give way. */
+    .kpi-seg { flex-shrink: 1; min-width: 0; }
+    .kpi-seg-opt { font-size: 12.5px; letter-spacing: 0.05em; padding: 3px 6px; white-space: nowrap; }
   }
 
   main {
