@@ -398,9 +398,14 @@
     gap: 8px;
     min-height: 20px;
   }
+  /* Quieter than the value on purpose: the tile's job is to land the number,
+     so the label gives up scale (15px -> 12.5px) to widen the value:label
+     ratio to ~3.3x. Colour deliberately stays --text-lt rather than going
+     lighter still — at 12.5px this is normal-size text, and --text-lt is
+     already only 3.15:1 on white. */
   .kpi-label {
-    font-size: 15px;
-    letter-spacing: 0.14em;
+    font-size: 12.5px;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--text-lt);
     font-weight: 500;
@@ -438,16 +443,29 @@
     color: var(--ocean);
     box-shadow: 0 1px 2px rgba(0,0,0,0.08);
   }
+  /* The value was --ocean (#52796F) — the same token as the header background,
+     giving the tile's headline number only 4.86:1 on the white card and just
+     1.5x its own label. --text takes it to 15.40:1 so the number, not the
+     chrome, is what the eye lands on. The teal identity stays in the icons. */
   .kpi-value {
     font-family: 'DM Serif Display', serif !important;
-    font-size: 2.312rem;
-    color: var(--ocean);
+    font-size: 2.6rem;
+    color: var(--text);
     line-height: 1.1;
     margin-top: 10px;
     letter-spacing: -0.01em;
   }
+  /* Rate qualifier ("/mo"). At full size it ate ~a third of the value's visual
+     mass for something nobody re-reads, so it drops to a small light suffix
+     and lets the digits carry the tile. letter-spacing resets the value's
+     -0.01em tightening, which is meant for the numerals. */
+  .kpi-unit {
+    font-size: 0.56em;
+    color: var(--text-lt);
+    letter-spacing: 0;
+  }
   .kpi-sub {
-    font-size: 15px;
+    font-size: 14px;
     color: var(--text-lt);
     margin-top: 6px;
     line-height: 1.35;
@@ -467,7 +485,7 @@
     .kpi { padding: 4px 12px; }
     .kpi:nth-child(3) { border-left: none; padding-left: 0; }
     .kpi:nth-child(2), .kpi:nth-child(4) { padding-right: 0; }
-    .kpi-value { font-size: 1.938rem; }
+    .kpi-value { font-size: 2.1rem; }
     /* In the 2-up mobile grid the right-column cell is only ~139px wide, so
        the longest label ("MEDIAN INCOME") at 15px/0.14em (~145px) spilled past
        the card toward the screen edge and read as clipped. Tighten the label
@@ -5003,7 +5021,7 @@ function renderSummaryStrip() {
   const homeVal = document.getElementById('kpi-home-value');
   const homeSub = document.getElementById('kpi-home-sub');
   if (currentHomeView === 'rent') {
-    countUpKPI(homeVal, d.rent, v => fmt(v) + '/mo');
+    countUpKPI(homeVal, d.rent, v => fmt(v) + '<span class="kpi-unit">/mo</span>');
     homeSub.innerHTML = 'median gross rent';
   } else {
     countUpKPI(homeVal, d.sfhPrice, fmtMoneyBig);
@@ -5069,7 +5087,7 @@ function renderSummaryStrip() {
     const monthly_kpi = tfp_kpi
       ? tfp_kpi.hawaii.family4Monthly * countyMult_kpi
       : g.monthlyFamily4;
-    if (typeof monthly_kpi === 'number') countUpKPI(grocVal, monthly_kpi, v => '$' + Math.round(v).toLocaleString() + '/mo');
+    if (typeof monthly_kpi === 'number') countUpKPI(grocVal, monthly_kpi, v => '$' + Math.round(v).toLocaleString() + '<span class="kpi-unit">/mo</span>');
     else grocVal.textContent = '—';
   } else {
     grocVal.textContent = '—';
@@ -5641,11 +5659,15 @@ if (housingDetail && rlbChart) {
    over 380ms. Reads as a precision instrument calibrating rather than
    a counter spinning up — communicates "fresh value" without making
    the user wait for the animation to finish before reading.            */
+// formatFn may return markup (the /mo formatters wrap the unit in
+// .kpi-unit), so this writes innerHTML rather than textContent. Every
+// formatter builds its string from a number we produced — the reduced-motion
+// path must use innerHTML too, or the span ships as literal text.
 function countUpKPI(el, targetVal, formatFn, dur) {
   if (!el || typeof targetVal !== 'number' || isNaN(targetVal)) return;
   dur = dur || 380;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    el.textContent = formatFn(targetVal); return;
+    el.innerHTML = formatFn(targetVal); return;
   }
   // Cancel any in-progress animation on this element
   if (el._countRaf) { cancelAnimationFrame(el._countRaf); el._countRaf = null; }
@@ -5655,7 +5677,7 @@ function countUpKPI(el, targetVal, formatFn, dur) {
   const t0 = performance.now();
   (function tick(now) {
     const p = Math.min((now - t0) / dur, 1);
-    el.textContent = formatFn(startVal + delta * ease(p));
+    el.innerHTML = formatFn(startVal + delta * ease(p));
     if (p < 1) el._countRaf = requestAnimationFrame(tick);
     else el._countRaf = null;
   })(t0);
