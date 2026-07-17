@@ -11,7 +11,8 @@ Reference family (per 7 U.S.C. § 2012):
   - Two children, ages 6–8 and 9–11
 
 Data sources:
-  AK-HI PDF: https://www.fns.usda.gov/sites/default/files/resource-files/cnpp-costfood-alaskahawaii-<mon><yyyy>.pdf
+  AK-HI PDF: https://www.fns.usda.gov/sites/default/files/resource-files/cnpp-costfood-ak-hi-<mon><yyyy>.pdf
+             (named cnpp-costfood-alaskahawaii-… before Jul 2026; we try both)
   US48 PDF:  https://www.fns.usda.gov/sites/default/files/resource-files/cnpp-costfood-tfp-<mon><yyyy>.pdf
   Index:     https://www.fns.usda.gov/research/cnpp/usda-food-plans/cost-food-monthly-reports
 
@@ -353,12 +354,24 @@ def fetch_pdf_via_index(slug_prefix: str) -> tuple[bytes, str] | None:
     return None
 
 
-def fetch_pdf(slug_prefix: str) -> tuple[bytes, str] | None:
-    """Try date-walked slugs first, then fall back to index scrape."""
-    result = fetch_pdf_by_slug(slug_prefix)
-    if result:
-        return result
-    return fetch_pdf_via_index(slug_prefix)
+def fetch_pdf(slug_prefixes: str | list[str]) -> tuple[bytes, str] | None:
+    """Try date-walked slugs first, then fall back to index scrape.
+
+    Accepts one slug prefix or several — USDA has renamed these files
+    before (alaskahawaii → ak-hi, Jul 2026), so callers pass every name
+    the PDF has ever had and we try them in order at each stage.
+    """
+    if isinstance(slug_prefixes, str):
+        slug_prefixes = [slug_prefixes]
+    for prefix in slug_prefixes:
+        result = fetch_pdf_by_slug(prefix)
+        if result:
+            return result
+    for prefix in slug_prefixes:
+        result = fetch_pdf_via_index(prefix)
+        if result:
+            return result
+    return None
 
 
 def parse_pdf_text(pdf_bytes: bytes) -> str:
@@ -485,7 +498,7 @@ def main() -> int:
             pdf_bytes = Path(args.pdf).read_bytes()
             ak_hi_url = f"file://{args.pdf}"
         else:
-            got = fetch_pdf("cnpp-costfood-alaskahawaii")
+            got = fetch_pdf(["cnpp-costfood-ak-hi", "cnpp-costfood-alaskahawaii"])
             if not got:
                 raise RuntimeError("could not fetch AK-HI PDF (tried slug variants + index fallback)")
             pdf_bytes, ak_hi_url = got
