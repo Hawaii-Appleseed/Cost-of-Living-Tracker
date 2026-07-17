@@ -21,12 +21,11 @@ plotly>=5.18
 # repo's install between syncs. To bump: update both hashes to the same
 # upstream commit and re-run `pip install -r requirements.txt` + pytest.
 #
-# NOTE: census-forecaster's pyproject force-includes src/census_forecaster/data
-# on top of the package include, so hatchling >= 1.26 refuses to build the
-# wheel ("A second file is being added to the wheel archive at the same
-# path"). Until that force-include is removed upstream, install with
-#   PIP_CONSTRAINT=build-constraints.txt pip install -r requirements.txt
-# which pins hatchling < 1.26 inside the isolated build env (the CI workflow
-# already does this).
-census-common @ git+https://github.com/dtomkatsu/Census-Forecaster.git@f0bea1b2dd5d76c24fc8f2f888869ae7bca11205#subdirectory=packages/common
-census-forecaster @ git+https://github.com/dtomkatsu/Census-Forecaster.git@f0bea1b2dd5d76c24fc8f2f888869ae7bca11205#subdirectory=packages/census_forecaster
+# NOTE: the redundant data/ force-include that made hatchling >= 1.26 refuse
+# to build census-forecaster's wheel was removed upstream in 75ba5a8 — this
+# pin (and anything after it) builds clean on any hatchling. The
+# PIP_CONSTRAINT=build-constraints.txt wiring in the CI workflows is now
+# belt-and-suspenders only and can be deleted along with that file next time
+# someone pushes with workflow scope.
+census-common @ git+https://github.com/dtomkatsu/Census-Forecaster.git@75ba5a8afdb06671a164d21e30639e84432d5ebb#subdirectory=packages/common
+census-forecaster @ git+https://github.com/dtomkatsu/Census-Forecaster.git@75ba5a8afdb06671a164d21e30639e84432d5ebb#subdirectory=packages/census_forecaster
