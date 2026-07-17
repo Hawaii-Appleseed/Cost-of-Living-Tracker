@@ -52,15 +52,13 @@ plus the mirror check on pushes and PRs.
 ## Local development
 
 ```bash
-PIP_CONSTRAINT=build-constraints.txt pip install -r requirements.txt pytest
+pip install -r requirements.txt pytest
 python -m pytest                   # test suite
 python scripts/check_freshness.py  # staleness gate
 open index.html                    # no server needed
 ```
 
-The `PIP_CONSTRAINT` pin (hatchling < 1.26) is needed until an upstream
-Census-Forecaster packaging fix lands — see `build-constraints.txt`. API keys
-(`BLS_API_KEY`, `CENSUS_API_KEY`, `FRED_API_KEY`) are read from the
+API keys (`BLS_API_KEY`, `CENSUS_API_KEY`, `FRED_API_KEY`) are read from the
 environment by the updaters, which degrade gracefully without them except
 where noted in each script.
 

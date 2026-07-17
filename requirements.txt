@@ -20,12 +20,5 @@ plotly>=5.18
 # Pinned to a commit hash (not @main) so upstream changes can't break this
 # repo's install between syncs. To bump: update both hashes to the same
 # upstream commit and re-run `pip install -r requirements.txt` + pytest.
-#
-# NOTE: the redundant data/ force-include that made hatchling >= 1.26 refuse
-# to build census-forecaster's wheel was removed upstream in 75ba5a8 — this
-# pin (and anything after it) builds clean on any hatchling. The
-# PIP_CONSTRAINT=build-constraints.txt wiring in the CI workflows is now
-# belt-and-suspenders only and can be deleted along with that file next time
-# someone pushes with workflow scope.
 census-common @ git+https://github.com/dtomkatsu/Census-Forecaster.git@75ba5a8afdb06671a164d21e30639e84432d5ebb#subdirectory=packages/common
 census-forecaster @ git+https://github.com/dtomkatsu/Census-Forecaster.git@75ba5a8afdb06671a164d21e30639e84432d5ebb#subdirectory=packages/census_forecaster

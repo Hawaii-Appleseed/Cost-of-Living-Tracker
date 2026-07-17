@@ -28,8 +28,6 @@ There is no Streamlit app and no Leaflet map here — don't look for them.
   [Census-Forecaster](https://github.com/dtomkatsu/Census-Forecaster) repo.
   The commit pinned in `requirements.txt` is the synced version — bump both
   pins together. Backtest must not regress past 6.76% MAPE.
-  (Installing currently needs `PIP_CONSTRAINT=build-constraints.txt` until an
-  upstream packaging fix lands — see that file.)
 - **Every UI change must be verified at 375px mobile width**, not just
   desktop. Prior edits have shipped clipped zone labels, overflowing pair-grid
   cards, and uncomfortably tight chrome because they were only checked at
