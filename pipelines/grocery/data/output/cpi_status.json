@@ -1,6 +1,6 @@
 {
   "target_date": "2026-07-15",
-  "is_interpolated": false,
+  "is_interpolated": true,
   "is_projected": false,
   "latest_actual_period": null,
   "ratio_info": {
