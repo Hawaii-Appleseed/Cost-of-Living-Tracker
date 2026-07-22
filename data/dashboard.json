@@ -14,7 +14,7 @@
     "condoPTI": 0.3673,
     "condoPrice": 595000,
     "income": 98800,
-    "mortgageOwnerPTI": 0.2465,
+    "mortgageOwnerPTI": 0.246,
     "ownerBurdenedPct": 0.3919,
     "ownerSeverelyBurdenedPct": 0.0573,
     "period": "2026-05-01",
@@ -29,7 +29,7 @@
     "sfhMortgage": 2897,
     "sfhPTI": 0.3519,
     "sfhPrice": 570000,
-    "tenantRentPTI": 0.3124,
+    "tenantRentPTI": 0.3118,
     "zoriYoY": 0.1703
   },
   "Honolulu": {
@@ -48,7 +48,7 @@
     "condoPrice": 515000,
     "cpiRentYoY": 0.031,
     "income": 129300,
-    "mortgageOwnerPTI": 0.2607,
+    "mortgageOwnerPTI": 0.2602,
     "ownerBurdenedPct": 0.4513,
     "ownerSeverelyBurdenedPct": 0.066,
     "period": "2026-05-01",
@@ -63,7 +63,7 @@
     "sfhMortgage": 5845,
     "sfhPTI": 0.5425,
     "sfhPrice": 1150000,
-    "tenantRentPTI": 0.3429,
+    "tenantRentPTI": 0.3422,
     "zoriYoY": 0.0537
   },
   "Kauai": {
@@ -81,7 +81,7 @@
     "condoPTI": 0.3672,
     "condoPrice": 800000,
     "income": 132900,
-    "mortgageOwnerPTI": 0.2637,
+    "mortgageOwnerPTI": 0.2632,
     "ownerBurdenedPct": 0.3548,
     "ownerSeverelyBurdenedPct": 0.0534,
     "period": "2026-05-01",
@@ -96,7 +96,7 @@
     "sfhMortgage": 6608,
     "sfhPTI": 0.5966,
     "sfhPrice": 1300000,
-    "tenantRentPTI": 0.3154,
+    "tenantRentPTI": 0.3148,
     "zoriYoY": 0.1869
   },
   "Maui": {
@@ -114,7 +114,7 @@
     "condoPTI": 0.3547,
     "condoPrice": 645000,
     "income": 110900,
-    "mortgageOwnerPTI": 0.2697,
+    "mortgageOwnerPTI": 0.2692,
     "ownerBurdenedPct": 0.3977,
     "ownerSeverelyBurdenedPct": 0.0711,
     "period": "2026-05-01",
@@ -129,7 +129,7 @@
     "sfhMortgage": 6116,
     "sfhPTI": 0.6618,
     "sfhPrice": 1203250,
-    "tenantRentPTI": 0.3348,
+    "tenantRentPTI": 0.3341,
     "zoriYoY": 0.0536
   },
   "State": {
@@ -148,7 +148,7 @@
     "condoPrice": 545900,
     "cpiRentYoY": 0.031,
     "income": 123000,
-    "mortgageOwnerPTI": 0.2596,
+    "mortgageOwnerPTI": 0.2591,
     "ownerBurdenedPct": 0.4307,
     "ownerSeverelyBurdenedPct": 0.0646,
     "period": "2026-05-01",
@@ -163,13 +163,13 @@
     "sfhMortgage": 4937,
     "sfhPTI": 0.4817,
     "sfhPrice": 971300,
-    "tenantRentPTI": 0.3378,
+    "tenantRentPTI": 0.3372,
     "zoriYoY": 0.0753
   },
   "_meta": {
     "blsRentPeriod": "2026-06",
     "buildPeriod": "2025",
-    "generatedAt": "2026-07-17T02:12:27",
+    "generatedAt": "2026-07-22T11:48:09",
     "housingPeriod": "2026-05",
     "mortgageRate": 6.55,
     "zoriPeriod": "2026-06"
