@@ -1,4 +1,4 @@
-# Housing-Affordability-Tracker — Claude rules
+# Cost-of-Living-Tracker — Claude rules
 
 ## What this repo actually is
 
@@ -22,7 +22,7 @@ There is no Streamlit app and no Leaflet map here — don't look for them.
   linear regression. BLS rent CPI samples each unit only every 6 months —
   single-print noise breaks linear fits.
 - **Repo-relative paths only** in commits and prompts (no `/Users/dtomkatsu/...`).
-  Madison's workdir is `~/repos/Housing-Affordability-Tracker/` — absolute
+  Madison's workdir is `~/repos/Cost-of-Living-Tracker/` — absolute
   laptop paths are invisible.
 - **Census forecasting must stay harmonized** with the standalone
   [Census-Forecaster](https://github.com/dtomkatsu/Census-Forecaster) repo.
@@ -67,5 +67,5 @@ There is no Streamlit app and no Leaflet map here — don't look for them.
 
 ## Companion docs (in vault)
 
-- `~/.openclaw/workspace/projects/Housing-Affordability-Tracker.md` — full project context.
-- `~/.openclaw/workspace/tasks/Housing-Affordability-Tracker.md` — active worklist.
+- `~/.openclaw/workspace/projects/Cost-of-Living-Tracker.md` — full project context.
+- `~/.openclaw/workspace/tasks/Cost-of-Living-Tracker.md` — active worklist.
