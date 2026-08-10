@@ -20,5 +20,5 @@ plotly>=5.18
 # Pinned to a commit hash (not @main) so upstream changes can't break this
 # repo's install between syncs. To bump: update both hashes to the same
 # upstream commit and re-run `pip install -r requirements.txt` + pytest.
-census-common @ git+https://github.com/dtomkatsu/Census-Forecaster.git@75ba5a8afdb06671a164d21e30639e84432d5ebb#subdirectory=packages/common
-census-forecaster @ git+https://github.com/dtomkatsu/Census-Forecaster.git@75ba5a8afdb06671a164d21e30639e84432d5ebb#subdirectory=packages/census_forecaster
+census-common @ git+https://github.com/dtomkatsu/Census-Forecaster.git@461c2b3d86cee614c65af9aa630b4442af329f1f#subdirectory=packages/common
+census-forecaster @ git+https://github.com/dtomkatsu/Census-Forecaster.git@461c2b3d86cee614c65af9aa630b4442af329f1f#subdirectory=packages/census_forecaster
