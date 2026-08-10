@@ -33,7 +33,6 @@ from __future__ import annotations
 
 import argparse
 import csv
-import importlib.util
 import io
 import json
 import sys
@@ -42,24 +41,28 @@ from pathlib import Path
 from typing import Any
 
 # ---------------------------------------------------------------------------
-# Imports from the live updater (hyphenated filename → importlib pattern)
+# Imports from the live pipeline
 # ---------------------------------------------------------------------------
+# These used to be read off redfin-price-updater.py via the hyphenated-filename
+# importlib dance. `be3f202` ("split the 2,438-line updater into the ha_housing
+# package") moved them into ha_housing without updating this harness, so it has
+# raised AttributeError: module 'rpu' has no attribute 'ZORI_URL' on every run
+# since. Import from the package directly — no importlib shim needed, and the
+# symbols now fail at import time rather than mid-backtest if they move again.
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from ha_common.http_client import fetch_bytes, fetch_text  # noqa: E402
 
-_RPU_SPEC = importlib.util.spec_from_file_location("rpu", ROOT / "redfin-price-updater.py")
-_RPU = importlib.util.module_from_spec(_RPU_SPEC)
-_RPU_SPEC.loader.exec_module(_RPU)  # type: ignore[union-attr]
-
-blend_rent_nowcast = _RPU.blend_rent_nowcast
-BLENDED_RENT_CPI_WEIGHT = _RPU.BLENDED_RENT_CPI_WEIGHT
-ZORI_URL = _RPU.ZORI_URL
-ZORI_COUNTY_MAP = _RPU.ZORI_COUNTY_MAP
-BLS_API_URL = _RPU.BLS_API_URL
-BLS_RENT_SERIES = _RPU.BLS_RENT_SERIES
-CENSUS_NAME_MAP = _RPU.CENSUS_NAME_MAP
+from ha_housing.nowcast import blend_rent_nowcast  # noqa: E402
+from ha_housing.config import (  # noqa: E402
+    BLENDED_RENT_CPI_WEIGHT,
+    BLS_API_URL,
+    BLS_RENT_SERIES,
+    CENSUS_NAME_MAP,
+    ZORI_COUNTY_MAP,
+    ZORI_URL,
+)
 
 # ---------------------------------------------------------------------------
 # Config

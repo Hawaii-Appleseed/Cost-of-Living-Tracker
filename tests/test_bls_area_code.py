@@ -2,7 +2,7 @@
 
 Why this file exists
 --------------------
-Until 2026-08-07 every CPI series in this repo used area `S49A`, labelled
+Until 2026-08-10 every CPI series in this repo used area `S49A`, labelled
 "Honolulu" throughout the code and docs. `S49A` is Los Angeles-Long
 Beach-Anaheim. The site published Los Angeles inflation as Hawaii's for as
 long as the chips have existed — understating headline CPI by ~1.8pp and
@@ -38,7 +38,7 @@ HAWAII_AREA = "S49F"
 WRONG_AREA = "S49A"
 
 # Expected publication cadence per series suffix, verified against the BLS
-# API on 2026-08-07. Mixed on purpose: the all-items/aggregate indices are
+# API on 2026-08-10. Mixed on purpose: the all-items/aggregate indices are
 # bimonthly for Urban Hawaii, the item-level ones are monthly.
 EXPECTED_PERIODS_PER_YEAR = {
     "SA0": 6,       # all items      — bimonthly (the four-area rule above)

@@ -8,15 +8,22 @@
 
 **Yes — 50/50 is acceptable and statistically indistinguishable from the optimum.**
 
-- Outer-island pooled blended-rent **MAPE at w=0.50 is 5.93%**, inside both the
+> **Re-run 2026-08-10 on corrected data.** Every number below was previously
+> computed against BLS area `S49A`, which is Los Angeles, not Hawaiʻi (see the
+> repo-wide correction to `S49F`). The figures moved; the conclusion did not.
+
+- Outer-island pooled blended-rent **MAPE at w=0.50 is 5.61%**, inside both the
   6.76% census-forecasting budget (`CLAUDE.md`) and the proposed 8% rent budget.
 - The MAPE-vs-weight curve is **shallow**: across the full 0.0→1.0 sweep the
-  outer-island MAPE only moves from 5.64% (best, w=0.4) to 7.66% (worst, pure
-  CPI). Production's 0.50 (5.93%) is **0.29 pp** off the optimum — noise-level.
-- That 0.29 pp is far smaller than the **ACS ground truth's own sampling MoE**
+  outer-island MAPE only moves from 5.33% (best, w=0.3) to 6.85% (worst, pure
+  CPI). Production's 0.50 (5.61%) is **0.28 pp** off the optimum — noise-level.
+- That 0.28 pp is far smaller than the **ACS ground truth's own sampling MoE**
   (Maui ±10.5%, Kauaʻi ±14.8% at 90% CI). The yardstick is blurrier than the
-  differences between candidate weights, so retuning to 0.4 would be overfitting
+  differences between candidate weights, so retuning to 0.3 would be overfitting
   to 15 noisy points. **Recommendation: keep 0.50.**
+- Correcting the series *narrowed* the spread (old: 5.64%–7.66%; new:
+  5.33%–6.85%) and moved the optimum one notch toward ZORI (0.4 → 0.3). Both
+  shifts are well inside the ACS noise band, so neither changes the call.
 
 ## Method
 
@@ -72,12 +79,12 @@ not a measured choice. Re-run this backtest once Kauaʻi has ≥2 years of ZORI
 
 | w (CPI weight) | MAPE % | |
 |---|---|---|
-| 0.0 | 6.33 | pure ZORI |
-| 0.3 | 5.67 | |
-| **0.4** | **5.64** | **optimum** |
-| 0.5 | 5.93 | **← production** |
-| 0.7 | 6.62 | |
-| 1.0 | 7.66 | pure CPI (worst) |
+| 0.0 | 6.22 | pure ZORI |
+| **0.3** | **5.33** | **optimum** |
+| 0.4 | 5.36 | |
+| 0.5 | 5.61 | **← production** |
+| 0.7 | 6.11 | |
+| 1.0 | 6.85 | pure CPI (worst) |
 
 Pure CPI is the *worst* option for the outer islands — confirming that applying
 Honolulu rent CPI alone to neighbor-island rents is the weakest choice and the
@@ -88,16 +95,16 @@ toward ZORI than 50/50, but the gain is inside the noise floor.
 
 | County | n | optimal w (MAPE) | production w (MAPE) | verdict |
 |---|---|---|---|---|
-| Honolulu | 6 | 1.0 (5.11%) | **0.7 (5.20%)** | ✓ negligible gap; tiny ACS MoE makes this the most trustworthy row |
-| Maui | 6 | 0.4 (3.99%) | **0.5 (4.29%)** | ✓ best-validated outer island; well under budget |
-| Hawaiʻi | 3 | 0.0 (7.83%) | **0.5 (9.21%)** | ⚠ see note |
+| Honolulu | 6 | 0.0 (5.47%) | **0.7 (6.13%)** | ✓ 0.66 pp gap, well inside Honolulu's ±2.5% ACS MoE. Note the optimum flipped from pure-CPI to pure-ZORI once the CPI series was corrected — on the old (Los Angeles) data, CPI looked like the better Honolulu predictor |
+| Maui | 6 | 0.4 (3.89%) | **0.5 (4.21%)** | ✓ best-validated outer island; well under budget |
+| Hawaiʻi | 3 | 0.0 (7.92%) | **0.5 (8.41%)** | ⚠ see note |
 | Kauaʻi | 0 | — | **0.5 (—)** | ⚠ no data — provisional |
 
 **Hawaiʻi note:** realized Big-Island rent grew +31% from 2022→2024 (ACS
 ×1.309), outrunning *both* the CPI factor (×1.105) and ZORI (×1.157). No blend
 of two under-shooting proxies can hit a target above both, so MAPE is high and
 falls monotonically as weight shifts to the larger (ZORI) factor. At w=0.5 the
-9.21% MAPE sits only ~1.5 pp above Hawaiʻi's own ACS noise band (SE 4.6% → ±9%
+8.41% MAPE sits only ~0.5 pp above Hawaiʻi's own ACS noise band (SE 4.6% → ±9%
 at 90% CI on a single pair), so part of that "miss" is likely a low 2022 ACS
 print rather than true nowcast error. Still, Hawaiʻi is the weakest county and
 worth re-checking next cycle.

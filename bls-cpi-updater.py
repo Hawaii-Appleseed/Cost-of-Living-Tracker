@@ -13,7 +13,7 @@ Series (area S49F = Urban Hawaii, NSA):
     CUURS49FSAT     — Transportation              bimonthly
 
 Area code is S49F. NOT S49A — that is Los Angeles-Long Beach-Anaheim, which
-this file fetched and labelled "Honolulu" until 2026-08-07. The cheap check
+this file fetched and labelled "Honolulu" until 2026-08-10. The cheap check
 is cadence: BLS publishes the all-items index monthly for exactly four areas
 (US average, New York, Chicago, Los Angeles), so any Hawaii SA0 series
 returning 12 observations a year is the wrong area.
