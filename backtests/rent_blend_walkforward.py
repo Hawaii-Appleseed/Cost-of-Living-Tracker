@@ -9,7 +9,7 @@ Methodology
 ~~~~~~~~~~~
 Cleveland Fed WP 22-38r style. For each anchor `T`:
 
-1. Pull BLS rent CPI (CUURS49ASEHA) capped at month T
+1. Pull BLS rent CPI (CUURS49FSEHA) capped at month T
 2. Pull ZORI county series capped at month T
 3. Pick the ACS 5-year vintage that would have been live at T
    (5-year vintages release in early December of year+2)

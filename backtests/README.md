@@ -14,7 +14,7 @@ Walk-forward backtest of the BLS-CPI / ZORI rent blend driving
 
 For each anchor `T ∈ {2022-04, 2022-10, 2023-04, 2023-10, 2024-04}`:
 
-1. Pull BLS rent CPI (`CUURS49ASEHA`) capped at `T`
+1. Pull BLS rent CPI (`CUURS49FSEHA`) capped at `T`
 2. Pull ZORI capped at `T`
 3. Pick ACS 5-year vintage available at `T` (release lag ~Dec of year+2)
 4. Run `blend_rent_nowcast()` for the live 70/30 weight + comparison baselines

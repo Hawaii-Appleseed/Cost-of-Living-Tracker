@@ -5,17 +5,30 @@ bls-cpi-updater.py
 Fetches Honolulu CPI series from BLS and patches the `cpiData` block in both
 squarespace-single-file.html and index.html.
 
-Series (area S49A = Urban Hawaii / Honolulu, NSA):
-    CUURS49ASA0     — All items, Honolulu (headline)
-    CUURS49ASAH     — Shelter, Honolulu
-    CUURS49ASAF11   — Food at home, Honolulu
-    CUURS49ASETB01  — Gasoline (all types), Honolulu  (energy proxy)
-    CUURS49ASAT     — Transportation, Honolulu
+Series (area S49F = Urban Hawaii, NSA):
+    CUURS49FSA0     — All items      (headline)   bimonthly
+    CUURS49FSAH     — Shelter                     bimonthly
+    CUURS49FSAF11   — Food at home                monthly
+    CUURS49FSETB01  — Gasoline (all types)        monthly   (energy proxy)
+    CUURS49FSAT     — Transportation              bimonthly
 
-Cadence: bimonthly. Data periods are odd months (Jan/Mar/May/Jul/Sep/Nov),
-released on or around the 15th of the following even month. YoY is computed
-against the same odd-month observation one year prior — both are guaranteed
-present in a bimonthly schedule, no interpolation needed.
+Area code is S49F. NOT S49A — that is Los Angeles-Long Beach-Anaheim, which
+this file fetched and labelled "Honolulu" until 2026-08-07. The cheap check
+is cadence: BLS publishes the all-items index monthly for exactly four areas
+(US average, New York, Chicago, Los Angeles), so any Hawaii SA0 series
+returning 12 observations a year is the wrong area.
+
+Cadence is MIXED — do not assume a shared period grid. All-items, shelter and
+transport are bimonthly (data periods are odd months — Jan/Mar/May/Jul/Sep/Nov
+— released on or around the 15th of the following even month); food-at-home
+and gasoline publish monthly. compute_yoy() is safe under this because it
+works one series at a time: each takes its own latest observation and looks
+for the same calendar month a year earlier, so every chip carries its own
+latestPeriod and the grids never have to align.
+
+Known gap: BLS published no October 2025 observation for the monthly series.
+A YoY that would need it returns None, which is the documented soft-fail —
+the chip hides rather than publishing a wrong number.
 
 For each series we compute YoY % change: (latest - 12mo prior) / 12mo prior * 100.
 
@@ -48,13 +61,14 @@ from ha_common.sanity import CPI_YOY_BOUNDS, SanityError, check_range  # noqa: E
 
 # ---------------------------------------------------------------
 SERIES = {
-    # Area S49A = Urban Hawaii / Honolulu (CUUR = CPI-U, NSA, bimonthly).
+    # Area S49F = Urban Hawaii (CUUR = CPI-U, NSA). Mixed cadence — see the
+    # module docstring. S49A is Los Angeles; do not put it back here.
     # Odd-month data periods; see module docstring for release cadence.
-    "allItems":  "CUURS49ASA0",     # All items
-    "shelter":   "CUURS49ASAH",     # Shelter
-    "food":      "CUURS49ASAF11",   # Food at home
-    "energy":    "CUURS49ASETB01",  # Gasoline / energy (motor fuel)
-    "transport": "CUURS49ASAT",     # Transportation
+    "allItems":  "CUURS49FSA0",     # All items
+    "shelter":   "CUURS49FSAH",     # Shelter
+    "food":      "CUURS49FSAF11",   # Food at home
+    "energy":    "CUURS49FSETB01",  # Gasoline / energy (motor fuel)
+    "transport": "CUURS49FSAT",     # Transportation
 }
 
 DEFAULT_FILES = [

@@ -83,7 +83,7 @@ def blend_rent_nowcast(
     component uses the same ACS dollar anchor (RENT_ANCHOR_YEAR); only the
     anchor→present growth factor differs.
 
-      bls_ratio    = CUURS49ASEHA(latest 3-mo trailing mean) / anchor annual avg
+      bls_ratio    = CUURS49FSEHA(latest 3-mo trailing mean) / anchor annual avg
                      [smoothed via BLS_RENT_SMOOTHING_WINDOW — see fetch_bls_rent_ratio]
       zori_ratio   = ZORI(latest 3-mo trailing mean) / ZORI(anchor annual avg)
                      [per county; state ratio used as proxy when a county's

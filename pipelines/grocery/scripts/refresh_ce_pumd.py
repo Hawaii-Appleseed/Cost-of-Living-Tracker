@@ -56,9 +56,9 @@ RAW_DIR = GROCERY_ROOT / "data" / "pumd_raw"
 OUT_JSON = GROCERY_ROOT / "data" / "pumd_honolulu_monthly.json"
 COUNTY_CSV = GROCERY_ROOT / "data" / "output" / "county_comparison.csv"
 
-# Honolulu food CPI (CUURS49ASAF11) is bimonthly. We average to annual for
+# Honolulu food CPI (CUURS49FSAF11) is bimonthly. We average to annual for
 # inflation adjustment between PUMD years.
-FOOD_CPI_SERIES = "CUURS49ASAF11"
+FOOD_CPI_SERIES = "CUURS49FSAF11"
 
 
 # ---------------------------------------------------------------------------

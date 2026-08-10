@@ -49,7 +49,7 @@ OUTER = ["Maui", "Hawaii", "Kauai"]
 TEST_YEARS = [2021, 2022, 2023, 2024]
 
 BLS_API_URL = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
-BLS_SERIES  = "CUURS49ASEHA"
+BLS_SERIES  = "CUURS49FSEHA"
 ZORI_URL    = ("https://files.zillowstatic.com/research/public_csvs/"
                "zori/County_zori_uc_sfrcondomfr_sm_month.csv")
 ZORI_MAP = {"Honolulu County": "Honolulu", "Hawaii County": "Hawaii",

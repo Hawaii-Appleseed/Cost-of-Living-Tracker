@@ -70,7 +70,7 @@ _DATA_TAG = "TFP"
 
 # BLS series for forward-projection: Honolulu "Food at home"
 BLS_API_URL     = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
-BLS_FOOD_SERIES = "CUURS49ASAF11"  # Honolulu, food at home, not seasonally adjusted
+BLS_FOOD_SERIES = "CUURS49FSAF11"  # Honolulu, food at home, not seasonally adjusted
 
 
 # -----------------------------------------------------------------

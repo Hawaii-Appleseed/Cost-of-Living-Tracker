@@ -38,7 +38,7 @@ their homes this month — not what a brand-new lease would cost.
 4. **Statewide** rent is the average of the counties, weighted by how many
    renter households each county has.
 
-**Sources:** Census ACS (table B25058), BLS Honolulu rent index (CUURS49ASEHA),
+**Sources:** Census ACS (table B25058), BLS Honolulu rent index (CUURS49FSEHA),
 Zillow ZORI, and HUD Fair Market Rents as a cross-check on the neighbor islands.
 
 **Freshness & confidence:** updated monthly; the month it's current as of is

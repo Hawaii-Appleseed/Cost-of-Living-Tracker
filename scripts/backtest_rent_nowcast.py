@@ -73,7 +73,7 @@ WEIGHT_GRID = [round(0.1 * i, 1) for i in range(11)]  # 0.0 .. 1.0
 CENSUS_RENT_VAR = "B25058_001E"
 CENSUS_RENT_MOE = "B25058_001M"
 BLS_API_URL     = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
-BLS_RENT_SERIES = "CUURS49ASEHA"
+BLS_RENT_SERIES = "CUURS49FSEHA"
 ZORI_URL        = ("https://files.zillowstatic.com/research/public_csvs/"
                    "zori/County_zori_uc_sfrcondomfr_sm_month.csv")
 ZORI_COUNTY_MAP = {
@@ -120,7 +120,7 @@ def fetch_acs_truth() -> dict:
 
 
 def fetch_bls_annual() -> dict:
-    """Return {year: annual_avg_index} for CUURS49ASEHA across TEST_YEARS."""
+    """Return {year: annual_avg_index} for CUURS49FSEHA across TEST_YEARS."""
     payload = json.dumps({
         "seriesid":  [BLS_RENT_SERIES],
         "startyear": str(min(TEST_YEARS)),
@@ -259,7 +259,7 @@ def main():
         print("ERROR: set CENSUS_API_KEY"); return
     print("Fetching ACS 1-yr contract rent (B25058) 2021-2024 ...")
     truth = fetch_acs_truth()
-    print("Fetching BLS CUURS49ASEHA annual averages ...")
+    print("Fetching BLS CUURS49FSEHA annual averages ...")
     bls_annual = fetch_bls_annual()
     print("Fetching ZORI county annual averages ...")
     zori_annual = fetch_zori_annual()

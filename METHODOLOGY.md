@@ -11,30 +11,30 @@ fresh ACS vintage drops, this is the file to read before touching numbers.
 |---|---|---|---|---|
 | SFH & condo medians | Redfin Data Center (public S3) | `state_market_tracker.tsv000.gz`, `county_market_tracker.tsv000.gz` | monthly, 3rd-Friday release | `redfin-price-updater.py` |
 | Contract rent (existing leases) | Census ACS 5-yr | `B25058_001E` | annual, December release | `redfin-price-updater.py` |
-| Rent CPI (existing tenants) | BLS Honolulu MSA | `CUURS49ASEHA` | bimonthly (even months), NSA | `redfin-price-updater.py` |
+| Rent CPI (existing tenants) | BLS Urban Hawaii | `CUURS49FSEHA` | monthly, NSA | `redfin-price-updater.py` |
 | Asking rent | Zillow ZORI | `County_zori_uc_sfrcondomfr_sm_month.csv` | monthly | `redfin-price-updater.py` |
 | HUD income limits | HHFDC county PDFs + HUD state PDF | FY 2025 MFI | annual | `redfin-price-updater.py` |
 | Construction authorizations | DBEDT QSER | Table E-8 | annual (from quarterly data) | `redfin-price-updater.py` |
-| All-items CPI (headline chip) | BLS Honolulu | `CUURS49ASA0` | bimonthly | `bls-cpi-updater.py` |
-| Shelter / food / gasoline / transport CPI | BLS Honolulu | `CUURS49ASAH`, `CUURS49ASAF11`, `CUURS49ASETB01`, `CUURS49ASAT` | bimonthly | `bls-cpi-updater.py` |
+| All-items CPI (headline chip) | BLS Urban Hawaii | `CUURS49FSA0` | bimonthly (odd months) | `bls-cpi-updater.py` |
+| Shelter / food / gasoline / transport CPI | BLS Urban Hawaii | `CUURS49FSAH` (bimonthly), `CUURS49FSAF11` (monthly), `CUURS49FSETB01` (monthly), `CUURS49FSAT` (bimonthly) | mixed — see below | `bls-cpi-updater.py` |
 | Thrifty Food Plan | USDA CNPP | Alaska-Hawaii monthly report | monthly | `tfp-updater.py` |
 | Gas prices | AAA Hawaii | statewide average | daily | `gas-price-updater.py` |
 | Grocery basket | In-house scrape, CPI-adjusted | `pipelines/grocery/` | ad-hoc + monthly CPI roll | `grocery-price-updater.py` |
 | Typical-household FAH spending (side-stat) | BLS CE PUMD interview survey | Honolulu PSU `S49A`–`S49D`, FINLWT21-weighted, 5y pool | annual, target October | `pipelines/grocery/scripts/refresh_ce_pumd.py` |
 
-The `CUURS49A*` prefix is **Honolulu Urban Hawaii, not seasonally adjusted**.
+The `CUURS49F*` prefix is **Honolulu Urban Hawaii, not seasonally adjusted**.
 There is no neighbor-island CPI — every CPI adjustment applied to Maui,
 Hawaii County, or Kauai uses the Honolulu ratio as a directional proxy.
 
 The grocery pipeline's `cpi_series.json` still uses the **legacy area-426
 codes** (`CUUSA426SAF11`, etc.). BLS continues to publish both the legacy
-A426 series and the post-2018 S49A series in parallel; treat them as
+A426 series and the post-2017 S49F series in parallel; treat them as
 equivalent for nowcast purposes. If BLS ever sunsets one of the prefixes,
 mirror the other before re-running the pipeline.
 
 ---
 
-## CPI release cadence (Honolulu, area S49A)
+## CPI release cadence (Urban Hawaii, area S49F)
 
 Every Honolulu CPI series consumed here is **bimonthly**, not monthly.
 
@@ -269,8 +269,8 @@ initialize the damped-trend fit in census forecasting; see
 
 **Machine learning (LSTM, XGBoost, Random Forest)** for projecting Honolulu
 CPI bimonthlies past the latest print: too little training data. The
-Honolulu S49A series only goes back to ~2018 (CPI area-code restructuring
-released the modern S49A codes that year), giving ~50 bimonthly
+Urban Hawaii S49F series only goes back to 2017 (CPI area-code restructuring
+released the modern S49F codes that year), giving ~50 bimonthly
 observations per series. Recent literature (e.g. *Modeling inflation with
 machine learning: a cross-horizon systematic review*, IJDSA 2025) finds
 LSTMs underperform AR/SARIMA and ridge on small-sample inflation data,
@@ -284,7 +284,7 @@ the academic consensus says is the right baseline class for this kind of
 short-horizon, small-sample series.
 
 **Seasonal adjustment (X-13ARIMA-SEATS)** before projecting: the BLS
-Honolulu S49A series we consume are NSA (not seasonally adjusted), but the
+Urban Hawaii S49F series we consume are NSA (not seasonally adjusted), but the
 projection horizon is at most ~3 months and the YoY chip on the dashboard
 already implicitly absorbs seasonality (same calendar month, year-over-year).
 A seasonal decomposition would need ≥3 years of clean data; with only ~50
@@ -361,8 +361,8 @@ income tracks per-worker private earnings.)
 
 | Series | Code | Role |
 |---|---|---|
-| Honolulu CPI, rent of primary residence | `CUURS49ASEHA` | Rent-burden numerator |
-| Honolulu CPI, all items | `CUURS49ASA0` | Owner-burden numerator proxy — locked-in mortgage P&I + slow-growing tax / insurance / utilities ≈ general CPI |
+| Honolulu CPI, rent of primary residence | `CUURS49FSEHA` | Rent-burden numerator |
+| Honolulu CPI, all items | `CUURS49FSA0` | Owner-burden numerator proxy — locked-in mortgage P&I + slow-growing tax / insurance / utilities ≈ general CPI |
 | Hawaiʻi state private avg weekly earnings (NSA) | `SMU15000000500000011` | Income denominator (both sides), trailing-12mo mean |
 
 Factors are statewide and applied uniformly across all five geographies —
@@ -373,7 +373,7 @@ is the finest Hawaiʻi-specific series available.
 The displayed tenant *rent dollars* (`rent`) grow by the blended CPI/ZORI(/FMR)
 factor, but the rent-*burden* numerator (`tenantRentPTI`) grows the ACS GRAPI
 anchor by the CPI-rent factor alone. This is deliberate: GRAPI measures what
-*existing* tenants pay, and the Honolulu rent CPI (`CUURS49ASEHA`, rent of
+*existing* tenants pay, and the Honolulu rent CPI (`CUURS49FSEHA`, rent of
 primary residence) is the matching existing-tenant deflator. ZORI and FMR
 describe *new-lease / asking* rent, which is the right signal for a forward
 nowcast of market rent but overstates what sitting tenants actually pay. So the
@@ -458,7 +458,7 @@ The BLS Honolulu rent CPI lags market asking rent by roughly 12 months — it
 samples each unit once every six months and averages continuing leases
 alongside new ones. Zillow ZORI is an asking-rent index that leads CPI but
 overreacts to turnover. There is only **one** BLS rent series for Hawaiʻi
-(Honolulu MSA, `CUURS49ASEHA`), so the CPI growth leg is identical for every
+(Honolulu MSA, `CUURS49FSEHA`), so the CPI growth leg is identical for every
 county — the ZORI leg is the only county-specific growth signal.
 
 We blend the legs, anchored to the same ACS dollar base. Most counties use a
@@ -665,7 +665,7 @@ microdata refresh:
 4. **Per-household monthly FAH** = sum(MTBI FAH UCCs) / 3 (each FMLI row
    is a quarterly interview).
 5. **Inflation-adjust** each year to the latest period via the Honolulu
-   food CPI series `CUURS49ASAF11`.
+   food CPI series `CUURS49FSAF11`.
 6. **Apply CE-recommended `FINLWT21` weights** for population-representative
    means; pool 5 years to mitigate small Honolulu PSU sample size
    (~50–200 households/quarter; 5y pool gives ~1.5–4k Honolulu HH-quarters).

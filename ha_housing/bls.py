@@ -150,7 +150,7 @@ def nowcast_burden_anchors(anchor: dict, anchor_year: str) -> dict:
 
 def fetch_bls_rent_ratio() -> tuple[float, float, str, float | None]:
     """
-    Fetch BLS CPI series CUURS49ASEHA (Honolulu MSA, rent of primary residence)
+    Fetch BLS CPI series CUURS49FSEHA (Honolulu MSA, rent of primary residence)
     and return (ratio_now, ratio_smoothed, period, yoy_pct).
 
     ratio_now     — latest_idx / RENT_ANCHOR_YEAR annual avg (single-month)

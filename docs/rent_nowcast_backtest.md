@@ -26,7 +26,7 @@ anchor). We test whether the blended *growth factor* reproduces realized growth:
 
 ```
 true_factor = ACS1(t1) / ACS1(t0)
-bls_factor  = BLS CUURS49ASEHA annual-avg(t1) / annual-avg(t0)   # Honolulu, shared by all counties
+bls_factor  = BLS CUURS49FSEHA annual-avg(t1) / annual-avg(t0)   # Honolulu, shared by all counties
 zori_factor = ZORI annual-avg(c, t1) / annual-avg(c, t0)         # per county
 pred(w)     = ACS1(t0) × ( w·bls_factor + (1-w)·zori_factor )
 ape(w)      = |pred(w) / ACS1(t1) − 1|

@@ -37,7 +37,7 @@ def _cpi_data(series_id: str, points: list[dict]) -> dict:
     return {series_id: points}
 
 
-SERIES = "CUURS49ASAF11"
+SERIES = "CUURS49FSAF11"
 
 
 # ---------------------------------------------------------------------------

@@ -151,7 +151,7 @@ def extract_honolulu_fah(
     mtbi_df : pandas.DataFrame
         Must contain columns NEWID, UCC, COST.
     food_cpi_annual : dict[int, float] | None
-        Annual Honolulu food CPI (CUURS49ASAF11). If provided with target_year,
+        Annual Honolulu food CPI (CUURS49FSAF11). If provided with target_year,
         each CU's quarterly FAH is inflated from fmli_year → target_year before
         weighting.
     target_year : int | None

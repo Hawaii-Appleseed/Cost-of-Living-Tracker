@@ -109,15 +109,15 @@ CENSUS_BURDEN_VARS = [
 # Owner SMOCAPI is dominated by sticky locked-in P&I + slow-growing
 # tax/ins/util → tracks Honolulu all-items CPI as a stand-in. Income
 # uses Hawaii state private avg weekly earnings (CES).
-BLS_CPI_ALL_ITEMS_HNL = "CUURS49ASA0"           # Honolulu, all items
+BLS_CPI_ALL_ITEMS_HNL = "CUURS49FSA0"           # Honolulu, all items
 BLS_WAGES_HI_PRIVATE  = "SMU15000000500000011"  # Hawaii state private avg weekly earnings (NSA)
 
 # BLS CPI: Honolulu MSA — "Rent of primary residence" (existing tenants, not new leases)
-# Series CUURS49ASEHA, not seasonally adjusted, base 1982-84=100.
+# Series CUURS49FSEHA, not seasonally adjusted, base 1982-84=100.
 # We scale the live ACS Honolulu contract rent (fetched each run) by the
 # BLS index ratio (latest / anchor-year avg) to get a monthly-current estimate.
 BLS_API_URL     = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
-BLS_RENT_SERIES = "CUURS49ASEHA"
+BLS_RENT_SERIES = "CUURS49FSEHA"
 BLS_BASE_YEAR   = RENT_ANCHOR_YEAR
 
 # NTR/ATR national benchmarks — manually refreshed quarterly from BLS research
@@ -131,7 +131,7 @@ NTR_ATR_BENCHMARKS_PATH = PROJECT_ROOT / "data" / "ntr_atr_benchmarks.json"
 # growth factors vs. RENT_ANCHOR_YEAR applied to the same ACS dollar anchor:
 #   blended_rent = acs_anchor × (cpi_w · bls_ratio + (1−cpi_w) · zori_ratio)
 #
-# The BLS Honolulu rent index (CUURS49ASEHA) is a Honolulu-only sample —
+# The BLS Honolulu rent index (CUURS49FSEHA) is a Honolulu-only sample —
 # applying it to neighbor islands at the same 70% weight implies that
 # Honolulu rent dynamics are a reliable proxy for Maui/Hawaiʻi/Kauaʻi,
 # which is methodologically weak. Outer islands get 50/50 so the only
