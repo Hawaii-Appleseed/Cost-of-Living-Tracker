@@ -1853,27 +1853,18 @@
     margin: 0 auto;
   }
 
-  /* Zone-tinted bar track: three background bands (seafoam / amber / coral)
-     mark the share-of-burdened-households brackets — <30% of households,
-     30–50%, 50%+. 50% tick marks the "majority burdened" threshold. */
+  /* Bar track plots the median share of income spent on housing (PTI) per
+     county. A single tick marks 50%-of-income — since the fill itself is
+     on the same income-share scale, the tick lines up directly against
+     the value it's describing (no separate household-share zones to
+     reconcile against a flat-colored fill). */
   .pti-bar-track {
     flex: 1;
     height: 18px;
     border-radius: 5px;
     position: relative;
-    overflow: visible; /* allow anchor tick label to overhang above */
-    background: linear-gradient(to right,
-      rgba(30,138,115,0.20)  0%,   rgba(30,138,115,0.20) 30%,
-      rgba(224,138,91,0.20) 30%,   rgba(224,138,91,0.20) 50%,
-      rgba(201,79,58,0.20)  50%,   rgba(201,79,58,0.20)  100%);
-  }
-  /* Severe-share overlay: darker coral inner bar drawn over the primary
-     burdened bar to show what fraction of the burdened share is severe
-     (≥50% of income on housing). */
-  .pti-bar-fill.pti-bar-fill--severe {
-    background: var(--coral-700, #8a3525) !important;
-    opacity: 0.92;
-    z-index: 1;
+    overflow: visible; /* allow tick to overhang slightly */
+    background: var(--bar-track);
   }
   .pti-bar-track .pti-bar-fill {
     position: absolute;
@@ -1891,36 +1882,6 @@
     border-radius: 2px;
     z-index: 2;
     opacity: 0.55;
-  }
-  /* Zone labels embedded in the State row's bar background — doubles as legend */
-  .pti-row.is-state { margin-top: 24px; }
-  .pti-zone-label {
-    position: absolute;
-    bottom: 100%;
-    margin-bottom: 3px;
-    height: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    pointer-events: none;
-    opacity: 0.85;
-  }
-  .pti-zone-label--ok   { color: var(--seafoam-700); }
-  .pti-zone-label--mid  { color: var(--amber); }
-  .pti-zone-label--high { color: var(--coral-500); }
-  /* On narrow viewports the zones are too small for the uppercase labels —
-     hide them. The bar zone background tints + the lede sentence already
-     carry the meaning. */
-  @media (max-width: 520px) {
-    .pti-zone-label { display: none; }
-    .pti-row.is-state { margin-top: 0; }
   }
   /* Lede sentence above the PTI grid — same pattern as afford-banner narrative */
   .pti-lede {
@@ -3884,38 +3845,31 @@ function selectCounty(county) {
       mcardV2('sfh',   'Single-family home', d.sfhPrice,   d.sfhIdx,   d.sfhMortgage,   housingBadge)
     + mcardV2('condo', 'Condo',              d.condoPrice, d.condoIdx, d.condoMortgage, housingBadge);
 
-  // Bar scale: 0–100% of households. The 50% tick marks the "majority of
-  // households are burdened" threshold; gradient bands behind the bar
-  // mirror the share buckets (<30 / 30–50 / 50+).
+  // Bar scale: 0–100% of income. The bar itself plots the median PTI
+  // (payment-to-income ratio) per county, so the 50%-of-income tick sits
+  // directly on the same scale as the fill it marks — unlike the prior
+  // household-share version, where a flat-colored bar sat under
+  // "<30/30-50/50+ of households" zone labels that didn't correspond to
+  // where the color actually changed along the bar.
   const majorityTickPct = 50;
   const shareColor = v => v >= 0.50 ? '#c94f3a' : v >= 0.30 ? '#e08a5b' : '#1e8a73';
 
-  // Build one row: each bar shows the SHARE of households that are
-  // cost-burdened (≥30% of income on housing). An inner darker-coral
-  // overlay shows the subset that's severely burdened (≥50% of income).
-  // This swaps the previous median-PTI visualization, which didn't match
-  // the headline "X% of households are cost-burdened" lede.
+  // Build one row: each bar shows the median share of income (PTI) that
+  // county's households spend on rent or mortgage payments.
   const ptiRow = (c, isState, mode) => {
-    const burd = (typeof burdenShare === 'function' ? burdenShare(c) : 0) || 0;
-    const sev  = (typeof severeShare === 'function' ? severeShare(c) : 0) || 0;
-    const wBurd = Math.min(burd * 100, 100).toFixed(1);
-    const wSev  = Math.min(sev  * 100, 100).toFixed(1);
-    const clr = shareColor(burd);
+    const ptiVal = (typeof burdenPTI === 'function' ? burdenPTI(c) : 0) || 0;
+    const wPti = Math.min(ptiVal * 100, 100).toFixed(1);
+    const clr = shareColor(ptiVal);
     const isCurrent = c === currentCounty;
-    const householdNoun = mode === 'rent' ? 'renter households' : 'owner households w/ mortgage';
-    const zoneLabels = isState ? `
-          <span class="pti-zone-label pti-zone-label--ok"   style="left:0%;width:30%">&lt;30%</span>
-          <span class="pti-zone-label pti-zone-label--mid"  style="left:30%;width:20%">30–50%</span>
-          <span class="pti-zone-label pti-zone-label--high" style="left:50%;width:50%">50%+ of households</span>` : '';
+    const housingNoun = mode === 'rent' ? 'rent' : 'mortgage payments';
     return `
       <div class="pti-row is-clickable${isCurrent ? ' is-current' : ''}${isState ? ' is-state' : ''}" role="button" tabindex="0" data-county="${c}" title="View ${fullLbl[c]}">
         <div class="pti-row-lbl${isState ? ' pti-row-lbl--state' : ''}">${shortLbl[c]}</div>
-        <div class="pti-bar-track">${zoneLabels}
-          <div class="pti-bar-fill" style="width:${wBurd}%;background:${clr};" data-tip="${pct(burd)} of ${shortLbl[c]} ${householdNoun} are cost-burdened · ${pct(sev)} severely"></div>
-          <div class="pti-bar-fill pti-bar-fill--severe" style="width:${wSev}%;"></div>
-          <div class="pti-bar-tick" style="left:${majorityTickPct}%;" title="50% — majority of households burdened"></div>
+        <div class="pti-bar-track">
+          <div class="pti-bar-fill" style="width:${wPti}%;background:${clr};" data-tip="${shortLbl[c]} households spend a median of ${pct(ptiVal)} of income on ${housingNoun}"></div>
+          <div class="pti-bar-tick" style="left:${majorityTickPct}%;" title="50% of income spent on housing"></div>
         </div>
-        <div class="pti-row-val" style="color:${clr}">${pct(burd)}</div>
+        <div class="pti-row-val" style="color:${clr}">${pct(ptiVal)}</div>
       </div>
       ${isState ? '<div class="pti-row-sep"></div>' : ''}
     `;
@@ -3936,8 +3890,8 @@ function selectCounty(county) {
   const severeShare = c => isRent ? countyData[c].rentSeverelyBurdenedPct
                                   : countyData[c].ownerSeverelyBurdenedPct;
   const panelLabel    = isRent ? 'Renters' : 'Owners with mortgage';
-  const panelSubLabel = isRent ? 'share of renter households that are cost-burdened, by county'
-                               : 'share of owner households (w/ mortgage) that are cost-burdened, by county';
+  const panelSubLabel = isRent ? 'median share of income renter households spend on rent, by county'
+                               : 'median share of income owner households (w/ mortgage) spend on mortgage payments, by county';
   const householdType = isRent ? 'renter' : 'owner';
   const householdTypePl = isRent ? 'renter households' : 'owner households with a mortgage';
 
