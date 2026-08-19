@@ -3986,9 +3986,10 @@ function selectCounty(county) {
     const w2 = (rd.askRent / maxRentH * 100).toFixed(1);
     const isState = c === 'State';
     const isCurrent = c === currentCounty;
-    // CPI YoY is only meaningful for State and Honolulu (Honolulu BLS rent
-    // CPI is the underlying series). Outer islands get ZORI YoY only.
-    const cpiChip   = (isState || c === 'Honolulu') ? rentYoyChip(rd.cpiRentYoY) : '';
+    // Tenant-rent YoY chip intentionally omitted for all counties: Hawaii
+    // has only one BLS rent CPI series (Honolulu MSA), so it was only ever
+    // available for State/Honolulu, which read as inconsistent next to the
+    // outer islands. Asking-rent (ZORI) YoY is available per county below.
     const zoriChip  = rentYoyChip(rd.zoriYoY);
     return `<div class="rent-row is-clickable${isCurrent ? ' is-current' : ''}${isState ? ' rent-row--state' : ''}" role="button" tabindex="0" data-county="${c}" title="View ${fullLbl[c]}">
       <div class="rent-row-lbl">${shortLbl[c]}${isState ? '<span class="rent-row-eyebrow">Statewide</span>' : ''}</div>
@@ -3997,7 +3998,7 @@ function selectCounty(county) {
           <div class="rent-hbar-track">
             <div class="rent-hbar" style="width:${w1}%;background:var(--ocean-300);" data-tip="Tenant rent · ${fmt(rd.rent)}/mo"></div>
           </div>
-          <div class="rent-hbar-val">${fmt(rd.rent)}${cpiChip}</div>
+          <div class="rent-hbar-val">${fmt(rd.rent)}</div>
         </div>
         <div class="rent-hbar-wrap">
           <div class="rent-hbar-track">
