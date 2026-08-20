@@ -25,7 +25,7 @@ There is no Streamlit app and no Leaflet map here — don't look for them.
   Madison's workdir is `~/repos/Cost-of-Living-Tracker/` — absolute
   laptop paths are invisible.
 - **Census forecasting must stay harmonized** with the standalone
-  [Census-Forecaster](https://github.com/dtomkatsu/Census-Forecaster) repo.
+  [Census-Forecaster](https://github.com/Hawaii-Appleseed/Census-Forecaster) repo.
   The commit pinned in `requirements.txt` is the synced version — bump both
   pins together. Backtest must not regress past 6.76% MAPE.
 - **Every UI change must be verified at 375px mobile width**, not just
