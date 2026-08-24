@@ -3365,10 +3365,10 @@
   </div>
 
   <div class="card" style="margin-bottom:1.25rem;">
-    <div class="card-title">How much of income goes to <span class="pti-mode-anchor"><button type="button" id="pti-mode-btn" class="pti-mode-btn" aria-haspopup="listbox" aria-expanded="false" onclick="togglePtiModePopover(event)" title="Switch between mortgage and rent"><span id="pti-mode-name">a mortgage</span><span class="caret" aria-hidden="true"></span></button><div class="pti-mode-popover" id="pti-mode-popover" role="listbox">
-        <button class="pti-mode-popover-item is-active" data-mode="mortgage" onclick="setPtiMode('mortgage')">Mortgage <span class="pti-mode-popover-item-sub">owners w/ mortgage · ACS B25092</span></button>
-        <button class="pti-mode-popover-item"           data-mode="rent"     onclick="setPtiMode('rent')">Rent <span class="pti-mode-popover-item-sub">renter households · ACS B25071</span></button>
-      </div></span>? <span class="afford-assumptions-info" tabindex="0" role="button" aria-label="About this chart" id="pti-mode-tip" data-tip="Share of owner households (with a mortgage) spending ≥30% of income on housing — mortgage, taxes, insurance, utilities (ACS B25091, 5-yr 2020-2024). Darker overlay = ≥50%.">ⓘ</span>
+    <div class="card-title">How much of income goes to <span class="pti-mode-anchor"><button type="button" id="pti-mode-btn" class="pti-mode-btn" aria-haspopup="listbox" aria-expanded="false" onclick="togglePtiModePopover(event)" title="Switch between mortgage and rent"><span id="pti-mode-name">rent</span><span class="caret" aria-hidden="true"></span></button><div class="pti-mode-popover" id="pti-mode-popover" role="listbox">
+        <button class="pti-mode-popover-item"           data-mode="mortgage" onclick="setPtiMode('mortgage')">Mortgage <span class="pti-mode-popover-item-sub">owners w/ mortgage · ACS B25092</span></button>
+        <button class="pti-mode-popover-item is-active" data-mode="rent"     onclick="setPtiMode('rent')">Rent <span class="pti-mode-popover-item-sub">renter households · ACS B25071</span></button>
+      </div></span>? <span class="afford-assumptions-info" tabindex="0" role="button" aria-label="About this chart" id="pti-mode-tip" data-tip="Share of renter households spending ≥30% of income on rent + utilities (ACS B25070, 5-yr 2020-2024). Darker overlay = ≥50% (severely burdened).">ⓘ</span>
     </div>
     <div id="pti-bars"></div>
   </div>
@@ -3568,7 +3568,7 @@ const shortLbl = { State:'State', Honolulu:'Honolulu', Maui:'Maui', Hawaii:'Hawa
 const fullLbl  = { State:'Statewide', Honolulu:'Honolulu', Maui:'Maui', Hawaii:'Hawaiʻi', Kauai:'Kauaʻi' };
 
 let currentCounty = 'State';
-let currentPtiMode = 'mortgage';   // 'mortgage' | 'rent' — switches the "How much of income goes to ___?" chart between homeownership P&I and rent burden.
+let currentPtiMode = 'rent';   // 'mortgage' | 'rent' — switches the "How much of income goes to ___?" chart between homeownership P&I and rent burden. Defaults to rent: renter burden is the more universal/urgent figure to lead with.
 
 const fmt = n => '$' + Math.round(n).toLocaleString();
 const pct = n => (n*100).toFixed(1)+'%';
