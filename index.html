@@ -74,6 +74,18 @@
     --green-lt: var(--seafoam-100);
     --amber:    var(--coral-300);
     --amber-lt: var(--coral-100);
+
+    /* Categorical set for the grocery basket composition bar (#goods-category-bars).
+       Fixed order — grains/dairy/fruits/beverages/meat/other — validated as
+       adjacent-pair CVD-safe via the dataviz skill's palette checker. Do not
+       reorder without re-validating: swapping cat-4 (beverages) next to a
+       cat-2-family orange fails the normal-vision floor (see skill palette.md). */
+    --cat-1:     #2a78d6;   /* grains & rice */
+    --cat-2:     #eb6834;   /* dairy */
+    --cat-3:     #1baf7a;   /* fruits */
+    --cat-4:     #eda100;   /* beverages */
+    --cat-5:     #e87ba4;   /* meat & pork */
+    --cat-other: #b9c6cc;   /* everything else, folded */
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -634,6 +646,23 @@
   .cat-bar-bg { flex: 1 1 40px; min-width: 40px; height: 20px; background: var(--bar-track); border-radius: 4px; position: relative; overflow: hidden; }
   .cat-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--ocean-mid), var(--ocean)); }
   .cat-bar-val { font-size: 16px; color: var(--text-mid); width: 58px; text-align: right; flex-shrink: 0; }
+
+  /* Grocery basket composition — single stacked bar (replaces the cat-bar-row list) */
+  .groc-stack-bar { display: flex; height: 38px; border-radius: 8px; overflow: hidden; width: 100%; }
+  .groc-stack-seg { position: relative; display: flex; align-items: center; justify-content: center; border-right: 2px solid var(--white); border-radius: 0; }
+  .groc-stack-seg:last-child { border-right: none; }
+  .groc-stack-seg.is-other { cursor: pointer; }
+  .groc-stack-seg-lbl { font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; padding: 0 5px; pointer-events: none; }
+  .groc-stack-seg-lbl.ink { color: var(--text); }
+  .groc-stack-legend { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 14px; }
+  .groc-stack-legend-item { display: flex; align-items: center; gap: 6px; font-size: 15px; color: var(--text-mid); }
+  .groc-stack-legend-item.is-clickable { cursor: pointer; }
+  .groc-stack-legend-item.is-clickable:hover { text-decoration: underline; }
+  .groc-stack-swatch { width: 11px; height: 11px; border-radius: 3px; flex-shrink: 0; }
+  .groc-stack-other-detail { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); }
+  .groc-stack-other-detail.is-open { display: block; }
+  .groc-stack-other-row { display: flex; justify-content: space-between; font-size: 15px; color: var(--text-mid); padding: 4px 0; }
+  .groc-stack-other-row b { color: var(--text); font-weight: 600; }
 
   /* Top items table on Goods pane */
   .top-items-table { width: 100%; border-collapse: collapse; font-size: 18px; }
@@ -4532,19 +4561,46 @@ function renderGoodsDetail(g) {
     }
   }
 
-  /* Category bars */
-  const catEntries = Object.entries(g.categories).filter(([_,v]) => v > 0);
-  const catMax = Math.max(...catEntries.map(([_,v])=>v));
-  document.getElementById('goods-category-bars').innerHTML = catEntries
-    .sort((a,b)=>b[1]-a[1])
-    .map(([k,v]) => {
-      const w = (v/catMax*100).toFixed(1);
-      return `<div class="cat-bar-row">
-        <div class="cat-bar-lbl">${CAT_LABELS[k]||k}</div>
-        <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:${w}%;"></div></div>
-        <div class="cat-bar-val">${fmt(v)}/wk</div>
-      </div>`;
-    }).join('');
+  /* Category bars — single stacked composition bar. Five fixed categories
+     (by far the largest across every county in practice) always keep the
+     same color/position; everything smaller folds into a clickable "Other"
+     segment so the bar stays readable without hiding the detail. */
+  const catAll = Object.entries(g.categories).filter(([_,v]) => v > 0);
+  const catTotal = catAll.reduce((s,[_,v]) => s + v, 0);
+  const STACK_TOP_KEYS = ['grains','dairy','fruits','beverages','protein_meat'];
+  const STACK_COLORS = { grains:'var(--cat-1)', dairy:'var(--cat-2)', fruits:'var(--cat-3)', beverages:'var(--cat-4)', protein_meat:'var(--cat-5)' };
+  const topKeySet = new Set(STACK_TOP_KEYS);
+  const topSegs = STACK_TOP_KEYS.map(k => [k, g.categories[k] || 0]).filter(([_,v]) => v > 0);
+  const otherEntries = catAll.filter(([k]) => !topKeySet.has(k)).sort((a,b) => b[1]-a[1]);
+  const otherTotal = otherEntries.reduce((s,[_,v]) => s + v, 0);
+  const stackSegs = [...topSegs, ['other', otherTotal]].filter(([_,v]) => v > 0);
+  document.getElementById('goods-category-bars').innerHTML = `
+    <div class="groc-stack-bar">
+      ${stackSegs.map(([k,v]) => {
+        const pct = (v / catTotal * 100);
+        const isOther = k === 'other';
+        const color = isOther ? 'var(--cat-other)' : STACK_COLORS[k];
+        const label = isOther ? 'Other' : (CAT_LABELS[k] || k);
+        const showLabel = pct >= 9;
+        const isYellowSlot = k === 'beverages';
+        const clickAttr = isOther ? ' onclick="toggleGrocOther()"' : '';
+        const titleAttr = isOther ? 'Everything outside the top 5 categories — click to see the breakdown' : `${label} · ${fmt(v)}/wk · ${pct.toFixed(0)}%`;
+        return `<div class="groc-stack-seg cat-bar-fill${isOther?' is-other':''}" style="width:${pct.toFixed(1)}%;background:${color};" title="${titleAttr}"${clickAttr}>${showLabel ? `<span class="groc-stack-seg-lbl${isYellowSlot?' ink':''}">${label}</span>` : ''}</div>`;
+      }).join('')}
+    </div>
+    <div class="groc-stack-legend">
+      ${stackSegs.map(([k,v]) => {
+        const pct = (v / catTotal * 100);
+        const isOther = k === 'other';
+        const color = isOther ? 'var(--cat-other)' : STACK_COLORS[k];
+        const label = isOther ? 'Other (click to expand)' : (CAT_LABELS[k] || k);
+        const clickAttr = isOther ? ' onclick="toggleGrocOther()"' : '';
+        return `<div class="groc-stack-legend-item${isOther?' is-clickable':''}"${clickAttr}><span class="groc-stack-swatch" style="background:${color};"></span>${label} &middot; ${fmt(v)}/wk &middot; ${pct.toFixed(0)}%</div>`;
+      }).join('')}
+    </div>
+    <div class="groc-stack-other-detail" id="goods-category-other-detail">
+      ${otherEntries.map(([k,v]) => `<div class="groc-stack-other-row"><span>${CAT_LABELS[k]||k}</span><b>${fmt(v)}/wk</b></div>`).join('')}
+    </div>`;
 
   /* Top items table */
   document.getElementById('goods-items-county-label').textContent = fullLbl[currentCounty];
@@ -4937,6 +4993,11 @@ function initAsofPopover() {
 function setHH(key) {
   currentHH = key;
   renderGoodsPane();
+}
+
+function toggleGrocOther() {
+  const el = document.getElementById('goods-category-other-detail');
+  if (el) el.classList.toggle('is-open');
 }
 
 function selectPane(pane) {
