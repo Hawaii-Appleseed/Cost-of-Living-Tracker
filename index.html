@@ -651,13 +651,13 @@
   .groc-stack-bar { display: flex; height: 38px; border-radius: 8px; overflow: hidden; width: 100%; }
   .groc-stack-seg { position: relative; display: flex; align-items: center; justify-content: center; border-right: 2px solid var(--white); border-radius: 0; }
   .groc-stack-seg:last-child { border-right: none; }
-  .groc-stack-seg.is-other { cursor: pointer; }
+  .groc-stack-seg { cursor: pointer; }
   .groc-stack-seg-lbl { font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; padding: 0 5px; pointer-events: none; }
   .groc-stack-seg-lbl.ink { color: var(--text); }
   .groc-stack-legend { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 14px; }
-  .groc-stack-legend-item { display: flex; align-items: center; gap: 6px; font-size: 15px; color: var(--text-mid); }
-  .groc-stack-legend-item.is-clickable { cursor: pointer; }
-  .groc-stack-legend-item.is-clickable:hover { text-decoration: underline; }
+  .groc-stack-legend-item { display: flex; align-items: center; gap: 6px; font-size: 15px; color: var(--text-mid); cursor: pointer; }
+  .groc-stack-legend-item:hover { text-decoration: underline; }
+  .groc-stack-seg.is-active-detail { outline: 2px solid rgba(0,0,0,0.25); outline-offset: -2px; }
   .groc-stack-swatch { width: 11px; height: 11px; border-radius: 3px; flex-shrink: 0; }
   .groc-stack-other-detail { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); }
   .groc-stack-other-detail.is-open { display: block; }
@@ -4574,6 +4574,20 @@ function renderGoodsDetail(g) {
   const otherEntries = catAll.filter(([k]) => !topKeySet.has(k)).sort((a,b) => b[1]-a[1]);
   const otherTotal = otherEntries.reduce((s,[_,v]) => s + v, 0);
   const stackSegs = [...topSegs, ['other', otherTotal]].filter(([_,v]) => v > 0);
+  // Every segment is clickable (not just "Other") — each opens the same shared
+  // detail panel, populated per-category. Other's panel lists the folded
+  // sub-categories; a top-5 category's panel restates its own figure so the
+  // interaction (and the affordance) is consistent across every segment.
+  const detailByKey = {};
+  stackSegs.forEach(([k,v]) => {
+    if (k === 'other') {
+      detailByKey[k] = otherEntries.map(([kk,vv]) => `<div class="groc-stack-other-row"><span>${CAT_LABELS[kk]||kk}</span><b>${fmt(vv)}/wk</b></div>`).join('');
+    } else {
+      const pct = (v / catTotal * 100);
+      detailByKey[k] = `<div class="groc-stack-other-row"><span>${CAT_LABELS[k]||k}</span><b>${fmt(v)}/wk &middot; ${pct.toFixed(0)}%</b></div>`;
+    }
+  });
+  window.__grocStackDetail = detailByKey;
   document.getElementById('goods-category-bars').innerHTML = `
     <div class="groc-stack-bar">
       ${stackSegs.map(([k,v]) => {
@@ -4583,9 +4597,8 @@ function renderGoodsDetail(g) {
         const label = isOther ? 'Other' : (CAT_LABELS[k] || k);
         const showLabel = pct >= 9;
         const isYellowSlot = k === 'beverages';
-        const clickAttr = isOther ? ' onclick="toggleGrocOther()"' : '';
-        const titleAttr = isOther ? 'Everything outside the top 5 categories — click to see the breakdown' : `${label} · ${fmt(v)}/wk · ${pct.toFixed(0)}%`;
-        return `<div class="groc-stack-seg cat-bar-fill${isOther?' is-other':''}" style="width:${pct.toFixed(1)}%;background:${color};" title="${titleAttr}"${clickAttr}>${showLabel ? `<span class="groc-stack-seg-lbl${isYellowSlot?' ink':''}">${label}</span>` : ''}</div>`;
+        const titleAttr = `${label} · ${fmt(v)}/wk · ${pct.toFixed(0)}% — click for detail`;
+        return `<div class="groc-stack-seg cat-bar-fill" data-cat-key="${k}" style="width:${pct.toFixed(1)}%;background:${color};" title="${titleAttr}" onclick="toggleGrocCat('${k}')">${showLabel ? `<span class="groc-stack-seg-lbl${isYellowSlot?' ink':''}">${label}</span>` : ''}</div>`;
       }).join('')}
     </div>
     <div class="groc-stack-legend">
@@ -4593,21 +4606,18 @@ function renderGoodsDetail(g) {
         const pct = (v / catTotal * 100);
         const isOther = k === 'other';
         const color = isOther ? 'var(--cat-other)' : STACK_COLORS[k];
-        const label = isOther ? 'Other (click to expand)' : (CAT_LABELS[k] || k);
-        const clickAttr = isOther ? ' onclick="toggleGrocOther()"' : '';
-        return `<div class="groc-stack-legend-item${isOther?' is-clickable':''}"${clickAttr}><span class="groc-stack-swatch" style="background:${color};"></span>${label} &middot; ${fmt(v)}/wk &middot; ${pct.toFixed(0)}%</div>`;
+        const label = isOther ? 'Other' : (CAT_LABELS[k] || k);
+        return `<div class="groc-stack-legend-item" data-cat-key="${k}" onclick="toggleGrocCat('${k}')"><span class="groc-stack-swatch" style="background:${color};"></span>${label} &middot; ${fmt(v)}/wk &middot; ${pct.toFixed(0)}%</div>`;
       }).join('')}
     </div>
-    <div class="groc-stack-other-detail" id="goods-category-other-detail">
-      ${otherEntries.map(([k,v]) => `<div class="groc-stack-other-row"><span>${CAT_LABELS[k]||k}</span><b>${fmt(v)}/wk</b></div>`).join('')}
-    </div>`;
+    <div class="groc-stack-other-detail" id="goods-category-other-detail"></div>`;
 
   /* Top items table */
   document.getElementById('goods-items-county-label').textContent = fullLbl[currentCounty];
   document.getElementById('goods-top-items').innerHTML = g.topItems.map(it => {
     const diff = (it.vsHnl - 1);
     const clr = diff > 0.02 ? 'var(--coral)' : diff < -0.02 ? 'var(--green)' : 'var(--text-lt)';
-    const diffTxt = currentCounty === 'Honolulu' ? '<span style="color:var(--text-lt);">—</span>' : `<span style="color:${clr};">${pctSigned(diff)}</span>`;
+    const diffTxt = currentCounty === 'Honolulu' ? '<span class="period-tag" title="Honolulu is the reference county — every county\'s price is compared against it">Baseline</span>' : `<span style="color:${clr};">${pctSigned(diff)}</span>`;
     return `<tr><td>${it.name}</td><td>$${it.price.toFixed(2)}</td><td>${diffTxt}</td></tr>`;
   }).join('');
 }
@@ -4995,9 +5005,21 @@ function setHH(key) {
   renderGoodsPane();
 }
 
-function toggleGrocOther() {
+function toggleGrocCat(key) {
   const el = document.getElementById('goods-category-other-detail');
-  if (el) el.classList.toggle('is-open');
+  if (!el) return;
+  document.querySelectorAll('.groc-stack-seg.is-active-detail').forEach(s => s.classList.remove('is-active-detail'));
+  const wasOpenForSameKey = el.dataset.openKey === key && el.classList.contains('is-open');
+  if (wasOpenForSameKey) {
+    el.classList.remove('is-open');
+    el.dataset.openKey = '';
+    return;
+  }
+  el.innerHTML = (window.__grocStackDetail && window.__grocStackDetail[key]) || '';
+  el.dataset.openKey = key;
+  el.classList.add('is-open');
+  const seg = document.querySelector(`.groc-stack-seg[data-cat-key="${key}"]`);
+  if (seg) seg.classList.add('is-active-detail');
 }
 
 function selectPane(pane) {
