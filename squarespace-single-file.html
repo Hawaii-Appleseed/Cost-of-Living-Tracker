@@ -3544,6 +3544,7 @@
         <div class="card">
           <div class="card-title">Highest-priced basket items</div>
           <div class="card-sub">Per-unit price in <span id="goods-items-county-label">Statewide</span> &nbsp;·&nbsp; vs. Honolulu</div>
+          <div id="goods-items-state-note"></div>
           <div style="overflow-x:auto;"><table class="top-items-table"><thead><tr><th>Item</th><th>Price</th><th>vs. Honolulu</th></tr></thead><tbody id="goods-top-items"></tbody></table></div>
         </div>
         <div class="note-box" style="border-left-color:var(--green);margin-bottom:0;">
@@ -4618,6 +4619,12 @@ function renderGoodsDetail(g) {
 
   /* Top items table */
   document.getElementById('goods-items-county-label').textContent = fullLbl[currentCounty];
+  const stateNoteEl = document.getElementById('goods-items-state-note');
+  if (stateNoteEl) {
+    stateNoteEl.innerHTML = currentCounty === 'State'
+      ? `<div class="note-box" style="font-size:15px;padding:10px 14px;margin:0 0 14px;line-height:1.5;">Statewide figures are population-weighted across all four counties (about 70% Honolulu, 14% Hawaiʻi Island, 11% Maui, 5% Kauaʻi) &mdash; so this comparison isn't fully independent from Honolulu's own prices.</div>`
+      : '';
+  }
   document.getElementById('goods-top-items').innerHTML = g.topItems.map(it => {
     const diff = (it.vsHnl - 1);
     const clr = diff > 0.02 ? 'var(--coral)' : diff < -0.02 ? 'var(--green)' : 'var(--text-lt)';
