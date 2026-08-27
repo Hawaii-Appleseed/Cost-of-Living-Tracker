@@ -2577,6 +2577,7 @@
      Each repaint rebuilds innerHTML, which retriggers the animation. */
   #housing-pair-grid > *,
   #goods-pair-grid   > *,
+  #goods-gas-pair-grid > *,
   #pti-bars          > *,
   #rent-grid         > *,
   #market-compare-wrap > *,
@@ -3500,9 +3501,9 @@
     <div id="goods-narrative" class="afford-banner"></div>
 
     <div class="metrics-container">
-      <div class="metrics-container-title">Groceries &amp; gas &middot; {{county}}</div>
-      <div class="housing-pair-grid" id="goods-pair-grid"></div>
-      <div class="affordability-note">Groceries are family-of-4 post-tax retail (USDA TFP, built from BLS Urban Hawaiʻi food-at-home CPI which already includes <span class="gloss" data-gloss="GET">GET</span>). Gas is current <span class="gloss" data-gloss="AAA">AAA</span> Hawaiʻi regular unleaded average.</div>
+      <div class="metrics-container-title">Groceries &middot; {{county}}</div>
+      <div class="housing-pair-grid" id="goods-pair-grid" style="grid-template-columns:1fr;"></div>
+      <div class="affordability-note">Groceries are family-of-4 post-tax retail (USDA TFP, built from BLS Urban Hawaiʻi food-at-home CPI which already includes <span class="gloss" data-gloss="GET">GET</span>).</div>
     </div>
 
     <div class="staple-items-panel">
@@ -3510,17 +3511,10 @@
       <div class="staple-items-grid" id="goods-staple-items"></div>
     </div>
 
-    <div class="housing-pair-grid" style="margin-top:22px;">
-      <div class="card">
-        <div class="card-title">Groceries by county</div>
-        <div class="card-sub">Share of median 4-person income</div>
-        <div id="goods-county-compare-groc"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Gas by county</div>
-        <div class="card-sub">vs. statewide average</div>
-        <div id="goods-county-compare-gas"></div>
-      </div>
+    <div class="card" style="margin-top:22px;">
+      <div class="card-title">Groceries by county</div>
+      <div class="card-sub">Share of median 4-person income</div>
+      <div id="goods-county-compare-groc"></div>
     </div>
 
     <div class="calc-section" style="margin-top:22px;">
@@ -3557,11 +3551,23 @@
           <br><br>
           <strong style="color:var(--text);">Data sources</strong><br>
           <span id="goods-datasources-body">
-            <span class="gloss" data-gloss="USDA">USDA</span> Food and Nutrition Service · <span class="gloss" data-gloss="CNPP">CNPP</span> <span class="gloss" data-gloss="thriftyFoodPlan">Thrifty Food Plan</span> monthly AK-HI report (reference family of 4) · Hawaiʻi Grocery Price Tracker · Hawaiʻi <span class="gloss" data-gloss="GET">GET</span> (4.5%) · U.S. Census Bureau County Business Patterns. Gas prices via <a href="https://gasprices.aaa.com/?state=HI" style="color:var(--green);" target="_blank">AAA Hawaiʻi</a> — updated daily, scraped monthly. Household-scaling factors follow the USDA four-person reference family normalization.
+            <span class="gloss" data-gloss="USDA">USDA</span> Food and Nutrition Service · <span class="gloss" data-gloss="CNPP">CNPP</span> <span class="gloss" data-gloss="thriftyFoodPlan">Thrifty Food Plan</span> monthly AK-HI report (reference family of 4) · Hawaiʻi Grocery Price Tracker · Hawaiʻi <span class="gloss" data-gloss="GET">GET</span> (4.5%) · U.S. Census Bureau County Business Patterns. Household-scaling factors follow the USDA four-person reference family normalization.
           </span>
         </div>
       </div>
     </details>
+
+    <div class="metrics-container" style="margin-top:22px;">
+      <div class="metrics-container-title" id="goods-gas-title">Gas &middot; {{county}}</div>
+      <div class="housing-pair-grid" id="goods-gas-pair-grid" style="grid-template-columns:1fr;"></div>
+      <div class="affordability-note">Gas is current <span class="gloss" data-gloss="AAA">AAA</span> Hawaiʻi regular unleaded average, scraped monthly.</div>
+    </div>
+
+    <div class="card" style="margin-top:22px;">
+      <div class="card-title">Gas by county</div>
+      <div class="card-sub">vs. statewide average</div>
+      <div id="goods-county-compare-gas"></div>
+    </div>
   </section><!-- /#pane-goods -->
 </main>
 
@@ -4209,12 +4215,14 @@ function renderGoodsPane() {
 
   // Update section header {{county}} placeholder
   const titleEl = document.querySelector('#pane-goods .metrics-container-title');
-  if (titleEl) titleEl.textContent = 'Groceries & gas · ' + fullLbl[currentCounty];
+  if (titleEl) titleEl.textContent = 'Groceries · ' + fullLbl[currentCounty];
+
+  const gasTitleEl = document.getElementById('goods-gas-title');
+  if (gasTitleEl) gasTitleEl.textContent = 'Gas · ' + fullLbl[currentCounty];
 
   /* 1. Narrative snapshot — prose + share-of-income coverage bar with
      10% cost-burden threshold. Mirrors the housing affordability snapshot
      so both panes lead with the same visual rhythm. */
-  const gasTxt = (gas && gas.regular) ? '<span class="num-badge num-badge--outline">$' + gas.regular.toFixed(2) + '/gal</span> for gas' : '';
   const sourceTip = tfp
     ? `USDA Thrifty Food Plan · county-adjusted · post-tax retail`
     : `Tracked basket · post-tax retail`;
@@ -4227,14 +4235,14 @@ function renderGoodsPane() {
                       : sharePct >= 8  ? 'num-badge--amber'
                       :                  'num-badge--green';
   const eyebrowLbl = currentCounty === 'State'
-    ? 'Statewide &middot; Groceries &amp; gas'
-    : `${fullLbl[currentCounty]} &middot; Groceries &amp; gas`;
+    ? 'Statewide &middot; Groceries'
+    : `${fullLbl[currentCounty]} &middot; Groceries`;
   document.getElementById('goods-narrative').innerHTML = `
     <div class="afford-banner-label">${eyebrowLbl}</div>
     <div class="afford-narrative">
       A family of four spends about
       <span class="num-badge num-badge--outline goods-narr-num" data-tip="${sourceTip}">$${displayMonthly.toLocaleString()}/mo</span>
-      on groceries${gasTxt ? ' and pays ' + gasTxt : ''} —
+      on groceries —
       <span class="num-badge ${shareBadgeCls}">${sharePct.toFixed(1)}%</span>
       of median household income goes to food alone.
     </div>`;
@@ -4313,7 +4321,9 @@ function renderGoodsPane() {
   } else {
     gasCard = '<div class="mcard-v2 mcard-v2--gas"><div class="mcard-v2-header"><span class="mcard-v2-title">Gas</span><span class="mcard-v2-date">—</span></div><div class="mcard-v2-price">—</div></div>';
   }
-  document.getElementById('goods-pair-grid').innerHTML = grocCard + gasCard;
+  document.getElementById('goods-pair-grid').innerHTML = grocCard;
+  const gasPairEl = document.getElementById('goods-gas-pair-grid');
+  if (gasPairEl) gasPairEl.innerHTML = gasCard;
 
   /* Repaint CPI badges (if cpiData available — fallback to blank) */
   renderGoodsCpiBadges();
