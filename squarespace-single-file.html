@@ -1359,14 +1359,6 @@
     display: flex;
     margin-bottom: 14px;
   }
-  .mcard-v2-bar-tick {
-    position: absolute;
-    top: 0; bottom: 0;
-    width: 2px;
-    background: rgba(7, 56, 74, 0.45);
-    z-index: 3;
-    pointer-events: none;
-  }
   .mcard-v2-bar-income {
     /* Seafoam by default — paired housing/goods cards always show the
        coastal palette, not a navy bar-of-the-day.                      */
@@ -1379,16 +1371,6 @@
   .mcard-v2-bar-income.is-full { border-radius: 999px; }
   .mcard-v2-bar-income.is-affordable {
     background: linear-gradient(90deg, var(--seafoam-400), var(--seafoam-200));
-  }
-  /* Severity-tiered fill for the Groceries card's own bar — green/amber/
-     coral by how much of income groceries take up, so a cost-burdened
-     value never reads as green ("positive"). */
-  .mcard-v2-bar-income.is-ok {
-    background: linear-gradient(90deg, var(--seafoam-500), var(--seafoam-700));
-  }
-  .mcard-v2-bar-income.is-stretched { background: var(--amber); }
-  .mcard-v2-bar-income.is-burden {
-    background: linear-gradient(90deg, var(--coral-300), var(--coral-500));
   }
   .mcard-v2-bar-gap {
     background: repeating-linear-gradient(
@@ -4196,34 +4178,20 @@ function renderGoodsPane() {
   if (gasTitleEl) gasTitleEl.textContent = 'Gas · ' + fullLbl[currentCounty];
 
   /* 1. Groceries card — price, a plain-English family-of-four sentence,
-     and a share-of-income bar. This used to be split across two widgets
-     (a card + a separate narrative banner below it showing the same
-     dollar figure and a near-duplicate bar); the sentence now folds
-     directly into the card, same as the coverage line on the housing
-     SFH/Condo cards. */
+     and a share-of-income bar. No severity tiers or "Cost-burdened" /
+     "Stretched" / "Affordable" labels — those depended on an 8%/10%
+     income-share cutoff that isn't a sourced, citable figure for
+     groceries (unlike housing's HUD 30% cost-burden standard elsewhere
+     on this dashboard), so the card just reports the share plainly. */
   const sharePct = displayShare * 100;
   const SHARE_SCALE = 100;
-  const shareTickAt = 10 / SHARE_SCALE * 100;
-  const shareBadgeCls = sharePct >= 10 ? 'num-badge--coral'
-                      : sharePct >= 8  ? 'num-badge--amber'
-                      :                  'num-badge--green';
   const familyPhrase = currentCounty === 'State'
     ? 'a family of four statewide'
     : `a family of four in ${fullLbl[currentCounty]}`;
 
   /* 2. Paired cards — Groceries + Gas */
-  const grocVerdict = displayShare >= 0.10 ? { cls:'chip--coral', lbl:'Cost-burdened' }
-                    : displayShare >= 0.08 ? { cls:'chip--amber', lbl:'Stretched' }
-                    :                        { cls:'chip--green', lbl:'Affordable' };
-  // Bar: 0–SHARE_SCALE% of income scale. The tick and the Affordable /
-  // Stretched / Cost-burdened labels reflect this dashboard's own color
-  // cutoffs (8% / 10%) — not an external or official standard; see the
-  // chip tooltip below.
   const grocSharePct = displayShare * 100;
   const grocFillPct = Math.min(grocSharePct / SHARE_SCALE * 100, 100);
-  const grocGapPct = 100 - grocFillPct;
-  const grocFillCls = 'mcard-v2-bar-income '
-    + (grocSharePct >= 10 ? 'is-burden' : grocSharePct >= 8 ? 'is-stretched' : 'is-ok');
   const monthlyFmt = '$' + displayMonthly.toLocaleString();
   const monthlyDisplayTxt = '$' + displayMonthly.toLocaleString() + '/mo';
   // BLS CE PUMD side-statistic — actual measured monthly food-at-home for
@@ -4243,15 +4211,10 @@ function renderGoodsPane() {
       <div class="mcard-v2-coverage">This is about what ${familyPhrase} spends on groceries each month.</div>
       <div class="mcard-v2-idx-row">
         <span class="mcard-v2-idx-lbl">Share of median income</span>
-        <span class="num-badge ${shareBadgeCls}">${grocSharePct.toFixed(1)}%</span>
+        <span class="num-badge num-badge--outline">${grocSharePct.toFixed(1)}%</span>
       </div>
       <div class="mcard-v2-bar">
-        <div class="${grocFillCls}" style="width:${grocFillPct.toFixed(1)}%"></div>
-        ${grocGapPct > 0 ? '<div class="mcard-v2-bar-gap" style="width:' + grocGapPct.toFixed(1) + '%"></div>' : ''}
-        <div class="mcard-v2-bar-tick" style="left:${shareTickAt.toFixed(1)}%"></div>
-      </div>
-      <div class="mcard-v2-footer">
-        <span class="chip tip-wrap ${grocVerdict.cls}" data-tip="Color reflects how much of income groceries take up: under 8% is comfortable, 8–10% is stretched, 10%+ is a heavy burden — this dashboard's own color cutoffs, not an official standard, since food has less room to cut than housing.">${grocVerdict.lbl}</span>
+        <div class="mcard-v2-bar-income" style="width:${grocFillPct.toFixed(1)}%"></div>
       </div>
     </div>`;
 
