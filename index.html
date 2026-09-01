@@ -1372,6 +1372,16 @@
   .mcard-v2-bar-income.is-affordable {
     background: linear-gradient(90deg, var(--seafoam-400), var(--seafoam-200));
   }
+  /* Severity-tiered fill for the Groceries card's own bar — mirrors
+     .goods-share-fill's is-ok/is-stretched/is-burden palette so a
+     cost-burdened value never reads as green ("positive"). */
+  .mcard-v2-bar-income.is-ok {
+    background: linear-gradient(90deg, var(--seafoam-500), var(--seafoam-700));
+  }
+  .mcard-v2-bar-income.is-stretched { background: var(--amber); }
+  .mcard-v2-bar-income.is-burden {
+    background: linear-gradient(90deg, var(--coral-300), var(--coral-500));
+  }
   .mcard-v2-bar-gap {
     background: repeating-linear-gradient(
       45deg,
@@ -4274,8 +4284,8 @@ function renderGoodsPane() {
   const grocSharePct = displayShare * 100;
   const grocFillPct = Math.min(grocSharePct / SHARE_SCALE * 100, 100);
   const grocGapPct = 100 - grocFillPct;
-  const grocAffordable = grocSharePct < 10;
-  const grocFillCls = 'mcard-v2-bar-income' + (grocAffordable ? ' is-affordable' : '');
+  const grocFillCls = 'mcard-v2-bar-income '
+    + (grocSharePct >= 10 ? 'is-burden' : grocSharePct >= 8 ? 'is-stretched' : 'is-ok');
   const monthlyFmt = '$' + displayMonthly.toLocaleString();
   const monthlyDisplayTxt = '$' + displayMonthly.toLocaleString() + '/mo';
   // BLS CE PUMD side-statistic — actual measured monthly food-at-home for
