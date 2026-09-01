@@ -4245,15 +4245,25 @@ function renderGoodsPane() {
       on groceries —
       <span class="num-badge ${shareBadgeCls}">${sharePct.toFixed(1)}%</span>
       of median household income goes to food alone.
+    </div>
+    <div class="goods-share-legend">
+      <span>0%</span>
+      <span class="goods-share-legend-mid">10% &middot; cost-burden threshold</span>
+      <span>${SHARE_SCALE}%</span>
+    </div>
+    <div class="goods-share-track tip-wrap" data-tip="10% of income spent on groceries alone is this dashboard's cost-burden threshold (8–10% = stretched) — set well below housing's 30% HUD standard, since food has far less room to cut.">
+      <div class="goods-share-fill ${shareFillCls}" style="width:${shareFillW}%"></div>
+      <div class="goods-share-tick" style="left:${shareTickAt}%"></div>
     </div>`;
 
   /* 2. Paired cards — Groceries + Gas */
   const grocVerdict = displayShare >= 0.10 ? { cls:'chip--coral', lbl:'Cost-burdened' }
                     : displayShare >= 0.08 ? { cls:'chip--amber', lbl:'Stretched' }
                     :                        { cls:'chip--green', lbl:'Affordable' };
-  // Bar: 0–15% of income scale, 10% threshold for burdened.
+  // Bar: 0–SHARE_SCALE% of income scale (matches the narrative snapshot
+  // bar above), 10% threshold for burdened.
   const grocSharePct = displayShare * 100;
-  const grocFillPct = Math.min(grocSharePct / 15 * 100, 100);
+  const grocFillPct = Math.min(grocSharePct / SHARE_SCALE * 100, 100);
   const grocGapPct = 100 - grocFillPct;
   const grocAffordable = grocSharePct < 10;
   const grocFillCls = 'mcard-v2-bar-income' + (grocAffordable ? ' is-affordable' : '');
@@ -4282,7 +4292,7 @@ function renderGoodsPane() {
         ${grocGapPct > 0 ? '<div class="mcard-v2-bar-gap" style="width:' + grocGapPct.toFixed(1) + '%"></div>' : ''}
       </div>
       <div class="mcard-v2-footer">
-        <span class="chip ${grocVerdict.cls}">${grocVerdict.lbl}</span>
+        <span class="chip tip-wrap ${grocVerdict.cls}" data-tip="Groceries are 'cost-burdened' at ≥10% of income (8–10% = 'stretched') — this dashboard's own threshold, set well below housing's 30% HUD standard since food has far less room to cut.">${grocVerdict.lbl}</span>
       </div>
     </div>`;
 
@@ -4343,7 +4353,7 @@ function renderGoodsPane() {
       const cShare  = cTfpMo ? (cTfpMo * 12) / cIncome : gd.groceryShareOfIncome;
       const cMonthly = cTfpMo ? Math.round(cTfpMo) : (gd.monthlyFamily4 || 0);
       const sharePct = cShare * 100;
-      const shareFill = Math.min(sharePct / 15 * 100, 100);
+      const shareFill = Math.min(sharePct / SHARE_SCALE * 100, 100);
       const shareClr = sharePct > 10 ? 'var(--coral)' : sharePct > 8 ? 'var(--amber)' : 'var(--green)';
       const gasRatio = avgGas > 0 && gx.regular ? (gx.regular / avgGas) : 1;
       const gasPct = Math.max(0, Math.min(100, (gasRatio - 0.85) / 0.30 * 100));
@@ -5692,7 +5702,7 @@ if (housingDetail && rlbChart) {
   }, { threshold: 0.05, rootMargin: '0px 0px -10px 0px' });
 
   const GROUPS = [
-    '#housing-pair-grid', '#afford-banner',
+    '#housing-pair-grid', '#goods-pair-grid', '#afford-banner',
     '#pti-bars', '#rent-grid',
     '#build-auth-bars',
     '#goods-county-compare-groc', '#goods-county-compare-gas',
