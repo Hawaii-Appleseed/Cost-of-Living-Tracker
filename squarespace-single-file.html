@@ -1343,12 +1343,21 @@
     margin-left: 2px;
   }
   .mcard-v2-bar {
+    position: relative;
     height: 8px;
     background: var(--bar-track);
     border-radius: 999px;
     overflow: hidden;
     display: flex;
     margin-bottom: 14px;
+  }
+  .mcard-v2-bar-tick {
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 2px;
+    background: rgba(7, 56, 74, 0.45);
+    z-index: 3;
+    pointer-events: none;
   }
   .mcard-v2-bar-income {
     /* Seafoam by default — paired housing/goods cards always show the
@@ -4227,7 +4236,7 @@ function renderGoodsPane() {
     ? `USDA Thrifty Food Plan · county-adjusted · post-tax retail`
     : `Tracked basket · post-tax retail`;
   const sharePct = displayShare * 100;
-  const SHARE_SCALE = 20;
+  const SHARE_SCALE = 100;
   const shareFillW = Math.min(sharePct / SHARE_SCALE * 100, 100);
   const shareTickAt = 10 / SHARE_SCALE * 100;
   const shareFillCls = sharePct >= 10 ? 'is-burden' : sharePct >= 8 ? 'is-stretched' : 'is-ok';
@@ -4290,6 +4299,7 @@ function renderGoodsPane() {
       <div class="mcard-v2-bar">
         <div class="${grocFillCls}" style="width:${grocFillPct.toFixed(1)}%"></div>
         ${grocGapPct > 0 ? '<div class="mcard-v2-bar-gap" style="width:' + grocGapPct.toFixed(1) + '%"></div>' : ''}
+        <div class="mcard-v2-bar-tick" style="left:${shareTickAt.toFixed(1)}%"></div>
       </div>
       <div class="mcard-v2-footer">
         <span class="chip tip-wrap ${grocVerdict.cls}" data-tip="Groceries are 'cost-burdened' at ≥10% of income (8–10% = 'stretched') — this dashboard's own threshold, set well below housing's 30% HUD standard since food has far less room to cut.">${grocVerdict.lbl}</span>
