@@ -1094,6 +1094,14 @@
   .goods-detail[open] > summary::before { transform: rotate(90deg); }
   .goods-detail > summary:hover { color: var(--ocean); }
   .goods-detail-body { margin-top: 16px; display: flex; flex-direction: column; gap: 20px; }
+  .goods-detail-heading {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-mid);
+    padding: 6px 0;
+  }
 
   .mcard-v2-header {
     display: flex;
@@ -3517,24 +3525,13 @@
   </section><!-- /#pane-housing -->
 
   <section id="pane-goods" class="pane" role="tabpanel">
-    <div id="goods-narrative" class="afford-banner"></div>
-
     <div class="metrics-container">
       <div class="metrics-container-title">Groceries &middot; {{county}}</div>
       <div class="housing-pair-grid" id="goods-pair-grid" style="grid-template-columns:1fr;"></div>
       <div class="affordability-note">Groceries are family-of-4 post-tax retail (USDA TFP, built from BLS Urban Hawaiʻi food-at-home CPI which already includes <span class="gloss" data-gloss="GET">GET</span>).</div>
     </div>
 
-    <div class="staple-items-panel">
-      <div class="card-title" style="margin-bottom:12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">Food Prices &middot; <span id="goods-staple-county-label">Statewide</span> <span class="gloss" data-gloss="foodPrices" tabindex="0" role="button" aria-label="About food prices" style="font-size:16px;font-weight:400;opacity:0.6;cursor:pointer;">ⓘ</span></div>
-      <div class="staple-items-grid" id="goods-staple-items"></div>
-    </div>
-
-    <div class="card" style="margin-top:22px;">
-      <div class="card-title">Groceries by county</div>
-      <div class="card-sub">Share of median 4-person income</div>
-      <div id="goods-county-compare-groc"></div>
-    </div>
+    <div id="goods-narrative" class="afford-banner"></div>
 
     <div class="calc-section" style="margin-top:22px;">
       <div class="card-title" style="margin-bottom:10px;">Grocery cost by household size</div>
@@ -3542,8 +3539,13 @@
       <div class="hh-compact-out" id="goods-hh-out"></div>
     </div>
 
-    <details class="goods-detail" id="goods-detail-disclosure">
-      <summary>Basket breakdown &amp; methodology</summary>
+    <div class="staple-items-panel">
+      <div class="card-title" style="margin-bottom:12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">Food Prices &middot; <span id="goods-staple-county-label">Statewide</span> <span class="gloss" data-gloss="foodPrices" tabindex="0" role="button" aria-label="About food prices" style="font-size:16px;font-weight:400;opacity:0.6;cursor:pointer;">ⓘ</span></div>
+      <div class="staple-items-grid" id="goods-staple-items"></div>
+    </div>
+
+    <div class="goods-detail" id="goods-detail-disclosure">
+      <div class="goods-detail-heading">Basket breakdown &amp; methodology</div>
       <div class="goods-detail-body">
         <div class="card">
           <div class="card-title">Spending by category</div>
@@ -3574,7 +3576,13 @@
           </span>
         </div>
       </div>
-    </details>
+    </div>
+
+    <div class="card" style="margin-top:22px;">
+      <div class="card-title">Groceries by county</div>
+      <div class="card-sub">Share of median 4-person income</div>
+      <div id="goods-county-compare-groc"></div>
+    </div>
 
     <div class="metrics-container" style="margin-top:22px;">
       <div class="metrics-container-title" id="goods-gas-title">Gas &middot; {{county}}</div>
