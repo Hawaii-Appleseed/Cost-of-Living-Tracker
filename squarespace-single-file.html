@@ -3480,8 +3480,6 @@
           <strong style="color:var(--text);">Methodology</strong><br>
           <span id="goods-methodology-body">
             Headline grocery figures are anchored to the <span class="gloss" data-gloss="USDA">USDA</span> <strong><span class="gloss" data-gloss="thriftyFoodPlan">Thrifty Food Plan</span></strong> for Hawaiʻi — a federally calibrated minimum-cost food budget for the reference family of four (two adults 20–50, two children ages 6–8 and 9–11). County-level variation comes from our priced staple basket below (Honolulu = 100 index). The USDA TFP for Hawaiʻi is built from BLS Urban Hawaiʻi food-at-home CPI, which BLS collects with sales and excise taxes already included — so Hawaiʻi's 4.5% <span class="gloss" data-gloss="GET">GET</span> is already reflected in the published figure (no separate tax multiplier is applied).
-            <br><br>
-            Our tracked basket covers staple SKUs collected from member/loyalty pricing at Foodland (Maikaʻi), Safeway (Club Card), Costco, Walmart, Target, and Don Quijote, then combined using per-county market-share weights derived from USDA SNAP retailer data. It is a <strong>price index</strong>, not a complete household food budget — useful for comparing counties month-to-month. The USDA <span class="gloss" data-gloss="TFP">TFP</span> number reflects the full household food basket as calibrated by USDA.
           </span>
           <br><br>
           <strong style="color:var(--text);">Data sources</strong><br>
@@ -4334,12 +4332,9 @@ function renderGoodsDetail(g) {
       provEl = document.getElementById('goods-methodology-provenance');
     }
     if (tfp) {
-      provEl.innerHTML = 'Our tracked basket for ' + fullLbl[currentCounty] +
-        ' is <strong>' + fmt(g.basketWithTax) + '/wk</strong> (' + fmt(g.monthlyFamily4) +
-        '/mo). TFP source: ' + formatMonth(tfp.hawaii.latestPeriod) + ' USDA CNPP AK-HI report.';
+      provEl.innerHTML = 'TFP source: ' + formatMonth(tfp.hawaii.latestPeriod) + ' USDA CNPP AK-HI report.';
     } else {
-      provEl.innerHTML = 'Tracked basket for ' + fullLbl[currentCounty] +
-        ': <strong>' + fmt(g.basketWithTax) + '/wk</strong> (' + fmt(g.monthlyFamily4) + '/mo).';
+      provEl.innerHTML = '';
     }
   }
 
