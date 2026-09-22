@@ -2332,6 +2332,26 @@
     margin-top: 1.25rem;
   }
 
+  /* Community price-submission call to action (grocery note box) */
+  .contribute-cta {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 11px 20px;
+    background: var(--ocean-700);
+    color: #fff;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.35;
+    text-decoration: none;
+    border-radius: 999px;
+    transition: background 0.15s ease;
+  }
+  .contribute-cta:hover,
+  .contribute-cta:focus-visible { background: var(--ocean-900); }
+  @media (max-width: 520px) {
+    .contribute-cta { display: block; text-align: center; font-size: 16px; padding: 12px 14px; }
+  }
+
   .divider-label {
     font-size: 19px;
     color: var(--text-lt);
@@ -3468,7 +3488,9 @@
         </div>
         <div class="note-box">
           <strong style="color:var(--text);">A note on these numbers</strong><br>
-          We want this dashboard to reflect what people are actually paying and how it&rsquo;s landing on working families&rsquo; budgets, not just an average. We&rsquo;re developing a way for community members to contribute their own grocery receipts and price photos &mdash; helping us build both a more localized picture of these basket prices and a localized, community-sourced breakdown of spending by category. Stay tuned.
+          We want this dashboard to reflect what people are actually paying and how it&rsquo;s landing on working families&rsquo; budgets, not just an average. You can help: send us a photo of a receipt or a shelf price tag from your store, and we&rsquo;ll use it to build both a more localized picture of these basket prices and a community-sourced breakdown of spending by category. Every submission is reviewed by our team before it informs anything here.
+          <br>
+          <a class="contribute-cta" href="https://docs.google.com/forms/d/e/1FAIpQLSf0rIvxEJnFRJ-42cyl2SDnZyZiBls8SJVP278xg_8uZVTeaw/viewform" target="_blank" rel="noopener noreferrer">Submit a grocery price &rarr;</a>
         </div>
         <div class="card">
           <div class="card-title">Highest-priced basket items</div>
