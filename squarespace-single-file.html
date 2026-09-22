@@ -2352,6 +2352,26 @@
     .contribute-cta { display: block; text-align: center; font-size: 16px; padding: 12px 14px; }
   }
 
+  /* Grocery section header — title + submit-a-price CTA, top of pane-goods */
+  .goods-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .goods-header-row .metrics-container-title { margin-bottom: 0; }
+  .contribute-cta--top {
+    margin-top: 0;
+    padding: 8px 16px;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  @media (max-width: 520px) {
+    .contribute-cta--top { display: inline-block; width: 100%; text-align: center; }
+  }
+
   .divider-label {
     font-size: 19px;
     color: var(--text-lt);
@@ -3461,7 +3481,10 @@
 
   <section id="pane-goods" class="pane" role="tabpanel">
     <div class="metrics-container">
-      <div class="metrics-container-title">Groceries &middot; {{county}}</div>
+      <div class="goods-header-row">
+        <div class="metrics-container-title">Groceries &middot; {{county}}</div>
+        <a class="contribute-cta contribute-cta--top" href="https://docs.google.com/forms/d/e/1FAIpQLSf0rIvxEJnFRJ-42cyl2SDnZyZiBls8SJVP278xg_8uZVTeaw/viewform" target="_blank" rel="noopener noreferrer">Submit a grocery price &rarr;</a>
+      </div>
       <div class="housing-pair-grid" id="goods-pair-grid" style="grid-template-columns:1fr;"></div>
       <div class="affordability-note">Groceries are family-of-4 post-tax retail (USDA TFP, built from BLS Urban Hawaiʻi food-at-home CPI which already includes <span class="gloss" data-gloss="GET">GET</span>).</div>
     </div>
