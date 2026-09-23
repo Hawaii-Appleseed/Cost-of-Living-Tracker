@@ -7,8 +7,13 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 # ─── CONFIG ─────────────────────────────────────────────────────
-STATE_URL  = "https://redfin-public-data.s3.us-west-2.amazonaws.com/redfin_market_tracker/state_market_tracker.tsv000.gz"
-COUNTY_URL = "https://redfin-public-data.s3.us-west-2.amazonaws.com/redfin_market_tracker/county_market_tracker.tsv000.gz"
+# Redfin moved its downloads to the "Data Center Download Hub" in mid-2026: the
+# old redfin_market_tracker/*.tsv000.gz files stopped updating on 2026-06-02
+# (last period 2026-05), which tripped the housingPeriod freshness gate on
+# 9/22. The replacement is plain CSV with spaced column names — see
+# download_redfin_csv(). The county file is ~385 MB, so it is streamed.
+STATE_URL  = "https://redfin-public-data.s3.us-west-2.amazonaws.com/redfin_data_center/property_types/monthly/all_states.csv"
+COUNTY_URL = "https://redfin-public-data.s3.us-west-2.amazonaws.com/redfin_data_center/property_types/monthly/all_counties.csv"
 ZORI_URL   = "https://files.zillowstatic.com/research/public_csvs/zori/County_zori_uc_sfrcondomfr_sm_month.csv"
 DBEDT_URL  = "https://files.hawaii.gov/dbedt/economic/data_reports/qser/E-construction-tables.xlsx"
 
