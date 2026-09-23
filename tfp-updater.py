@@ -302,7 +302,7 @@ def try_fetch(url: str, timeout: int = 30) -> bytes | None:
 def fetch_pdf_by_slug(slug_prefix: str, today: date | None = None) -> tuple[bytes, str] | None:
     """Walk back through recent months trying slug variants.
 
-    slug_prefix is 'cnpp-costfood-alaskahawaii' or 'cnpp-costfood-tfp'.
+    slug_prefix is e.g. 'cnpp-costfood-alaskahawaii' or 'cnpp-costfood' (national).
     Returns (pdf_bytes, source_url) or None.
     """
     if today is None:
@@ -330,7 +330,12 @@ def fetch_pdf_via_index(slug_prefix: str) -> tuple[bytes, str] | None:
         return None
     html = body.decode("utf-8", errors="replace")
     # Find all hrefs matching the slug prefix and dated with month+year.
-    pattern = re.compile(rf'href="([^"]*{re.escape(slug_prefix)}[^"]*\.pdf)"', re.IGNORECASE)
+    # The month must follow the prefix directly: the national file is now
+    # plain "cnpp-costfood-<mon><yyyy>", so a looser match would also take
+    # "cnpp-costfood-alaskahawaii-…" or "cnpp-costfood-3levels-…".
+    months = "|".join(MONTHS_LONG + MONTHS)
+    pattern = re.compile(
+        rf'href="([^"]*{re.escape(slug_prefix)}-(?:{months})[a-z]*\d{{4}}\.pdf)"', re.IGNORECASE)
     hrefs = pattern.findall(html)
     if not hrefs:
         return None
@@ -519,7 +524,9 @@ def main() -> int:
             pdf_bytes2 = Path(args.pdf_us).read_bytes()
             us_url = f"file://{args.pdf_us}"
         else:
-            got = fetch_pdf("cnpp-costfood-tfp")
+            # USDA dropped "-tfp" from the national file's name by Jul 2026
+            # (cnpp-costfood-july2026.pdf); the old name now 404s.
+            got = fetch_pdf(["cnpp-costfood", "cnpp-costfood-tfp"])
             if not got:
                 raise RuntimeError("could not fetch national PDF")
             pdf_bytes2, us_url = got

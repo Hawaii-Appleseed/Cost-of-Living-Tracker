@@ -1,4 +1,4 @@
-"""Redfin S3 market-tracker TSVs → smoothed median sale prices."""
+"""Redfin S3 Data Center CSVs → smoothed median sale prices."""
 # Extracted from redfin-price-updater.py — see that file's docstring for the
 # pipeline overview. Behavior-preserving split; function bodies are unchanged.
 import csv
@@ -6,10 +6,54 @@ import gzip
 import io
 import statistics
 import sys
+import urllib.request
 
 from ha_common.http_client import fetch_bytes
 
 from .config import COUNTY_MAP, COUNTY_URL, PROP_TYPE_MAP, STATE_URL
+
+
+def download_redfin_csv(url: str, region_names: set[str]) -> list[dict]:
+    """Stream a Redfin Data Center CSV and return only the rows for
+    ``region_names``, re-keyed to the old market-tracker TSV columns so
+    extract_hawaii_prices() is unchanged.
+
+    The new files (2026) differ from the old TSVs in three ways that matter:
+    column names are spaced ("PERIOD BEGIN", "PROPERTY TYPE"); states are
+    identified by name ("Hawaii"), not code; and the sale price is
+    "MEDIAN SALE PRICE NSA ($)" — one row per region/type/month, no
+    seasonally-adjusted duplicate. Streaming matters: the county file is
+    ~385 MB and only ~700 of its rows are Hawaiʻi.
+
+    Note the level shift: on the overlapping months (2026-02..05) the new
+    statewide median runs ~3-4% above the old file for single-family and
+    ~1-7% below for condos — Redfin recomputed the history. Every value in the
+    3-month window comes from the same file, so the smoothed figure stays
+    internally consistent; it just steps once at the switch.
+    """
+    print(f"  Downloading {url.split('/')[-1]} (streaming, Hawaiʻi rows only)...")
+    req = urllib.request.Request(url, headers={"User-Agent": "cost-of-living-tracker"})
+    out = []
+    with urllib.request.urlopen(req, timeout=300) as resp:
+        lines = io.TextIOWrapper(resp, encoding="utf-8", newline="")
+        for row in csv.DictReader(lines):
+            name = row.get("REGION NAME", "")
+            if name not in region_names:
+                continue
+            if row.get("FREQUENCY", "Monthly") != "Monthly":
+                continue
+            out.append({
+                "REGION":            name,
+                "STATE_CODE":        "HI" if name == "Hawaii" else "",
+                "PROPERTY_TYPE":     row.get("PROPERTY TYPE", ""),
+                "MEDIAN_SALE_PRICE": row.get("MEDIAN SALE PRICE NSA ($)", ""),
+                "PERIOD_BEGIN":      row.get("PERIOD BEGIN", ""),
+                "PERIOD_DURATION":   "30",
+            })
+    if not out:
+        raise RuntimeError(f"no rows for {sorted(region_names)} in {url} — "
+                           "has Redfin renamed its columns again?")
+    return out
 
 
 def download_tsv(url: str) -> list[dict]:
@@ -105,8 +149,8 @@ def _fetch_sale_prices() -> dict:
     (no Hawaii data at all is unrecoverable).
     """
     print("Fetching Redfin housing market data...")
-    state_rows  = download_tsv(STATE_URL)
-    county_rows = download_tsv(COUNTY_URL)
+    state_rows  = download_redfin_csv(STATE_URL, {"Hawaii"})
+    county_rows = download_redfin_csv(COUNTY_URL, set(COUNTY_MAP))
     prices = {
         **extract_hawaii_prices(state_rows,  region_col="STATE_CODE", region_values={"HI": "State"}),
         **extract_hawaii_prices(county_rows, region_col="REGION",     region_values=COUNTY_MAP),
